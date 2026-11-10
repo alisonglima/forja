@@ -169,6 +169,46 @@ html { color-scheme: light dark; scroll-behavior: smooth; -webkit-text-size-adju
     --shadow: 0 18px 40px rgba(0, 0, 0, .35);
   }
 }
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fbf7ef;
+  --bg-2: #f3ebdd;
+  --surface: #fffdf8;
+  --surface-2: #f7f0e4;
+  --ink: #241f1a;
+  --muted: #6d6459;
+  --line: #e2d6c4;
+  --line-strong: #cdbda6;
+  --accent: #a94e27;
+  --accent-ink: #fff8f2;
+  --accent-soft: #f4ddcf;
+  --ok: #2f6a4c;
+  --ok-soft: #dcecdf;
+  --warn: #8a5a12;
+  --code-bg: #241f1a;
+  --code-ink: #f6eee2;
+  --shadow: 0 18px 40px rgba(60, 42, 24, .10);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #15120f;
+  --bg-2: #1b1713;
+  --surface: #211c17;
+  --surface-2: #2a241d;
+  --ink: #f3eadc;
+  --muted: #b8ab99;
+  --line: #3a3229;
+  --line-strong: #4d4236;
+  --accent: #e08a5f;
+  --accent-ink: #21150e;
+  --accent-soft: #3b291e;
+  --ok: #8bc7a4;
+  --ok-soft: #1e3327;
+  --warn: #e0b66a;
+  --code-bg: #0e0c0a;
+  --code-ink: #f3eadc;
+  --shadow: 0 18px 40px rgba(0, 0, 0, .35);
+}
 body {
   margin: 0;
   background: var(--bg);
@@ -209,7 +249,18 @@ pre code { background: none; border: 0; padding: 0; font-size: 1em; }
   background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
-.bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 13px 0; }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 0; flex-wrap: wrap; }
+.top nav { flex: 1 1 auto; }
+.top-actions { display: flex; align-items: center; gap: 8px; flex: none; margin-left: auto; }
+.repo-link, .theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 34px; padding: 6px 11px; border-radius: 999px;
+  border: 1px solid var(--line-strong); background: var(--surface); color: var(--muted);
+  text-decoration: none; font: 600 13px var(--sans); cursor: pointer;
+}
+.repo-link:hover, .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.theme-toggle { padding: 6px 10px; }
+.theme-icon { font-size: 15px; line-height: 1; }
 .brand {
   display: inline-flex; align-items: center; gap: 10px;
   font-family: var(--serif); font-size: 22px; color: var(--ink); text-decoration: none;
@@ -415,7 +466,8 @@ marker path { fill: var(--accent); }
 @media (max-width: 760px) {
   .top { position: static; }
   .bar { flex-wrap: wrap; gap: 10px; padding: 12px 0; }
-  .top nav ul { gap: 5px 14px; }
+  .top nav ul { gap: 5px 12px; }
+  .top-actions { width: 100%; justify-content: flex-end; margin-left: 0; }
   main > section { padding: 46px 0; scroll-margin-top: 20px; }
   .sec-head { flex-wrap: wrap; }
   .figure svg.diagram-wide { display: none; }
@@ -593,6 +645,13 @@ TEMPLATE = r"""<!doctype html>
         <li><a href="#problemas">Problemas</a></li>
       </ul>
     </nav>
+    <div class="top-actions">
+      <a class="repo-link" href="https://github.com/alisonglima/forja" target="_blank" rel="noopener noreferrer" aria-label="Abrir o repositório Forja no GitHub">GitHub</a>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Alternar tema claro e escuro" title="Alternar tema">
+        <span class="theme-icon" id="theme-icon" aria-hidden="true">◐</span>
+        <span class="theme-label">Tema</span>
+      </button>
+    </div>
   </div>
 </header>
 
@@ -1302,6 +1361,40 @@ TEMPLATE = r"""<!doctype html>
 </footer>
 
 <script>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  var key = "forja-theme";
+  var button = document.getElementById("theme-toggle");
+  var icon = document.getElementById("theme-icon");
+  function systemMode() {
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  function currentMode() {
+    return root.getAttribute("data-theme") || systemMode();
+  }
+  function paint() {
+    var mode = currentMode();
+    if (icon) icon.textContent = mode === "dark" ? "☀" : "☾";
+    if (button) {
+      button.title = mode === "dark" ? "Mudar para tema claro" : "Mudar para tema escuro";
+      button.setAttribute("aria-label", button.title);
+    }
+  }
+  try {
+    var saved = window.localStorage.getItem(key);
+    if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved);
+  } catch (error) { /* sem localStorage */ }
+  if (button) {
+    button.addEventListener("click", function () {
+      var next = currentMode() === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { window.localStorage.setItem(key, next); } catch (error) { /* sem localStorage */ }
+      paint();
+    });
+  }
+  paint();
+})();
 (function () {
   "use strict";
   function fallbackCopy(text) {

@@ -46,7 +46,9 @@ def test_embeds_every_prompt_verbatim_with_a_copy_button(tmp_path):
 
 def test_is_fully_offline(tmp_path):
     page = _build(tmp_path)
-    assert not re.search(r"""(?:src|href)\s*=\s*["']https?://""", page)
+    assert not re.search(r"""src\s*=\s*["']https?://""", page)
+    external_hrefs = re.findall(r"""href\s*=\s*["'](https?://[^"']+)""", page)
+    assert all(url == "https://github.com/alisonglima/forja" for url in external_hrefs)
     assert "@import" not in page and "fonts.googleapis" not in page
     assert not re.search(r"<script[^>]+src=", page, re.I)
 
@@ -92,3 +94,10 @@ def test_fails_clearly_when_a_prompt_dir_is_missing(tmp_path):
 
 def test_page_has_a_short_size(tmp_path):
     assert len(_build(tmp_path).encode("utf-8")) < 600_000
+
+
+def test_has_theme_toggle_and_repository_link(tmp_path):
+    page = _build(tmp_path)
+    assert 'id="theme-toggle"' in page
+    assert "https://github.com/alisonglima/forja" in page
+    assert 'data-theme="dark"' in page and 'data-theme="light"' in page

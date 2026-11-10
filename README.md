@@ -111,7 +111,7 @@ O kit é distribuído sob a **MIT License** (veja [`LICENSE`](LICENSE)). Depend�
 
 ## Contribuindo
 
-Issues e pull requests são bem-vindos. Leia [`CONTRIBUTING.md`](CONTRIBUTING.md) e [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Para reportar uma vulnerabilidade, use o canal privado descrito em [`SECURITY.md`](SECURITY.md).
+Issues e pull requests são bem-vindos. Leia [`CONTRIBUTING.md`](CONTRIBUTING.md) e [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Para reportar uma vulnerabilidade, use o canal privado descrito em [`SECURITY.md`](SECURITY.md). Para uma auditoria independente da implementação, use [`VALIDATION-PROMPT.md`](VALIDATION-PROMPT.md).
 
 ## Status
 
