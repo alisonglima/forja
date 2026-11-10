@@ -5,7 +5,41 @@ from pathlib import Path
 
 from . import ids
 
-LAYER_TYPES = ("clip", "narration", "captions", "card", "music", "sfx")
+LAYER_TYPES = ("clip", "narration", "captions", "card", "music", "sfx", "overlay")
+_OVERLAY_PRESETS = ("lower_third", "title", "callout", "quote", "cta", "logo", "stat")
+_OVERLAY_POSITIONS = (
+    "bottom-left",
+    "bottom-right",
+    "top-left",
+    "top-right",
+    "center",
+    "bottom-center",
+    "top-center",
+)
+_OVERLAY_DEFAULT_POSITION = {
+    "lower_third": "bottom-left",
+    "title": "center",
+    "callout": "bottom-right",
+    "quote": "center",
+    "cta": "bottom-center",
+    "logo": "top-right",
+    "stat": "top-left",
+}
+_OVERLAY_STYLE_KEYS = (
+    "primary",
+    "ink",
+    "paper",
+    "accent",
+    "font",
+    "font_size",
+    "radius",
+    "opacity",
+    "width",
+    "align",
+    "uppercase",
+    "shadow",
+)
+_HEX_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
 _FITS = ("cover", "contain")
 _ASSET_FIELDS = ("file", "asset", "track")
 _WORD_RE = re.compile(r"[^\w]+", re.UNICODE)
@@ -143,6 +177,107 @@ def _check_anchors(layer, scene_id, narration_text, issues):
             )
 
 
+def _check_overlay(layer, scene_id, issues):
+    label = _layer_label(layer, scene_id)
+    preset = layer.get("preset")
+    if preset not in _OVERLAY_PRESETS:
+        issues.append(
+            _issue(
+                "error",
+                label,
+                "OVERLAY_PRESET",
+                "preset de overlay invalido: %r (use %s)"
+                % (preset, ", ".join(_OVERLAY_PRESETS)),
+            )
+        )
+        return
+
+    text = layer.get("text")
+    subtext = layer.get("subtext")
+    if preset != "logo":
+        if not isinstance(text, str) or not text.strip():
+            issues.append(
+                _issue("error", label, "OVERLAY_TEXT", "overlay %s exige text" % preset)
+            )
+        elif len(text) > 280:
+            issues.append(
+                _issue("error", label, "OVERLAY_TEXT", "overlay.text passa de 280 caracteres")
+            )
+    if subtext is not None and (not isinstance(subtext, str) or len(subtext) > 120):
+        issues.append(
+            _issue("error", label, "OVERLAY_TEXT", "overlay.subtext deve ter ate 120 caracteres")
+        )
+
+    position = layer.get("position", _OVERLAY_DEFAULT_POSITION.get(preset))
+    if position not in _OVERLAY_POSITIONS:
+        issues.append(
+            _issue(
+                "error",
+                label,
+                "OVERLAY_POSITION",
+                "posicao de overlay invalida: %r" % (position,),
+            )
+        )
+
+    if preset == "logo":
+        asset = layer.get("asset")
+        if not isinstance(asset, str) or not asset:
+            issues.append(
+                _issue("error", label, "OVERLAY_ASSET", "overlay logo exige asset (PNG/SVG)")
+            )
+
+    hold_s = layer.get("hold_s")
+    if hold_s is not None and (not _is_number(hold_s) or float(hold_s) <= 0):
+        issues.append(
+            _issue("error", label, "OVERLAY_HOLD", "overlay.hold_s deve ser positivo")
+        )
+
+    style = layer.get("style")
+    if style is not None:
+        if not isinstance(style, dict):
+            issues.append(_issue("error", label, "OVERLAY_STYLE", "overlay.style deve ser mapeamento"))
+        else:
+            unknown = sorted(set(style) - set(_OVERLAY_STYLE_KEYS))
+            if unknown:
+                issues.append(
+                    _issue(
+                        "error",
+                        label,
+                        "OVERLAY_STYLE",
+                        "chaves de estilo desconhecidas: %s" % ", ".join(unknown),
+                    )
+                )
+            for key in ("primary", "ink", "paper", "accent"):
+                if key in style and (not isinstance(style[key], str) or not _HEX_RE.match(style[key])):
+                    issues.append(
+                        _issue("error", label, "OVERLAY_STYLE", f"style.{key} deve ser #RRGGBB")
+                    )
+            if "font" in style and (not isinstance(style["font"], str) or not style["font"].strip()):
+                issues.append(_issue("error", label, "OVERLAY_STYLE", "style.font invalido"))
+            if "font_size" in style:
+                value = style["font_size"]
+                if not _is_number(value) or not (12 <= float(value) <= 200):
+                    issues.append(_issue("error", label, "OVERLAY_STYLE", "style.font_size deve ficar entre 12 e 200"))
+            if "radius" in style:
+                value = style["radius"]
+                if not _is_number(value) or not (0 <= float(value) <= 80):
+                    issues.append(_issue("error", label, "OVERLAY_STYLE", "style.radius deve ficar entre 0 e 80"))
+            if "opacity" in style:
+                value = style["opacity"]
+                if not _is_number(value) or not (0 <= float(value) <= 1):
+                    issues.append(_issue("error", label, "OVERLAY_STYLE", "style.opacity deve ficar entre 0 e 1"))
+            if "width" in style:
+                value = style["width"]
+                if not _is_number(value) or not (40 <= float(value) <= 1200):
+                    issues.append(_issue("error", label, "OVERLAY_STYLE", "style.width deve ficar entre 40 e 1200"))
+            if "align" in style and style["align"] not in ("left", "center", "right"):
+                issues.append(_issue("error", label, "OVERLAY_STYLE", "style.align deve ser left, center ou right"))
+            if "uppercase" in style and not isinstance(style["uppercase"], bool):
+                issues.append(_issue("error", label, "OVERLAY_STYLE", "style.uppercase deve ser booleano"))
+            if "shadow" in style and not isinstance(style["shadow"], bool):
+                issues.append(_issue("error", label, "OVERLAY_STYLE", "style.shadow deve ser booleano"))
+
+
 def validate_storyboard(sb, root=None):
     issues = []
     if not isinstance(sb, dict):
@@ -231,6 +366,9 @@ def validate_storyboard(sb, root=None):
 
             if root is not None:
                 _check_asset(layer, scene_id, root, issues)
+
+            if layer_type == "overlay":
+                _check_overlay(layer, scene_id, issues)
 
             if layer_type == "music":
                 license_info = layer.get("license")
@@ -342,6 +480,9 @@ def resolve_timeline(sb, narration_s, words=None):
                 end = start + float(hold_s)
             else:
                 end = scene_end
+            if layer.get("type") == "overlay" and end > scene_end:
+                end = scene_end
+                warnings.append("overlay cortado no fim da cena")
             if (
                 layer.get("type") in ("narration", "captions")
                 and not isinstance(layer.get("enter"), dict)
@@ -367,6 +508,34 @@ def resolve_timeline(sb, narration_s, words=None):
         )
 
     return {"fps": fps, "total_s": cursor, "scenes": resolved}
+
+
+def caption_windows(timeline):
+    """Janelas de overlays na parte de baixo que devem levantar a legenda."""
+    windows = []
+    scenes = timeline.get("scenes") if isinstance(timeline, dict) else None
+    if not isinstance(scenes, list):
+        return windows
+    for scene in scenes:
+        if not isinstance(scene, dict):
+            continue
+        layers = scene.get("layers")
+        if not isinstance(layers, list):
+            continue
+        for layer in layers:
+            if not isinstance(layer, dict) or layer.get("type") != "overlay":
+                continue
+            position = str(
+                layer.get("position")
+                or _OVERLAY_DEFAULT_POSITION.get(layer.get("preset"), "")
+            )
+            if not position.startswith("bottom"):
+                continue
+            start = _as_float(layer.get("start"), _as_float(scene.get("start"), 0.0))
+            end = _as_float(layer.get("end"), _as_float(scene.get("end"), start))
+            if end > start:
+                windows.append([start, end])
+    return windows
 
 
 def _timestamp(seconds):

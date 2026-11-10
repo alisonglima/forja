@@ -34,12 +34,12 @@ case "$cmd" in
     df -h . | tail -1 ;;
   build) c build forja ;;
   new)
-    [ $# -eq 2 ] || { usage; exit 2; }
+    [ $# -ge 2 ] || { usage; exit 2; }
     case "$1" in
       ""|.*|*..*|*[!A-Za-z0-9._-]*) echo "ERRO: nome do projeto invalido (use letras, numeros, ponto, hifen ou sublinhado; sem / nem ..)"; exit 2;;
     esac
     mkdir -p projects; cp "$2" "projects/.entrada-$1.mp4"
-    c run --rm forja init "/projects/$1" --source "/projects/.entrada-$1.mp4"; rm -f "projects/.entrada-$1.mp4" ;;
+    c run --rm forja init "/projects/$1" --source "/projects/.entrada-$1.mp4" "${@:3}"; rm -f "projects/.entrada-$1.mp4" ;;
   run) c run --rm forja "$@" ;;
   shell) c run --rm --entrypoint bash forja ;;
   browser-up) c --profile browser up -d browser cdp-proxy; echo "tela: https://localhost:3001 (aceite o certificado) | CDP: http://127.0.0.1:9222" ;;

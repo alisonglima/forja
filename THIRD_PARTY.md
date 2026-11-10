@@ -49,6 +49,8 @@ depois do `npm install`; leia-o antes de usar o kit em uma empresa com mais de 3
 | imagem `lscr.io/linuxserver/chromium` (opcional) | latest | GPL-3.0 (repositório LinuxServer.io) | API do GitHub em 10/11/2026; componentes internos **a verificar** |
 | imagem `alpine/socat` (opcional) | latest | GPL-2.0 para o socat | **a verificar** no pacote Alpine |
 | modelo Whisper (baixado em runtime) | tiny/large conforme config | MIT (OpenAI Whisper) | repositório oficial do modelo |
+| piper-tts (TTS local opcional) | 1.8.0 | **GPL-3.0-or-later** | metadado do PyPI; o áudio gerado não herda a GPL |
+| voz pt-BR `pt_BR-faber-medium` | medium, 22.05 kHz | modelo/repositório MIT; dataset CC0 | `MODEL_CARD` do repositório `rhasspy/piper-voices`; SHA-256 fixado no Dockerfile |
 
 ## Serviços externos (não são dependências empacotadas)
 

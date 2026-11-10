@@ -6,6 +6,7 @@ import numpy as np
 import yaml
 from scipy.io import wavfile
 
+from .. import brief
 from .. import cues as cues_mod
 from .. import ids
 from .. import media, mixlib, probe, qa, schedule, storyboard as storyboard_mod, tts
@@ -243,6 +244,8 @@ def _remotion_entry(ctx):
 def _run_validate(ctx):
     sb = _load_storyboard(ctx)
     issues = storyboard_mod.validate_storyboard(sb, ctx.root)
+    issues.extend(brief.brief_issues(ctx.root))
+    issues.extend(brief.approval_issues(ctx.root, ("script", "overlays")))
     summary = qa.summarize(issues)
     _write_json(ctx.work / "validate.json", summary)
     if summary["errors"]:
@@ -320,6 +323,7 @@ def _run_timeline(ctx):
         storyboard_mod.to_srt(timeline, texts), encoding="utf-8"
     )
 
+    caption_windows = storyboard_mod.caption_windows(timeline)
     events = []
     for scene in timeline.get("scenes") or []:
         if not isinstance(scene, dict):
@@ -334,13 +338,19 @@ def _run_timeline(ctx):
                 break
         if captions is None:
             continue
+        start = float(captions.get("start", scene.get("start", 0.0)))
+        end = float(captions.get("end", scene.get("end", 0.0)))
+        raised = any(
+            max(start, window[0]) < min(end, window[1])
+            for window in caption_windows
+        )
         events.append(
             {
-                "start": float(captions.get("start", scene.get("start", 0.0))),
-                "end": float(captions.get("end", scene.get("end", 0.0))),
+                "start": start,
+                "end": end,
                 "lines": lines,
                 "narrador": False,
-                "raised": False,
+                "raised": raised,
             }
         )
     _write_json(ctx.work / "subs.json", events)
@@ -420,6 +430,7 @@ def _run_mix(ctx):
 
 
 def _run_render(ctx):
+    brief.require_approvals(ctx.root, ctx.cfg, ("script", "voice", "overlays"))
     timeline = _read_json(ctx.work / "timeline.json", {})
     events = _read_json(ctx.work / "subs.json", [])
     sb = _load_storyboard(ctx)
@@ -431,11 +442,12 @@ def _run_render(ctx):
     props = {
         "timeline": timeline,
         "subs": events,
-        "lowerThirds": [],
+        "lowerThirds": storyboard_mod.caption_windows(timeline),
         "fps": canvas.get("fps", render_cfg.get("fps", 30)),
         "width": canvas.get("w", render_cfg.get("width", 1280)),
         "height": canvas.get("h", render_cfg.get("height", 720)),
         "fontSize": render_cfg.get("font_size", 32),
+        "brand": ctx.cfg.get("brand") or {},
         "durationS": total,
     }
     entry, template = _remotion_entry(ctx)
@@ -657,7 +669,7 @@ def steps_factory():
 
 
 FILES = {
-    "agent_writes": ["storyboard.yaml", "config.yaml", "voices/<cena>.wav"],
+    "agent_writes": ["storyboard.yaml", "config.yaml", "voices/<cena>.wav", "brief.yaml", "approvals.json"],
     "generated": ["work/", "out/video.mp4", "out/legendas.srt", "out/qa.json"],
 }
 

@@ -18,11 +18,12 @@ switch ($Cmd) {
     if ((Test-Path .env) -and ((Get-Content .env -Raw) -match '(?m)^GEMINI_API_KEY=.+')) { "GEMINI_API_KEY: definida (opcional)" } else { "GEMINI_API_KEY: ausente (opcional; o padrao e o provider files)" } }
   "build" { C build forja }
   "new" {
-    if ($Rest.Count -ne 2) { throw "uso: .\kit.ps1 new <nome> <video>" }
+    if ($Rest.Count -lt 2) { throw "uso: .\kit.ps1 new <nome> <video> [opcoes do init]" }
     if ($Rest[0] -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$' -or $Rest[0] -match '\.\.') { throw "nome do projeto invalido (use letras, numeros, ponto, hifen ou sublinhado; sem / nem ..)" }
     New-Item -ItemType Directory -Force projects | Out-Null
     Copy-Item -LiteralPath $Rest[1] "projects/.entrada-$($Rest[0]).mp4"
-    C run --rm forja init "/projects/$($Rest[0])" --source "/projects/.entrada-$($Rest[0]).mp4"
+    $extra = @(); if ($Rest.Count -gt 2) { $extra = $Rest[2..($Rest.Count - 1)] }
+    C run --rm forja init "/projects/$($Rest[0])" --source "/projects/.entrada-$($Rest[0]).mp4" @extra
     Remove-Item -LiteralPath "projects/.entrada-$($Rest[0]).mp4" -Force -ErrorAction SilentlyContinue }
   "run" { C run --rm forja @Rest }
   "shell" { C run --rm --entrypoint bash forja }

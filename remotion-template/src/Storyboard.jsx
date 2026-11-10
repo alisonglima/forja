@@ -1,5 +1,6 @@
 import { AbsoluteFill, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { Captions } from "./Captions.jsx";
+import { Overlay } from "./Overlay.jsx";
 
 const ClipLayer = ({ layer, width, height, fps }) => (
   <OffthreadVideo
@@ -52,13 +53,13 @@ const CardLayer = ({ layer, durationInFrames }) => {
   );
 };
 
-const Scene = ({ scene, fps, width, height }) => (
+const Scene = ({ scene, fps, width, height, brand }) => (
   <Sequence
     from={Math.round(scene.start * fps)}
     durationInFrames={Math.max(1, Math.round((scene.end - scene.start) * fps))}
   >
     {scene.layers.map((layer, i) => {
-      if (layer.type !== "clip" && layer.type !== "card") return null;
+      if (layer.type !== "clip" && layer.type !== "card" && layer.type !== "overlay") return null;
 
       const start = layer.start ?? scene.start;
       const end = layer.end ?? scene.end;
@@ -70,7 +71,15 @@ const Scene = ({ scene, fps, width, height }) => (
           from={Math.max(0, Math.round((start - scene.start) * fps))}
           durationInFrames={durationInFrames}
         >
-          {layer.type === "clip" ? (
+          {layer.type === "overlay" ? (
+            <Overlay
+              layer={layer}
+              brand={brand}
+              width={width}
+              height={height}
+              durationInFrames={durationInFrames}
+            />
+          ) : layer.type === "clip" ? (
             <ClipLayer layer={layer} width={width} height={height} fps={fps} />
           ) : (
             <CardLayer layer={layer} durationInFrames={durationInFrames} />
@@ -81,10 +90,10 @@ const Scene = ({ scene, fps, width, height }) => (
   </Sequence>
 );
 
-export const Storyboard = ({ timeline, subs = [], lowerThirds = [], fps, width, height, fontSize = 32 }) => (
+export const Storyboard = ({ timeline, subs = [], lowerThirds = [], brand = {}, fps, width, height, fontSize = 32 }) => (
   <AbsoluteFill style={{ backgroundColor: "#000" }}>
     {(timeline?.scenes ?? []).map((scene, i) => (
-      <Scene key={scene.id ?? i} scene={scene} fps={fps} width={width} height={height} />
+      <Scene key={scene.id ?? i} scene={scene} fps={fps} width={width} height={height} brand={brand} />
     ))}
     <Captions
       subs={subs}

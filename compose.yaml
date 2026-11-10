@@ -40,7 +40,8 @@ services:
       CUSTOM_USER: "${BROWSER_USER:-forja}"
       PASSWORD: "${BROWSER_PASSWORD:?rode ./kit.sh setup antes}"
       # O CDP do Chromium so escuta em 127.0.0.1 DENTRO do container (a flag --remote-debugging-address e ignorada).
-      CHROME_CLI: "--remote-debugging-port=9222 https://aistudio.google.com/"
+      # Abra a interface do provedor que voce escolher. Ex.: https://aistudio.google.com/
+      CHROME_CLI: "--remote-debugging-port=9222 ${BROWSER_START_URL:-about:blank}"
     volumes:
       - chromium-config:/config          # perfil logado: fica no volume, nunca na imagem
     ports:

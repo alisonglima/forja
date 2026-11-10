@@ -39,6 +39,7 @@ export const Root = () => (
         timeline: { fps: 30, total_s: 1, scenes: [] },
         subs: [],
         lowerThirds: [],
+        brand: {},
         durationS: 5,
         fps: 30,
         width: 1280,

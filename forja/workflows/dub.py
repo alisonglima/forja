@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 from scipy.io import wavfile
 
+from .. import brief
 from .. import cues as cues_mod
 from .. import ids
 from .. import media, mixlib, probe, qa, render, schedule, subs, transcribe, tts
@@ -170,6 +171,8 @@ def _run_transcribe(ctx):
 def _run_check(ctx):
     cues = cues_mod.load_cues(ctx.root / "cues.json")
     issues = cues_mod.validate_cues(cues, ctx.cfg)
+    issues.extend(brief.brief_issues(ctx.root))
+    issues.extend(brief.approval_issues(ctx.root, ("script", "voice")))
     summary = qa.summarize(issues)
     _write_json(ctx.work / "check.json", summary)
     if summary["errors"]:
@@ -301,6 +304,7 @@ def _run_mix(ctx):
 
 
 def _run_render(ctx):
+    brief.require_approvals(ctx.root, ctx.cfg, ("script", "voice"))
     events = _read_json(ctx.work / "subs.json", [])
     lower_thirds = _lower_thirds(ctx)
     clip_info = _read_json(ctx.work / "clip.json", {})
@@ -582,7 +586,7 @@ def steps_factory():
 
 
 FILES = {
-    "agent_writes": ["cues.json", "lower_thirds.json", "config.yaml", "voices/<id>.wav"],
+    "agent_writes": ["cues.json", "lower_thirds.json", "config.yaml", "voices/<id>.wav", "brief.yaml", "approvals.json"],
     "generated": ["work/", "out/video.mp4", "out/legendas.srt", "out/qa.json"],
 }
 

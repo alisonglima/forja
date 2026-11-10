@@ -4,7 +4,7 @@ import os
 import shutil
 from pathlib import Path
 
-from . import cache, config, errors
+from . import brief, cache, config, errors
 
 _DIRS = ("input", "voices", "work", "out")
 _SOURCE_NAME = "source.mp4"
@@ -96,13 +96,39 @@ def _agent_files_md(workflow: str) -> str:
         return (
             "- `storyboard.yaml`: cenas, camadas (clip, narration, captions, card, music), duracoes e licencas.\n"
             "- `assets/`: clipes, cards (PNG) e trilhas usados pelo storyboard (caminhos relativos a raiz).\n"
-            "- `voices/<cena>.wav`: a narracao de cada cena, gerada por voce com a conta/ferramenta do usuario (provider `files`).\n"
+            "- `voices/<cena>.wav`: a narracao de cada cena, gerada por voce com a conta/ferramenta do usuario (provider `files`) ou pelo Piper local.\n"
+            "- `brief.yaml`: objetivo, publico, tom e restricoes definidos pelo humano.\n"
+            "- `approvals.json`: aprovacoes humanas de roteiro, voz, overlays e publicacao.\n"
         )
     return (
         "- `cues.json`: falas, papeis e textos em pt-BR.\n"
         "- `lower_thirds.json`: janelas de tarja de nome no original.\n"
-        "- `voices/<id>.wav`: a voz de cada cue, gerada por voce com a conta/ferramenta do usuario (provider `files`).\n"
+        "- `voices/<id>.wav`: a voz de cada cue, gerada por voce com a conta/ferramenta do usuario (provider `files`) ou pelo Piper local.\n"
+        "- `brief.yaml`: objetivo, publico, tom e restricoes definidos pelo humano.\n"
+        "- `approvals.json`: aprovacoes humanas de roteiro, voz, overlays e publicacao.\n"
     )
+
+
+BRIEF_STARTER = """# Preencha com o humano antes de criar o roteiro. O kit valida e avisa, mas a decisao e humana.
+version: 1
+objective: ""
+audience: ""
+tone: ""
+duration_s: null
+must_include: []
+must_avoid: []
+consent: false
+"""
+
+APPROVALS_STARTER = """{
+  "script": false,
+  "voice": false,
+  "overlays": false,
+  "publish": false,
+  "by": "",
+  "at": ""
+}
+"""
 
 
 STORYBOARD_STARTER = """# Storyboard (versao 1). Edite as cenas; rode `forja --json status` para ver o proximo passo.
@@ -118,7 +144,7 @@ scenes:
 """
 
 
-def scaffold(root, name, source=None, workflow="dub", force=False) -> list[str]:
+def scaffold(root, name, source=None, workflow="dub", force=False, require_approvals=False) -> list[str]:
     """Cria o esqueleto de um projeto e devolve caminhos relativos."""
     root = Path(root)
     if root.exists() and not root.is_dir():
@@ -142,9 +168,18 @@ def scaffold(root, name, source=None, workflow="dub", force=False) -> list[str]:
         config_path.unlink()
     config.write_default_config(
         config_path,
-        project={"name": str(name), "workflow": str(workflow)},
+        project={
+            "name": str(name),
+            "workflow": str(workflow),
+            "require_approvals": bool(require_approvals),
+        },
     )
     created.append(_relative(root, config_path))
+
+    for filename, content in ((brief.BRIEF_FILE, BRIEF_STARTER), (brief.APPROVALS_FILE, APPROVALS_STARTER)):
+        path = root / filename
+        _write_text(path, content)
+        created.append(_relative(root, path))
 
     if workflow == "storyboard":
         (root / "assets").mkdir(parents=True, exist_ok=True)

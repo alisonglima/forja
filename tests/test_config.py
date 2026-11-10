@@ -210,3 +210,47 @@ def test_load_config_accepts_a_registered_tts_provider(tmp_path):
         assert config.load_config(path)["voices"]["provider"] == "custom-test"
     finally:
         registry.reset_for_tests()
+
+
+def test_default_brand_theme_is_documented():
+    from forja import config
+
+    brand = config.DEFAULTS["brand"]
+    assert brand["primary"].startswith("#") and brand["font"]
+    assert brand["safe_margin"] >= 0
+
+
+def test_load_config_rejects_bad_brand_color(tmp_path):
+    from forja import config
+
+    path = _write(tmp_path, "brand:\n  primary: vermelho\n")
+    with pytest.raises(config.ConfigError) as excinfo:
+        config.load_config(path)
+    assert "brand.primary" in str(excinfo.value)
+
+
+def test_load_config_rejects_brand_logo_escape(tmp_path):
+    from forja import config
+
+    path = _write(tmp_path, "brand:\n  logo: ../fora.png\n")
+    with pytest.raises(config.ConfigError) as excinfo:
+        config.load_config(path)
+    assert "brand.logo" in str(excinfo.value)
+
+
+def test_load_config_accepts_piper_with_defaults(tmp_path):
+    from forja import config
+
+    path = _write(tmp_path, "voices:\n  provider: piper\n")
+    loaded = config.load_config(path)
+    assert loaded["voices"]["provider"] == "piper"
+    assert loaded["voices"]["piper"]["model"].endswith(".onnx")
+
+
+def test_load_config_rejects_piper_bad_length_scale(tmp_path):
+    from forja import config
+
+    path = _write(tmp_path, "voices:\n  provider: piper\n  piper:\n    length_scale: 3\n")
+    with pytest.raises(config.ConfigError) as excinfo:
+        config.load_config(path)
+    assert "length_scale" in str(excinfo.value)

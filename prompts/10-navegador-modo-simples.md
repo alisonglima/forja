@@ -7,7 +7,7 @@ Fatos medidos que decidem o desenho:
 
 Passos:
 1. Descubra onde está o Chrome (`google-chrome`, `chromium`, caminho do Windows `%ProgramFiles%\Google\Chrome\Application\chrome.exe`, ou `/Applications/Google Chrome.app`).
-2. Abra com: `--user-data-dir=<pasta-do-perfil-dedicado> --remote-debugging-port=9222 --no-first-run --window-size=1280,900 --window-position=60,60 https://aistudio.google.com/` (ou a interface do provedor que eu escolher). A pasta do perfil fica fora do kit e **nunca** entra em backup nem em git.
+2. Abra com: `--user-data-dir=<pasta-do-perfil-dedicado> --remote-debugging-port=9222 --no-first-run --window-size=1280,900 --window-position=60,60 <INTERFACE_DO_SEU_PROVEDOR>` (ou a interface do provedor que eu escolher). A pasta do perfil fica fora do kit e **nunca** entra em backup nem em git.
 3. Espere eu fazer o login e me avise quando a página inicial aparecer.
 4. Confirme o CDP: `GET http://127.0.0.1:9222/json/version` deve responder com a versão do Chrome. A porta **nunca** pode ser exposta fora de `127.0.0.1` (ela não tem autenticação: quem alcança controla o navegador e as sessões logadas).
 5. Para controlar, use o **Playwright MCP** do seu agente apontando para `http://127.0.0.1:9222` (`npx @playwright/mcp@latest --cdp-endpoint http://127.0.0.1:9222`) ou o seu recurso de "computer use". Uma única instância por perfil.

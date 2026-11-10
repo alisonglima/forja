@@ -667,3 +667,80 @@ def test_validate_storyboard_reports_unsafe_scene_id():
 
     issues = storyboard.validate_storyboard(_sb(scenes=[_scene(scene_id="../PWNED")]))
     assert _has(issues, "BAD_ID")
+
+
+def test_validate_storyboard_accepts_a_lower_third_overlay():
+    from forja import storyboard
+
+    sb = _sb(scenes=[_scene(layers=[
+        _narration(),
+        _captions(),
+        {"type": "overlay", "preset": "lower_third", "text": "Ana", "subtext": "Diretora"},
+    ])])
+    assert storyboard.validate_storyboard(sb) == []
+
+
+def test_validate_storyboard_rejects_unknown_overlay_preset():
+    from forja import storyboard
+
+    sb = _sb(scenes=[_scene(layers=[
+        _narration(),
+        {"type": "overlay", "preset": "hologram", "text": "x"},
+    ])])
+    assert _has(storyboard.validate_storyboard(sb), "OVERLAY_PRESET")
+
+
+def test_validate_storyboard_requires_logo_asset():
+    from forja import storyboard
+
+    sb = _sb(scenes=[_scene(layers=[
+        _narration(),
+        {"type": "overlay", "preset": "logo"},
+    ])])
+    assert _has(storyboard.validate_storyboard(sb), "OVERLAY_ASSET")
+
+
+def test_validate_storyboard_rejects_bad_overlay_style():
+    from forja import storyboard
+
+    sb = _sb(scenes=[_scene(layers=[
+        _narration(),
+        {"type": "overlay", "preset": "title", "text": "x", "style": {"opacity": 2}},
+    ])])
+    assert _has(storyboard.validate_storyboard(sb), "OVERLAY_STYLE")
+
+
+def test_resolve_timeline_clips_overlay_at_scene_end():
+    from forja import storyboard
+
+    sb = _timeline_sb(
+        {
+            "id": "s1",
+            "duration": {"fixed_s": 3.0},
+            "layers": [
+                {"type": "overlay", "preset": "title", "text": "x", "hold_s": 10},
+            ],
+        }
+    )
+    timeline = storyboard.resolve_timeline(sb, {})
+    layer = timeline["scenes"][0]["layers"][0]
+    assert layer["end"] == pytest.approx(3.0)
+    assert "overlay cortado" in layer["warnings"][0]
+
+
+def test_caption_windows_uses_default_position_for_lower_third():
+    from forja import storyboard
+
+    timeline = {
+        "scenes": [
+            {
+                "id": "s1",
+                "start": 0.0,
+                "end": 4.0,
+                "layers": [
+                    {"type": "overlay", "preset": "lower_third", "text": "x", "start": 0.6, "end": 3.4}
+                ],
+            }
+        ]
+    }
+    assert storyboard.caption_windows(timeline) == [[0.6, 3.4]]

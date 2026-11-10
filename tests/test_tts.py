@@ -397,3 +397,69 @@ def test_custom_registered_provider_is_dispatched(tmp_path):
         assert result.is_file() and result.read_bytes().startswith(b"RIFF")
     finally:
         registry.reset_for_tests()
+
+
+def test_piper_provider_writes_a_wav_without_network(tmp_path):
+    from types import SimpleNamespace
+
+    from forja import tts
+
+    cfg = _cfg()
+    cfg["voices"]["provider"] = "piper"
+    cfg["voices"]["piper"] = {
+        "binary": "piper",
+        "model": "/opt/piper/pt_BR-faber-medium.onnx",
+        "length_scale": 1.0,
+        "speaker": None,
+    }
+
+    def fake_run(cmd, **kwargs):
+        assert "--model" in cmd and "--output_file" in cmd
+        target = cmd[cmd.index("--output_file") + 1]
+        with open(target, "wb") as handle:
+            handle.write(tts.mock_wav("oi"))
+        return SimpleNamespace(returncode=0, stderr=b"")
+
+    result = tts.synthesize(
+        _cue(),
+        cfg,
+        tmp_path,
+        post=lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("sem rede")),
+        run=fake_run,
+    )
+    assert result.is_file() and result.read_bytes().startswith(b"RIFF")
+
+
+def test_piper_missing_binary_is_missing_prereq(tmp_path):
+    from forja import tts
+    from forja.errors import ForjaError
+
+    cfg = _cfg()
+    cfg["voices"]["provider"] = "piper"
+    cfg["voices"]["piper"] = {"binary": "piper-inexistente", "model": "/tmp/x.onnx"}
+
+    def fake_run(cmd, **kwargs):
+        raise FileNotFoundError(cmd[0])
+
+    with pytest.raises(ForjaError) as excinfo:
+        tts.synthesize(_cue(), cfg, tmp_path, post=None, run=fake_run)
+    assert excinfo.value.code == "MISSING_PREREQ"
+
+
+def test_piper_failure_is_provider_error(tmp_path):
+    from types import SimpleNamespace
+
+    from forja import tts
+    from forja.errors import ForjaError
+
+    cfg = _cfg()
+    cfg["voices"]["provider"] = "piper"
+    cfg["voices"]["piper"] = {"binary": "piper", "model": "/tmp/x.onnx"}
+
+    def fake_run(cmd, **kwargs):
+        return SimpleNamespace(returncode=2, stderr=b"modelo invalido")
+
+    with pytest.raises(ForjaError) as excinfo:
+        tts.synthesize(_cue(), cfg, tmp_path, post=None, run=fake_run)
+    assert excinfo.value.code == "PROVIDER_ERROR"
+    assert "modelo invalido" in str(excinfo.value)

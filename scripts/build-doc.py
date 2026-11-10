@@ -27,7 +27,7 @@ PROMPT_INFO = {
     ),
     "01-preparar-kit": (
         "Preparar o kit",
-        "Na primeira vez: cria o .env, coloca a chave e passa no doctor.",
+        "Na primeira vez: cria o .env, escolhe o caminho de voz e passa no doctor.",
     ),
     "02-instalar-skill-no-seu-agente": (
         "Instalar a skill no seu agente",
@@ -35,7 +35,7 @@ PROMPT_INFO = {
     ),
     "03-dublagem-transcrever-e-entender": (
         "Dublagem: transcrever e entender",
-        "Primeiro passo de um video para dublar: cria o projeto e transcreve.",
+        "Primeiro passo de um video para dublar: cria o projeto, preenche o brief e transcreve.",
     ),
     "04-dublagem-quem-fala": (
         "Dublagem: quem fala",
@@ -47,7 +47,7 @@ PROMPT_INFO = {
     ),
     "06-dublagem-elenco-e-vozes": (
         "Dublagem: elenco e vozes",
-        "Escolhe uma voz por pessoa e salva os WAVs em voices/ (ou usa um provedor por API, se configurado).",
+        "Escolhe uma voz por pessoa e gera/salva as vozes (Piper local, conta ou API opcional).",
     ),
     "07-dublagem-gerar-e-revisar": (
         "Dublagem: gerar e revisar",
@@ -59,7 +59,7 @@ PROMPT_INFO = {
     ),
     "09-evoluir-a-forja": (
         "Evoluir a forja",
-        "Quando voce quer um provedor ou um workflow novo, sem quebrar o resto.",
+        "Quando voce quer um provedor, overlay ou workflow novo, sem quebrar o resto.",
     ),
     "10-navegador-modo-simples": (
         "Navegador: modo simples",
@@ -384,6 +384,11 @@ marker path { fill: var(--accent); }
 }
 .copy:hover { border-color: var(--accent); color: var(--accent); }
 .copy.done { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.code-block {
+  background: var(--code); color: var(--code-ink); border-radius: 14px; padding: 18px 22px;
+  overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px;
+  line-height: 1.55; margin: 18px 0 0;
+}
 .prompt pre {
   margin: 0; padding: 0 22px 20px; max-height: 340px; overflow: auto;
   background: transparent; border: 0; border-radius: 0;
@@ -418,7 +423,12 @@ marker path { fill: var(--accent); }
   .lede, .sec-lede { font-size: 17px; }
   .prompt-head { flex-direction: column; gap: 12px; padding: 18px 18px 12px; }
   .copy { width: 100%; }
-  .prompt pre { padding: 0 18px 18px; }
+  .code-block {
+  background: var(--code); color: var(--code-ink); border-radius: 14px; padding: 18px 22px;
+  overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px;
+  line-height: 1.55; margin: 18px 0 0;
+}
+.prompt pre { padding: 0 18px 18px; }
   .card { padding: 20px; }
   .steps > li { padding: 16px 16px 16px 56px; }
   .steps > li::before { left: 14px; top: 15px; }
@@ -567,8 +577,10 @@ TEMPLATE = r"""<!doctype html>
     <nav aria-label="Seções do guia">
       <ul>
         <li><a href="#visao-geral">Visão geral</a></li>
+        <li><a href="#brief">Brief</a></li>
         <li><a href="#modo-simples">Modos</a></li>
         <li><a href="#arquitetura">Arquitetura</a></li>
+        <li><a href="#overlays">Overlays</a></li>
         <li><a href="#prompts">Prompts</a></li>
         <li><a href="#seguranca">Segurança</a></li>
         <li><a href="#licencas">Licenças</a></li>
@@ -586,7 +598,7 @@ TEMPLATE = r"""<!doctype html>
     <div class="hero-copy">
       <p class="eyebrow">Guia do kit · versão 0.1</p>
       <h1>Vídeo com voz e legenda,<br><em>operado pelo seu agente.</em></h1>
-      <p class="lede">A <strong>forja</strong> dubla vídeos para o português e monta vídeos por cenas usando as <strong>suas contas</strong>. Você conversa com o seu agente de IA; ele roda os comandos, confere o resultado e pede a sua decisão quando é hora de escolher.</p>
+      <p class="lede">A <strong>forja</strong> dubla vídeos para o português e monta vídeos por cenas usando a <strong>voz local</strong> ou as <strong>suas contas</strong>. Você conversa com o seu agente de IA; ele roda os comandos, confere o resultado e pede a sua decisão quando é hora de escolher.</p>
       <div class="actions">
         <a class="btn primary" href="#visao-geral">Entender em 2 minutos</a>
         <a class="btn" href="#prompts">Ir para os prompts</a>
@@ -595,6 +607,7 @@ TEMPLATE = r"""<!doctype html>
         <li>Roda na sua máquina</li>
         <li>Docker em x86_64</li>
         <li>Sem chave de API obrigatória</li>
+        <li>Overlays e legendas no Remotion</li>
         <li>O vídeo não é enviado para ninguém</li>
       </ul>
     </div>
@@ -705,7 +718,7 @@ TEMPLATE = r"""<!doctype html>
     <h3 style="margin-top:36px">Começar em 5 passos</h3>
     <ol class="steps">
       <li><strong>Prepare o kit.</strong><p><code>./kit.sh setup</code> cria o <code>.env</code>, uma senha aleatória do navegador e as pastas <code>projects/</code> e <code>models/</code>.</p></li>
-      <li><strong>Escolha as vozes.</strong><p>O padrão é <code>voices.provider: files</code>: você gera cada voz na interface/ferramenta da sua conta e salva em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. Provedor por API é opcional.</p></li>
+      <li><strong>Escolha as vozes.</strong><p>Use <code>piper</code> para narração local autônoma (voz pt-BR na imagem), <code>files</code> para gerar com a sua conta/ferramenta em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>, ou <code>gemini</code> como API opcional.</p></li>
       <li><strong>Construa a imagem.</strong><p><code>./kit.sh build</code>. É a parte demorada; só acontece na primeira vez (ou quando o kit muda).</p></li>
       <li><strong>Ensine o seu agente.</strong><p>Copie o <strong>prompt 02</strong> desta página e cole no seu agente. Ele instala a skill e passa a saber operar a forja.</p></li>
       <li><strong>Peça o vídeo.</strong><p>Use o <strong>prompt 03</strong> para dublar um vídeo existente ou o <strong>prompt 08</strong> para criar um vídeo por cenas.</p></li>
@@ -718,10 +731,56 @@ TEMPLATE = r"""<!doctype html>
   </div>
 </section>
 
+<section id="brief">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Brief e aprovação humana</h2></div>
+    <p class="sec-lede">O humano define o que importa; o agente faz o resto. O <code>brief.yaml</code> é a fonte dos requisitos e o <code>approvals.json</code> é o registro de quem aprovou.</p>
+
+    <div class="cards">
+      <article class="card">
+        <h4>O brief</h4>
+        <p><code>objective</code>, <code>audience</code>, <code>tone</code>, <code>duration_s</code>, <code>must_include</code>, <code>must_avoid</code> e <code>consent</code>. O agente lê e usa como restrição; o <code>check</code>/<code>validate</code> avisa quando falta algo.</p>
+      </article>
+      <article class="card">
+        <h4>A aprovação</h4>
+        <p>Quatro chaves: <code>script</code>, <code>voice</code>, <code>overlays</code> e <code>publish</code>. O render exige as três primeiras quando <code>project.require_approvals</code> está ligado.</p>
+      </article>
+      <article class="card">
+        <h4>O gate</h4>
+        <p>Sem as aprovações, o passo <code>render</code> falha com <code>GATE_FAILED</code>. É de propósito: o agente não publica nem renderiza por conta própria.</p>
+      </article>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <strong>Crie o projeto.</strong>
+        <p><code>./kit.sh new &lt;nome&gt; &lt;vídeo&gt;</code> ou <code>forja init &lt;dir&gt;</code> cria <code>brief.yaml</code>, <code>approvals.json</code> e liga <code>require_approvals</code>. Em demo/teste, <code>forja init --no-require-approvals</code> desliga o gate.</p>
+      </li>
+      <li>
+        <strong>Preencha o brief com o humano.</strong>
+        <p>Objetivo, público, tom, duração, o que não pode faltar e o que não pode aparecer. O agente pergunta; não inventa requisito.</p>
+      </li>
+      <li>
+        <strong>Revise e aprove.</strong>
+        <p>Depois de ler o roteiro, o elenco e o plano de overlays, o humano roda <code>forja approve --script --voice --overlays --by "Nome"</code>. Publicar é uma aprovação separada (<code>--publish</code>).</p>
+      </li>
+      <li>
+        <strong>Rode o pipeline.</strong>
+        <p>O render só começa com as aprovações. Se o roteiro mudar, aprove de novo: o gate não é um carimbo eterno.</p>
+      </li>
+    </ol>
+
+    <div class="note ok">
+      <span class="label">por que isso existe</span>
+      <p>O agente é ótimo no trabalho determinístico e ruim em julgamento de marca, voz e consentimento. O brief e a aprovação deixam a decisão com uma pessoa — e dão ao agente um contrato claro para seguir.</p>
+    </div>
+  </div>
+</section>
+
 <section id="modo-simples">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">02</span><h2>Modo padrão: as suas contas</h2></div>
-    <p class="sec-lede">É o caminho recomendado: <strong>sem chave de API</strong>. Você gera as vozes na interface ou na ferramenta que já usa e o kit faz o resto.</p>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Modo padrão: voz local ou suas contas</h2></div>
+    <p class="sec-lede">Dois caminhos <strong>sem chave de API</strong>: o Piper local (voz neural na imagem) ou a sua conta/ferramenta. Você escolhe com o agente e o kit faz o resto.</p>
 
     <ol class="steps">
       <li>
@@ -729,12 +788,12 @@ TEMPLATE = r"""<!doctype html>
         <p><code>./kit.sh setup</code> copia o <code>.env.example</code>, gera a senha do navegador, ajusta o seu UID/GID e cria <code>projects/</code> e <code>models/</code>.</p>
       </li>
       <li>
-        <strong>Confirme o provedor de voz.</strong>
-        <p>O padrão é <code>voices.provider: files</code> e <code>voices.input_dir: voices</code>. Você não precisa de chave; as vozes ficam em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. Um provedor por API é opcional e configurado no <code>config.yaml</code>.</p>
+        <strong>Escolha o caminho de voz.</strong>
+        <p><code>voices.provider: piper</code> sintetiza localmente com a voz pt-BR da imagem, sem conta nem API. <code>files</code> lê os WAVs que você gera com a sua conta/ferramenta em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. <code>gemini</code> é API opcional.</p>
       </li>
       <li>
-        <strong>Gere as vozes com a sua conta.</strong>
-        <p>Abra a interface do provedor que você escolher (por exemplo no navegador, com a sua conta) ou use a ferramenta local que preferir. Para cada cue do <code>cues.json</code>, gere a fala e salve um WAV PCM em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. O kit valida, normaliza e mixa.</p>
+        <strong>Gere as vozes.</strong>
+        <p>No <code>piper</code>, rode o passo <code>voices</code> e o kit sintetiza cada cue. No <code>files</code>, abra a interface/ferramenta da sua conta, gere a fala de cada cue e salve um WAV PCM em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. O kit valida, normaliza e mixa.</p>
       </li>
       <li>
         <strong>Confira o ambiente.</strong>
@@ -742,7 +801,7 @@ TEMPLATE = r"""<!doctype html>
       </li>
       <li>
         <strong>Construa a imagem.</strong>
-        <p><code>./kit.sh build</code>. O Docker baixa a base, instala ffmpeg, Python, Whisper e o Chrome Headless do Remotion. Vai demorar alguns minutos na primeira vez.</p>
+        <p><code>./kit.sh build</code>. O Docker baixa a base, instala ffmpeg, Python, Whisper, Piper + voz pt-BR e o Chrome Headless do Remotion. Vai demorar alguns minutos na primeira vez.</p>
       </li>
       <li>
         <strong>Entregue o volante ao agente.</strong>
@@ -752,7 +811,7 @@ TEMPLATE = r"""<!doctype html>
 
     <div class="note ok">
       <span class="label">nenhuma chave obrigatória</span>
-      <p>No modo <code>files</code>, o kit não fala com nenhum serviço de voz: ele só valida e mixa os arquivos que você gerou. Se você escolher um provedor por API, a chave é sua, fica no <code>.env</code> e o gasto é decidido por você.</p>
+      <p>Nos modos <code>piper</code>/<code>files</code>, o kit não fala com nenhum serviço de voz: ele sintetiza localmente ou valida/mixa os arquivos que você gerou. Se você escolher um provedor por API, a chave é sua, fica no <code>.env</code> e o gasto é decidido por você.</p>
     </div>
 
     <h3 style="margin-top:34px">O que fica onde</h3>
@@ -775,7 +834,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="modo-avancado">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">03</span><h2>Modo avançado: navegador no container</h2></div>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Modo avançado: navegador no container</h2></div>
     <p class="sec-lede">Para quem quer a interface do provedor numa aba do navegador normal, sem ocupar a área de trabalho — e para quem optar por um provedor de voz por API.</p>
 
     <ol class="steps">
@@ -828,7 +887,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="arquitetura">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">04</span><h2>Como as peças se encaixam</h2></div>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Como as peças se encaixam</h2></div>
     <p class="sec-lede">Você fala com o agente. Ele roda o <code>kit.sh</code>. O <code>kit.sh</code> chama o Docker. Dentro do container, a CLI orquestra ffmpeg, Whisper, Remotion e o provedor de voz que você escolher.</p>
 
     <figure class="figure">
@@ -862,7 +921,7 @@ TEMPLATE = r"""<!doctype html>
       <li><strong>Whisper (faster-whisper)</strong> — transcreve em CPU, com timestamps por palavra, sem mandar o áudio para fora.</li>
       <li><strong>Remotion + Chrome Headless Shell</strong> — desenha as legendas e o vídeo por cenas quadro a quadro.</li>
       <li><strong>CLI forja</strong> — decide o que rodar, guarda o cache, escreve os eventos e aplica o portão de QA.</li>
-      <li><strong>Provedor de voz</strong> — fora do container, recebe o texto e devolve a voz; você usa a sua conta/interface ou, se optar, uma chave de API.</li>
+      <li><strong>Provedor de voz</strong> — o Piper roda <em>dentro</em> do container, sem rede; os modos <code>files</code>/API usam a sua conta/interface ou, se optar, uma chave.</li>
     </ul>
 
     <div class="note ok">
@@ -872,9 +931,60 @@ TEMPLATE = r"""<!doctype html>
   </div>
 </section>
 
+<section id="overlays">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Overlays profissionais</h2></div>
+    <p class="sec-lede">Sete presets prontos, tema de marca e ajuste por camada. O overlay entra na timeline do <code>storyboard.yaml</code> e é desenhado pelo Remotion, junto com a legenda.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Preset</th><th>Para que serve</th><th>Posição padrão</th></tr></thead>
+        <tbody>
+          <tr><td><code>lower_third</code></td><td>Nome e cargo de quem fala, com barra de destaque.</td><td><code>bottom-left</code></td></tr>
+          <tr><td><code>title</code></td><td>Título de abertura ou capítulo, com subtítulo.</td><td><code>center</code></td></tr>
+          <tr><td><code>callout</code></td><td>Número, dado ou destaque curto com borda de acento.</td><td><code>bottom-right</code></td></tr>
+          <tr><td><code>quote</code></td><td>Citação com atribuição e aspas grandes.</td><td><code>center</code></td></tr>
+          <tr><td><code>cta</code></td><td>Chamada final em pílula, para o fechamento.</td><td><code>bottom-center</code></td></tr>
+          <tr><td><code>logo</code></td><td>Marca d'água/logo no canto (PNG ou SVG).</td><td><code>top-right</code></td></tr>
+          <tr><td><code>stat</code></td><td>Número grande com rótulo, estilo painel.</td><td><code>top-left</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="code-block"><code>- type: overlay
+  preset: lower_third
+  text: "Ana Silva"
+  subtext: "Diretora de produto"
+  position: bottom-left
+  enter: {anchor: scene_start, offset_s: 0.6}
+  hold_s: 3.5
+  style: {accent: "#C24B2A", ink: "#1A1714", paper: "#F6F1E8"}</code></pre>
+
+    <div class="cards">
+      <article class="card">
+        <h4>Tema de marca</h4>
+        <p><code>brand</code> no <code>config.yaml</code>: <code>primary</code>, <code>ink</code>, <code>paper</code>, <code>accent</code>, <code>font</code>, <code>logo</code> e <code>safe_margin</code>. Cada overlay pode sobrescrever <code>style</code> (cor, fonte, tamanho, raio, opacidade, largura e alinhamento).</p>
+      </article>
+      <article class="card">
+        <h4>Legenda sem colisão</h4>
+        <p>Quando um overlay fica na parte de baixo, o passo <code>timeline</code> marca a legenda como <em>raised</em> e o Remotion sobe o bloco. O lower-third e a legenda não se sobrepõem.</p>
+      </article>
+      <article class="card">
+        <h4>Validação</h4>
+        <p>Preset, texto, posição, <code>hold_s</code>, estilo e asset são validados no <code>validate</code>. Asset fora da raiz ou ausente vira <code>ASSET_*</code>; preset inválido vira <code>OVERLAY_*</code>.</p>
+      </article>
+    </div>
+
+    <div class="note">
+      <span class="label">regra de composição</span>
+      <p>Um overlay principal por cena. Não empilhe título + lower-third + CTA no mesmo instante; o vídeo fica limpo e o olho sabe onde olhar. O agente mostra o plano de overlays antes de renderizar.</p>
+    </div>
+  </div>
+</section>
+
 <section id="prompts">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">05</span><h2>Os prompts, na ordem</h2></div>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Os prompts, na ordem</h2></div>
     <p class="sec-lede">São mensagens prontas para colar no seu agente. Cada uma assume que a anterior foi concluída. O botão <strong>Copiar</strong> leva o texto inteiro — o mesmo que está logo abaixo.</p>
 
     <div class="route">
@@ -896,13 +1006,13 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="seguranca">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">06</span><h2>Segurança sem drama</h2></div>
+    <div class="sec-head"><span class="sec-num">08</span><h2>Segurança sem drama</h2></div>
     <p class="sec-lede">O kit foi desenhado para uma máquina e para as <strong>suas</strong> contas. Estas são as regras que mantêm isso simples.</p>
 
     <div class="cards">
       <article class="card">
         <h4>Sem chave obrigatória</h4>
-        <p>No modo padrão (<code>voices.provider: files</code>), o kit não fala com nenhum serviço de voz: você gera os WAVs e ele valida/mixa. Se optar por um provedor de API, a chave fica só no <code>.env</code> (0600 no Linux/macOS; no Windows, restrinja a pasta do kit), nunca em log, commit, print ou <code>--json</code>.</p>
+        <p>Nos modos <code>piper</code>/<code>files</code>, o kit não fala com nenhum serviço de voz: ele sintetiza localmente ou valida/mixa os WAVs. Se optar por um provedor de API, a chave fica só no <code>.env</code> (0600 no Linux/macOS; no Windows, restrinja a pasta do kit), nunca em log, commit, print ou <code>--json</code>.</p>
       </article>
       <article class="card">
         <h4>O container não é root</h4>
@@ -921,6 +1031,10 @@ TEMPLATE = r"""<!doctype html>
         <p>Use a sua conta e a sua ferramenta de voz. Não compartilhe login, não empreste chave e não deixe a tela do Chromium aberta em máquina compartilhada.</p>
       </article>
       <article class="card">
+        <h4>Aprovação é humana</h4>
+        <p><code>brief.yaml</code> registra objetivo/público/tom; <code>forja approve</code> registra roteiro/voz/overlays. Com <code>require_approvals</code>, o render falha com <code>GATE_FAILED</code> sem essas chaves.</p>
+      </article>
+      <article class="card">
         <h4>Consentimento é de quem publica</h4>
         <p>Voz sintetizada de pessoa real pede autorização e aviso. O prompt 12 monta a pasta de conformidade com você; a decisão final é sempre humana.</p>
       </article>
@@ -935,7 +1049,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="licencas">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">07</span><h2>Licenças e direitos</h2></div>
+    <div class="sec-head"><span class="sec-num">09</span><h2>Licenças e direitos</h2></div>
     <p class="sec-lede">Você não precisa ser advogado para usar o kit — mas precisa saber o que está usando e o que vai publicar.</p>
 
     <div class="table-wrap">
@@ -956,6 +1070,11 @@ TEMPLATE = r"""<!doctype html>
             <td><strong>Whisper / faster-whisper</strong></td>
             <td>MIT (modelo e implementação).</td>
             <td>Transcrição local, sem custo por minuto. O modelo é baixado uma vez.</td>
+          </tr>
+          <tr>
+            <td><strong>Piper TTS + voz pt-BR</strong></td>
+            <td><code>piper-tts</code> GPL-3.0-or-later; modelo/voz MIT e dataset CC0.</td>
+            <td>Roda local, sem conta/API. O áudio gerado não herda a GPL; a imagem inclui um binário GPL (como o ffmpeg) — se redistribuir a imagem, cumpra as obrigações de fonte.</td>
           </tr>
           <tr>
             <td><strong>Provedor de voz</strong></td>
@@ -990,7 +1109,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="navegador">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">08</span><h2>O Chromium pode rodar minimizado?</h2></div>
+    <div class="sec-head"><span class="sec-num">10</span><h2>O Chromium pode rodar minimizado?</h2></div>
     <p class="sec-lede">Pergunta curta, resposta honesta: <strong>não é confiável</strong>. Janela minimizada ou totalmente coberta conta como oculta para o navegador.</p>
 
     <div class="note">
@@ -1034,7 +1153,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="problemas">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">09</span><h2>Quando algo dá errado</h2></div>
+    <div class="sec-head"><span class="sec-num">11</span><h2>Quando algo dá errado</h2></div>
     <p class="sec-lede">Não adivinhe a causa. Leia o erro literal, reproduza com o menor comando possível e só então conclua. O prompt 13 conduz o agente por essa ordem.</p>
 
     <ol class="steps">
@@ -1065,10 +1184,11 @@ TEMPLATE = r"""<!doctype html>
       <table>
         <thead><tr><th>Código do erro</th><th>Quase sempre é</th><th>Saída</th></tr></thead>
         <tbody>
-          <tr><td><code>MISSING_INPUT</code></td><td>Falta a voz em <code>voices/&lt;id&gt;.wav</code> ou outro arquivo de entrada.</td><td>Gere a voz com a sua conta/ferramenta e salve no caminho indicado; rode o passo de novo.</td></tr>
+          <tr><td><code>MISSING_INPUT</code></td><td>Falta a voz em <code>voices/&lt;id&gt;.wav</code> ou outro arquivo de entrada.</td><td>Gere a voz com a sua conta/ferramenta e salve no caminho indicado; ou use <code>voices.provider: piper</code>; rode o passo de novo.</td></tr>
           <tr><td><code>MISSING_KEY</code></td><td>Só no provedor por API: a chave não está no <code>.env</code>.</td><td>Se você optou por API, preencha a chave; no modo <code>files</code>, isso não se aplica.</td></tr>
-          <tr><td><code>MISSING_PREREQ</code></td><td>Falta ffmpeg, modelo ou o build não terminou.</td><td>Rode <code>./kit.sh doctor</code> e <code>./kit.sh build</code>.</td></tr>
-          <tr><td><code>GATE_FAILED</code></td><td>O check ou o QA encontrou erro.</td><td>Corrija os itens de <code>issues</code>; não force a entrega.</td></tr>
+          <tr><td><code>MISSING_PREREQ</code></td><td>Falta ffmpeg, o binário/modelo do Piper ou o build não terminou.</td><td>Rode <code>./kit.sh doctor</code> e <code>./kit.sh build</code>; confira <code>voices.piper.binary</code>/<code>model</code>.</td></tr>
+          <tr><td><code>GATE_FAILED</code></td><td>O check/QA encontrou erro ou falta aprovação humana.</td><td>Corrija os <code>issues</code>; se for aprovação, rode <code>forja approve --script --voice --overlays --by NOME</code>. Não force a entrega.</td></tr>
+          <tr><td><code>OVERLAY_* / ASSET_*</code></td><td>Preset, texto, posição, estilo ou asset do overlay inválido.</td><td>Corrija o <code>storyboard.yaml</code>; assets devem ficar dentro da raiz do projeto.</td></tr>
           <tr><td><code>RATE_LIMITED</code></td><td>Cota do provedor.</td><td>Aguarde; o kit já tenta de novo com espera.</td></tr>
           <tr><td><code>CONFIG_INVALID</code></td><td><code>config.yaml</code> ou <code>storyboard.yaml</code> inválido.</td><td>Leia a mensagem; rode <code>forja init</code> de novo se necessário.</td></tr>
           <tr><td><code>USAGE</code></td><td>Comando ou argumento errado.</td><td>Confira <code>forja --help</code> e o prompt da etapa.</td></tr>

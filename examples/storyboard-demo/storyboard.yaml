@@ -8,9 +8,11 @@ scenes:
       - {type: clip, file: assets/clip.mp4, in_s: 0, fit: cover}
       - {type: narration, text: "Bem-vindo ao exemplo de video por cenas."}
       - {type: captions, from: narration}
+      - {type: overlay, preset: lower_third, text: "Forja", subtext: "Video por cenas", enter: {anchor: scene_start, offset_s: 0.6}, hold_s: 3.5}
       - {type: music, track: assets/trilha.wav, gain_db: -14, license: {kind: cc0, source: "gerada localmente (seno)"}}
   - id: cartao
     duration: {fixed_s: 3}
     layers:
       - {type: clip, file: assets/clip.mp4, in_s: 1, fit: cover}
       - {type: card, asset: assets/card.png, pop: true}
+      - {type: overlay, preset: cta, text: "Seu proximo video comeca aqui", position: bottom-center, hold_s: 2.4}

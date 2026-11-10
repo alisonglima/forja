@@ -25,20 +25,27 @@ meu-video/
 ## config.yaml (defaults em `config.DEFAULTS`)
 
 ```yaml
-project:    {name: meu-video, source_lang: en, target_lang: pt-BR}
+project:    {name: meu-video, source_lang: en, target_lang: pt-BR, require_approvals: true}
 input:      {video: input/source.mp4, start: 0.0, duration: null}     # null = até o fim
 transcribe: {model: large-v3-turbo, language: en, compute_type: int8, vad: true}
 voices:
-  provider: files                  # files | gemini | mock
+  provider: files                  # files | piper | gemini | mock
   input_dir: voices                # provider files: WAVs do usuário em <projeto>/voices/<id>.wav
   model: gemini-3.8-flash-tts      # só provider gemini (opcional)
   api_key_env: GEMINI_API_KEY      # NOME da variável; o valor nunca vai no arquivo
+  piper:                           # provider piper (local, sem conta/API)
+    binary: piper
+    model: /opt/piper/pt_BR-faber-medium.onnx
+    length_scale: 1.0
+    speaker: null
   min_tempo: 0.90
   max_tempo: 1.20
   glossary: {}                     # {"Marca": "Mar-ka"} aplicado ao texto antes do TTS
   cast:                            # papel -> voz
     narrator: {voice: Leda,   style: "calm, warm, measured"}
     default:  {voice: Charon, style: "natural, conversational"}
+brand:      {primary: "#C24B2A", ink: "#1A1714", paper: "#F6F1E8", accent: "#C24B2A",
+             font: "Liberation Sans", logo: "", safe_margin: 48}
 mix:        {voice_lufs: -18.0, duck_narrator_db: -20.0, duck_speech_db: -13.0, ramp_s: 0.30,
              orig_gain: 0.90, target_lufs: -16.0, true_peak: -1.5, lra: 11.0}
 render:     {width: 1280, height: 720, fps: 30, font_size: 32, max_chars_line: 42, max_lines: 2, cps_max: 20.0}
@@ -59,7 +66,8 @@ Lista de objetos: `{"id": "A", "speaker": "narradora", "role": "narrator"|"speec
 ### `config.py`
 - `DEFAULTS: dict`; `class ConfigError(ValueError)`.
 - `load_config(path) -> dict`: lê YAML, **deep-merge** sobre `DEFAULTS`, valida (`voices.min_tempo <= max_tempo`, `render.fps > 0`,
-  `voices.provider in {"files","gemini","mock"}` (e `input_dir` relativo, sem `..`), `mix.true_peak <= 0`); levanta `ConfigError` com a chave no texto.
+  `voices.provider in {"files","piper","gemini","mock"}` ou registrado, `input_dir` relativo sem `..`, `project.require_approvals` booleano,
+  `brand` com cores `#RRGGBB`/fonte/margem e `piper` com binário/modelo/length_scale/speaker válidos, `mix.true_peak <= 0`); levanta `ConfigError` com a chave no texto.
 - `write_default_config(path, **overrides) -> None`: grava `DEFAULTS` + overrides rasos por seção, recusa sobrescrever (`FileExistsError`).
 
 ### `cues.py`
@@ -111,8 +119,9 @@ Lista de objetos: `{"id": "A", "speaker": "narradora", "role": "narrator"|"speec
 - `mock_wav(text, sr=24000) -> bytes`: tom determinístico com duração `estimate_duration_s(text)` (provider `mock`).
 - `input_dir(cfg) -> str`: pasta relativa das vozes fornecidas (default `voices`).
 - `provided_wav(cue, cfg, root) -> Path`: resolve `<root>/<input_dir>/<id>.wav`, exige `id` seguro e WAV válido; ausente → `MISSING_INPUT`, inválido → `CONFIG_INVALID`.
-- `source_for(cue, cfg, root, cache_dir, post, env=None, sleep=...) -> Path`: provider `files` → `provided_wav`; senão → `synthesize`.
-- `synthesize(...)`: `mock`/`gemini` embutidos; qualquer outro `voices.provider` é resolvido por `registry.get("tts", provider)`, cuja fábrica devolve `callable(cue, cfg, cache_dir, post=..., env=...) -> bytes | Path` com o WAV bruto. Plugins de `forja.providers` são carregados no início da CLI.
+- `piper_wav(cue, cfg, cache_dir, env=None, run=None) -> bytes`: roda `piper --model ... --output_file ...` com o texto no stdin; ausente → `MISSING_PREREQ`, exit ≠ 0 → `PROVIDER_ERROR`; o WAV bruto é normalizado por `synthesize`.
+- `source_for(cue, cfg, root, cache_dir, post, env=None, sleep=..., run=None) -> Path`: provider `files` → `provided_wav`; senão → `synthesize`.
+- `synthesize(...)`: `mock`/`piper`/`gemini` embutidos; qualquer outro `voices.provider` é resolvido por `registry.get("tts", provider)`, cuja fábrica devolve `callable(cue, cfg, cache_dir, post=..., env=...) -> bytes | Path` com o WAV bruto. Plugins de `forja.providers` são carregados no início da CLI.
 - `synthesize(cue, cfg, cache_dir, post, env=os.environ, sleep=time.sleep) -> pathlib.Path`: cache hit não chama `post`;
   3 tentativas com backoff (1, 2, 4 s) em erro 429/5xx; 4xx ≠ 429 não repete; chave ausente → `RuntimeError("variável X não definida")`;
   valida WAV (RIFF, >0 amostras, mono) e reamostra para 24 kHz se necessário.
@@ -123,7 +132,7 @@ Lista de objetos: `{"id": "A", "speaker": "narradora", "role": "narrator"|"speec
 - `run_transcribe(wav, cfg, model_dir) -> dict` (import tardio de `faster_whisper`; não testado em unidade).
 
 ### `render.py`
-- `build_props(clip_name, total, subs, lower_thirds, cfg) -> dict` (entrada do template Remotion).
+- `build_props(clip_name, total, subs, lower_thirds, cfg) -> dict` (entrada do template Remotion; inclui `brand`).
 - `remotion_cmd(entry, props_path, public_dir, out) -> list[str]`; `mux_cmd(video, wav, out) -> list[str]`
   (`-c:v copy -c:a aac -b:a 192k -shortest`, `-movflags +faststart`).
 
@@ -320,10 +329,10 @@ Um passo = `Step(name, doc, inputs, outputs, run, needs)`; `run(ctx)` devolve um
 | `orig` | clip | `work/clip.mp4` | `work/orig.wav` | `media.extract_audio(clip, orig.wav)` (48 kHz estéreo) |
 | `transcribe` | orig | `work/orig.wav`, config | `work/transcript.json` | `transcribe.run_transcribe(orig, cfg, model_dir)`; `model_dir = ctx.env.get("FORJA_MODEL_DIR")` ou `~/.cache/forja/models`; grava o JSON |
 | `check` | — | `cues.json`, config | `work/check.json` | `cues.load_cues` + `cues.validate_cues` → `qa.summarize(issues)` gravado; **se houver `error`: `ForjaError("GATE_FAILED", ..., details={"issues": [...]})`** (avisos não reprovam) |
-| `voices` | check | `cues.json`, config | `work/voices/manifest.json` (+ `work/voices/<id>.wav`) | para cada cue: `tts.source_for(cue, cfg, ctx.root, work/"cache"/"tts", post=_http_post, env=ctx.env)` (provider `files` lê `voices/<id>.wav`; `mock` não chama `post`); aplica ganho por fala `mixlib.voice_gain_cmd(wav, work/voices/<id>.wav, cfg["mix"]["voice_lufs"])` via `media.run_checked`; manifesto `{id: {"wav": "work/voices/<id>.wav", "duration": seg}}` (duração lida com o módulo `wave`) |
+| `voices` | check | `cues.json`, config | `work/voices/manifest.json` (+ `work/voices/<id>.wav`) | para cada cue: `tts.source_for(cue, cfg, ctx.root, work/"cache"/"tts", post=_http_post, env=ctx.env)` (provider `files` lê `voices/<id>.wav`; `piper` roda local; `mock` não chama `post`); aplica ganho por fala `mixlib.voice_gain_cmd(wav, work/voices/<id>.wav, cfg["mix"]["voice_lufs"])` via `media.run_checked`; manifesto `{id: {"wav": "work/voices/<id>.wav", "duration": seg}}` (duração lida com o módulo `wave`) |
 | `schedule` | voices | manifesto, `cues.json`, `lower_thirds.json`, `work/clip.json`, config | `work/plan.json`, `work/subs.json`, `out/legendas.srt` | durações e `schedule.speech_bounds` (amostras de cada `<id>.wav` via `scipy.io.wavfile`) → `schedule.plan(cues, durations, cfg, total=clip.json["duration"], bounds)` → `plan.json`; `subs.build_subs(plan, cues, lower_thirds, cfg)` → `subs.json`; `subs.to_srt` → `out/legendas.srt` |
 | `mix` | schedule, orig | `work/plan.json`, `work/orig.wav`, voices, config | `work/mix.wav`, `work/loudness.json`, `work/voices/<id>.fit.wav` | por cue do plano: `media.trim_tempo_cmd(wav, fit, tempo)` com **`-ar 48000 -ac 1` inseridos antes do arquivo de saída** (rodado por `media.run_checked`); `duck_intervals = [(start, end, mixlib.db_to_gain(duck_narrator_db se role=="narrator" senão duck_speech_db))]`; `media.assemble_mix(orig, [{"wav": fit, "start": start}], duck_intervals, cfg, work/"mix_raw.wav")`; `media.normalize_loudness(mix_raw, work/mix.wav, cfg)`; depois **mede a saída** com `media.measure_loudness(work/mix.wav, cfg)` e grava `loudness.json` como `{"I": ..., "TP": ...}` (chaves `input_i`/`input_tp` dessa medição). O gate de QA julga o que será entregue, nunca a medição de entrada do 2º passe |
-| `render` | mix | `work/mix.wav`, `work/subs.json`, `lower_thirds.json`, `work/clip.mp4`, config | `out/video.mp4` | `render.build_props("clip.mp4", total, subs, lower_thirds, cfg)`; `media.render_remotion(entry, props, public_dir=work, out=work/"render.mp4", cwd=<dir do template>)`; `media.mux(render.mp4, mix.wav, out/video.mp4)`; `entry` = `src/index.jsx` dentro do template; template = `ctx.env["FORJA_REMOTION_DIR"]` ou `<repo>/remotion-template` (relativo ao pacote: `Path(__file__).resolve().parents[2] / "remotion-template"`) |
+| `render` | mix | `work/mix.wav`, `work/subs.json`, `lower_thirds.json`, `work/clip.mp4`, config | `out/video.mp4` | `brief.require_approvals(..., ("script","voice"))`; `render.build_props("clip.mp4", total, subs, lower_thirds, cfg)`; `media.render_remotion(entry, props, public_dir=work, out=work/"render.mp4", cwd=<dir do template>)`; `media.mux(render.mp4, mix.wav, out/video.mp4)`; `entry` = `src/index.jsx` dentro do template; template = `ctx.env["FORJA_REMOTION_DIR"]` ou `<repo>/remotion-template` (relativo ao pacote: `Path(__file__).resolve().parents[2] / "remotion-template"`) |
 | `qa` | render | `out/video.mp4`, `work/plan.json`, `work/subs.json`, `work/loudness.json`, `lower_thirds.json`, config | `out/qa.json` | `qa.check_subs` + `qa.check_overlap` + `qa.check_loudness(loudness.json, cfg)` + `qa.check_schedule(plan)` → `qa.summarize` gravado em `out/qa.json`; **se `errors > 0`: `ForjaError("GATE_FAILED", ...)`** |
 
 `_http_post(url, headers, body) -> dict`: `urllib.request` (só `https`; erro HTTP → exceção com atributo `status`; formato que `tts.synthesize` espera: leia `tts.py`). `lower_thirds.json` ausente = `[]`.
@@ -336,12 +345,55 @@ Entrada mínima válida: `{"version": 1, "canvas": {"w": 1280, "h": 720, "fps": 
 
 | passo | needs | lê | escreve | o que faz |
 |---|---|---|---|---|
-| `validate` | — | `storyboard.yaml`, config | `work/validate.json` | `storyboard.validate_storyboard(sb, root)` → `qa.summarize(issues)` gravado; **`error` ⇒ `ForjaError("GATE_FAILED", ..., details={"issues": [...]})`** |
+| `validate` | — | `storyboard.yaml`, config | `work/validate.json` | `storyboard.validate_storyboard(sb, root)` + avisos de `brief`/aprovação → `qa.summarize(issues)` gravado; **`error` ⇒ `ForjaError("GATE_FAILED", ..., details={"issues": [...]})`** |
 | `voices` | validate | `storyboard.yaml`, config | `work/voices/manifest.json` (+ `work/voices/<cena>.wav`) | para cada cena com camada `narration`: `cue = {"id": <cena>, "text": layer["text"], "voice": layer.get("voice"), "style": layer.get("style")}` (sem `voice` ⇒ o cast `default` do config); `tts.source_for(cue, cfg, ctx.root, work/"cache"/"tts", post=_http_post, env=ctx.env)` (provider `files` lê `voices/<cena>.wav`); ganho `mixlib.voice_gain_cmd(... cfg["mix"]["voice_lufs"])` via `media.run_checked`; manifesto `{cena: {"wav": "work/voices/<cena>.wav", "duration": seg}}` (duração do trecho com fala: `schedule.speech_bounds` ou, se `None`, a do WAV) |
 | `timeline` | voices | `storyboard.yaml`, manifesto, config | `work/timeline.json`, `work/subs.json`, `out/legendas.srt` | `storyboard.resolve_timeline(sb, {cena: duration}, words=None)` (âncoras por palavra caem em `scene_start` e viram `warnings` — v1 não alinha palavras) → `timeline.json` (com `"fps"`, `"total_s"`); legendas: para cada cena com camada `captions` e narração, `texts[cena] = cues.split_lines(texto, cfg["render"]["max_chars_line"], cfg["render"]["max_lines"])` (se `None`, quebra simples por palavras em 2 linhas) → `storyboard.to_srt(timeline, texts)` → `out/legendas.srt` e eventos `{"start","end","lines","narrador":false,"raised":false}` em `work/subs.json` |
 | `mix` | timeline | `work/timeline.json`, manifesto, `storyboard.yaml`, config | `work/mix.wav`, `work/loudness.json`, `work/bed.wav`, `work/voices/<cena>.fit.wav` | **base** `work/bed.wav` (48 kHz estéreo, `total_s`): se houver camada `music` (`track`, `gain_db` default 0), decodifica a trilha cortada em `total_s` com `volume=<gain_db>dB` (ffmpeg via `media.run_checked`); senão silêncio (`anullsrc`); a narração de cada cena entra em `scene.start + (duration.pad_before ou 0)` (voz ajustada com `media.trim_tempo_cmd(wav, fit, 1.0)` + `-ar 48000 -ac 1` antes do arquivo de saída); `duck_intervals = [(ini, fim, mixlib.db_to_gain(layer.get("ducking_db", cfg["mix"]["duck_narrator_db"])))]` para o intervalo de cada narração; `media.assemble_mix(bed, voices, duck_intervals, {**cfg, "mix": {**cfg["mix"], "orig_gain": 1.0}}, work/"mix_raw.wav")`; `media.normalize_loudness(...)` e **mede a saída** (`media.measure_loudness(work/mix.wav, cfg)`) → `loudness.json` `{"I","TP"}`. Áudio embutido dos clipes e `sfx` **não** entram no v1: se existirem, `warnings` no retorno do passo (`CLIP_AUDIO_IGNORED`, `SFX_IGNORED`), nunca erro |
-| `render` | mix | `work/timeline.json`, `work/subs.json`, `work/mix.wav`, assets | `out/video.mp4` | props = `{"timeline": timeline, "subs": subs, "lowerThirds": [], "fps": canvas.fps, "width": canvas.w, "height": canvas.h, "fontSize": cfg["render"]["font_size"], "durationS": timeline["total_s"]}`; `media.render_remotion(entry, props, public_dir=<raiz do projeto>, out=work/"render.mp4", cwd=<template>, composition="Storyboard")`; `media.mux(render.mp4, mix.wav, out/video.mp4)` (entry/template como no `dub`) |
+| `render` | mix | `work/timeline.json`, `work/subs.json`, `work/mix.wav`, assets | `out/video.mp4` | `brief.require_approvals(..., ("script","voice","overlays"))`; props = `{"timeline": timeline, "subs": subs, "lowerThirds": storyboard.caption_windows(timeline), "brand": cfg["brand"], "fps": canvas.fps, "width": canvas.w, "height": canvas.h, "fontSize": cfg["render"]["font_size"], "durationS": timeline["total_s"]}`; `media.render_remotion(entry, props, public_dir=<raiz do projeto>, out=work/"render.mp4", cwd=<template>, composition="Storyboard")`; `media.mux(render.mp4, mix.wav, out/video.mp4)` (entry/template como no `dub`) |
 | `qa` | render | `out/video.mp4`, `work/subs.json`, `work/loudness.json`, `work/timeline.json`, config | `out/qa.json` | `qa.check_subs` + `qa.check_loudness` + (v1) conferência de duração: `ffprobe` do `out/video.mp4` vs `timeline.total_s` (diferença > 0.5 s ⇒ `error` `DURATION_MISMATCH`) → `qa.summarize` gravado; `errors > 0` ⇒ `GATE_FAILED` |
 
 `_http_post` e o resolvedor do template/entry: **reuse** os de `forja/workflows/dub.py` (importe-os de lá; não duplique).
 `music` sem `license` já é erro do `validate`. Nenhum asset é copiado: o `public_dir` é a raiz do projeto e os `file`/`asset` das camadas são relativos a ela.
+
+## Overlays do storyboard (v1.1)
+
+`LAYER_TYPES` inclui `overlay`. A camada tem:
+
+```yaml
+- type: overlay
+  preset: lower_third | title | callout | quote | cta | logo | stat
+  text: "..."                 # obrigatório exceto logo; até 280 caracteres
+  subtext: "..."              # opcional; até 120
+  position: bottom-left | bottom-right | top-left | top-right | center | bottom-center | top-center
+  asset: assets/logo.png      # obrigatório no preset logo
+  enter: {anchor: scene_start, offset_s: 0.6}
+  hold_s: 3.5
+  safe_area: true
+  style: {accent: "#RRGGBB", ink: "#RRGGBB", paper: "#RRGGBB", font: "...", font_size: 12..200,
+          radius: 0..80, opacity: 0..1, width: 40..1200, align: left|center|right,
+          uppercase: bool, shadow: bool}
+```
+
+- `validate_storyboard` emite `OVERLAY_PRESET`, `OVERLAY_TEXT`, `OVERLAY_POSITION`, `OVERLAY_ASSET`,
+  `OVERLAY_HOLD` e `OVERLAY_STYLE`; assets passam por `ASSET_MISSING`/`ASSET_OUTSIDE`.
+- `resolve_timeline` calcula `start`/`end` com `enter`/`hold_s`; overlay que passa do fim da cena é
+  cortado com warning.
+- `caption_windows(timeline)` devolve as janelas de overlays com posição `bottom-*`; o passo `timeline`
+  marca `raised` nos eventos de legenda que colidem, e `Captions.jsx` sobe a legenda.
+- `Overlay.jsx` (Remotion) desenha os presets com `brand` + `style`; o texto usa fallback
+  `Liberation Sans, Arial, Helvetica, sans-serif`. O tema padrão está em `config.brand`.
+- O storyboard demo em `examples/storyboard-demo/` exercita `lower_third` e `cta`.
+
+## Brief e aprovação humana (v1.1)
+
+- `brief.yaml`: `version: 1`, `objective`, `audience`, `tone`, `duration_s`, `must_include`,
+  `must_avoid`, `consent`. `brief.brief_issues(root)` devolve avisos `BRIEF_MISSING`/`BRIEF_INCOMPLETE`
+  e erros de schema; `check`/`validate` anexam esses avisos ao resultado.
+- `approvals.json`: `{"script","voice","overlays","publish"}` booleanos + `by`/`at`.
+  `load_approvals` falha fechado (`GATE_FAILED`) com JSON inválido; `write_approvals` é atômico.
+- `forja approve --script --voice --overlays --publish --by NOME` grava as aprovações.
+- `project.require_approvals` (default `true` no `forja init`; `false` em `project.scaffold` para testes)
+  faz `render` chamar `brief.require_approvals`; sem as chaves exigidas → `GATE_FAILED`.
+  `forja init --no-require-approvals` desliga o gate em demos/testes.
+- `brief`/`approvals` entram em `agent_writes`; o agente só chama `approve` depois da confirmação
+  explícita do humano.

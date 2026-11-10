@@ -1,7 +1,7 @@
 Você é meu assistente de infraestrutura. Quero o **Chromium rodando dentro de um container Docker**, visível numa aba do meu navegador normal, para eu fazer login com a **minha conta** e usar a interface do provedor de voz sem instalar nada nem aparecer na minha área de trabalho. Este é o caminho recomendado para contas próprias; a chave de API é opcional.
 
 1. Garanta o `.env` (`./kit.sh setup` cria `BROWSER_PASSWORD` aleatória). Não imprima a senha; eu a pego do arquivo.
-2. Suba: `./kit.sh browser-up`. Ele inicia o Chromium (imagem `linuxserver/chromium`, `linux/amd64`) e um pequeno proxy que torna o CDP alcançável **somente** em `127.0.0.1:9222` da minha máquina.
+2. Suba: `./kit.sh browser-up`. Ele inicia o Chromium (imagem `linuxserver/chromium`, `linux/amd64`) e um pequeno proxy que torna o CDP alcançável **somente** em `127.0.0.1:9222` da minha máquina. A URL inicial vem de `BROWSER_START_URL` no `.env` (ex.: a interface do provedor que eu uso).
 3. Eu abro **https://localhost:3001** (aceito o certificado autoassinado, entro com usuário/senha do `.env`) e faço o login do provedor **uma única vez nessa aba**. O perfil fica num **volume Docker** (`chromium-config`), nunca na imagem; sobrevive a reinícios. O login é feito **dentro deste ambiente final**; a sessão **não é movida** entre máquinas.
 4. Confirme o CDP: `GET http://127.0.0.1:9222/json/version` responde; um cliente Playwright consegue `connectOverCDP("http://127.0.0.1:9222")` e listar a aba. **Não** conecte pelo nome do container (`browser:9222`): o Chromium recusa Host que não seja IP/localhost (HTTP 500).
 5. Para controlar, use o Playwright MCP ou "computer use" do seu agente apontando para esse endereço. Deixe a aba `https://localhost:3001` aberta para eu acompanhar.

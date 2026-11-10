@@ -15,6 +15,7 @@ import yaml
 
 from . import (
     __version__,
+    brief,
     config,
     describe as describe_module,
     media,
@@ -82,11 +83,19 @@ def _build_parser():
     def command(name):
         return sub.add_parser(name, add_help=False, exit_on_error=False)
 
+    approve = command("approve")
+    approve.add_argument("--script", action="store_true")
+    approve.add_argument("--voice", action="store_true")
+    approve.add_argument("--overlays", action="store_true")
+    approve.add_argument("--publish", action="store_true")
+    approve.add_argument("--by", default="humano")
+
     init = command("init")
     init.add_argument("dir")
     init.add_argument("--source", default=None)
     init.add_argument("--force", action="store_true")
     init.add_argument("--workflow", default=None)
+    init.add_argument("--no-require-approvals", action="store_true")
 
     for name in ("describe", "status", "doctor", "providers", "transcribe", "check", "schedule", "mix", "render"):
         command(name)
@@ -335,7 +344,14 @@ def _scaffold(args):
     workflows.get_workflow(workflow)  # valida antes de criar qualquer coisa
     if workflow == "dub" and not args.source:
         raise ForjaError("USAGE", "o workflow dub precisa de --source VIDEO", hint="`forja init DIR --source VIDEO` (ou `--workflow storyboard` para um video por cenas, sem origem)")
-    created = project_module.scaffold(root, name, source=args.source, workflow=workflow, force=bool(args.force))
+    created = project_module.scaffold(
+        root,
+        name,
+        source=args.source,
+        workflow=workflow,
+        force=bool(args.force),
+        require_approvals=not bool(getattr(args, "no_require_approvals", False)),
+    )
     return root, created
 
 
@@ -373,6 +389,27 @@ def _cmd_status(project_dir, json_mode, out):
     else:
         lines.append("proximo: nada; tudo atualizado")
     _stream_write(out, "\n".join(lines))
+    return 0
+
+
+def _cmd_approve(project_dir, args, json_mode, out):
+    project = _require_project(project_dir)
+    updates = {
+        key: True
+        for key in ("script", "voice", "overlays", "publish")
+        if getattr(args, key, False)
+    }
+    if not updates:
+        raise ForjaError(
+            "USAGE",
+            "informe ao menos uma aprovacao (--script, --voice, --overlays ou --publish)",
+            hint="ex.: forja approve --script --voice --by Ana",
+        )
+    data = brief.write_approvals(project.root, updates, by=args.by)
+    if json_mode:
+        _write_json(out, _envelope({"approvals": data, "path": brief.APPROVALS_FILE}))
+        return 0
+    _stream_write(out, "aprovacoes registradas: " + ", ".join(sorted(updates)) + " por " + data["by"])
     return 0
 
 
@@ -430,6 +467,18 @@ def _cmd_doctor(project_dir, json_mode, env, out, err):
         key_ok = _key_is_set(env, key_name)
         # Apenas o NOME da variavel e o estado; o valor nunca entra na saida.
         add("tts_api_key", key_ok, "%s: %s" % (key_name, "definida" if key_ok else "ausente"))
+    elif provider == "piper":
+        piper = voices.get("piper") if isinstance(voices.get("piper"), dict) else {}
+        binary = str(piper.get("binary") or "piper")
+        model = str(piper.get("model") or "")
+        found = _which(binary, env)
+        model_ok = bool(model) and Path(model).is_file()
+        add(
+            "tts_provider",
+            found is not None and model_ok,
+            "provider: piper; binario %s; modelo %s"
+            % ("ok" if found is not None else "ausente", "ok" if model_ok else "ausente"),
+        )
     else:
         add("tts_provider", True, "provider: %s (sem chave de API)" % provider)
 
@@ -559,6 +608,8 @@ def _dispatch(args, project_dir, json_mode, env, out, err):
         return _cmd_init(args, json_mode, out)
     if command == "doctor":
         return _cmd_doctor(project_dir, json_mode, env, out, err)
+    if command == "approve":
+        return _cmd_approve(project_dir, args, json_mode, out)
     if command == "providers":
         return _cmd_providers(json_mode, env, out)
     if command == "status":

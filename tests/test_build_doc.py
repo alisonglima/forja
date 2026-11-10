@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "build-doc.py"
-SECTIONS = ["visao-geral", "modo-simples", "modo-avancado", "arquitetura", "prompts", "seguranca", "licencas", "navegador", "problemas"]
+SECTIONS = ["visao-geral", "brief", "modo-simples", "modo-avancado", "arquitetura", "overlays", "prompts", "seguranca", "licencas", "navegador", "problemas"]
 
 
 def _build(tmp_path, name="guia.html"):

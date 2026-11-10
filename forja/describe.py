@@ -32,6 +32,18 @@ _COMMANDS = [
             _arg("--source", False, "video de entrada; sem ele, cria um projeto do workflow storyboard"),
             _arg("--workflow", False, "dub ou storyboard (default: dub com --source, storyboard sem)"),
             _arg("--force", False, "sobrescreve arquivos existentes"),
+            _arg("--no-require-approvals", False, "desliga o gate de aprovacoes humanas (padrao: ligado)"),
+        ],
+    },
+    {
+        "name": "approve",
+        "summary": "Registra aprovacoes humanas de roteiro, voz, overlays e publicacao.",
+        "args": [
+            _arg("--script", False, "aprova o roteiro/cues"),
+            _arg("--voice", False, "aprova o elenco/vozes"),
+            _arg("--overlays", False, "aprova os overlays"),
+            _arg("--publish", False, "aprova a publicacao"),
+            _arg("--by", False, "quem aprovou (nome ou papel)"),
         ],
     },
     {
@@ -166,6 +178,13 @@ _BUILTIN_PROVIDERS = (
         "requires_env": (),
         "network": False,
         "note": "voce gera os WAVs em voices/<id>.wav (padrao)",
+    },
+    {
+        "kind": "tts",
+        "name": "piper",
+        "requires_env": (),
+        "network": False,
+        "note": "TTS neural local; modelo pt-BR na imagem",
     },
     {
         "kind": "tts",

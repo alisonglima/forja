@@ -18,6 +18,7 @@ def build_props(clip_name, total, subs, lower_thirds, cfg) -> dict:
         "fontSize": font_size,
         "subs": copy.deepcopy(subs),
         "lowerThirds": copy.deepcopy(lower_thirds),
+        "brand": copy.deepcopy(cfg.get("brand") or {}) if isinstance(cfg, dict) else {},
     }
 
 

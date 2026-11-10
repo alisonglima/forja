@@ -17,10 +17,10 @@ Você opera a CLI `forja` (no kit: `./kit.sh run ...`; instalada: `forja ...`). 
 2. Faça o que o passo pede (alguns passos são **seus**: escrever `cues.json`, `lower_thirds.json`, `config.yaml`, `storyboard.yaml` e as vozes em `voices/`).
 3. `forja --json --project <dir> run [--only passo]` → roda só o que mudou (cache por hash). Falhou? Leia `error.code` + `error.hint`; `retryable: true` pode repetir, o resto corrija a causa.
 4. `forja --json --project <dir> qa --strict` antes de entregar. Exit `1` = reprovado: corrija os `issues`.
-5. Pare e **pergunte ao humano** em: escolha de voz, texto final dos cues, consentimento/aviso de IA e qualquer gasto com API além do combinado.
+5. Pare e **pergunte ao humano** em: escolha de voz, texto final dos cues, overlays, consentimento/aviso de IA e qualquer gasto com API. O `brief.yaml` é do humano; depois da revisão, registre `forja approve --script --voice --overlays --by <nome>`.
 
 ## Vozes
-O padrão é `voices.provider: files`: **o humano gera as vozes com a conta/ferramenta dele** e você salva um WAV PCM por cue em `<projeto>/voices/<id>.wav`. O kit valida, normaliza, mixa e renderiza. Não peça chave de API nesse modo. Provedores por API são opcionais e configurados pelo humano no `config.yaml`/`.env`.
+Há três caminhos: `files` (o humano gera os WAVs em `<projeto>/voices/<id>.wav`), `piper` (TTS neural local, sem conta/API) e `gemini` (API opcional). O kit valida, normaliza, mixa e renderiza. Não peça chave de API nos modos `files`/`piper`.
 
 ## Descobrir
 `forja --json describe` lista comandos, workflows, passos (entradas/saídas), provedores (e se a variável da chave está definida), códigos de erro e o schema do `config.yaml`.
@@ -32,4 +32,4 @@ O padrão é `voices.provider: files`: **o humano gera as vozes com a conta/ferr
 - Voz sintética de pessoa real ⇒ aviso de IA no vídeo + consentimento (ver `prompts/12-consentimento-e-aviso.md`).
 
 ## Arquivos
-Agente escreve: `cues.json`, `lower_thirds.json`, `config.yaml`, `storyboard.yaml`, `assets/` e `voices/<id>.wav`. Gerados: `work/*`, `out/video.mp4`, `out/legendas.srt`, `out/qa.json`.
+Agente escreve: `cues.json`, `lower_thirds.json`, `config.yaml`, `storyboard.yaml`, `assets/`, `voices/<id>.wav`; o humano preenche `brief.yaml` e aprova em `approvals.json`. Gerados: `work/*`, `out/video.mp4`, `out/legendas.srt`, `out/qa.json`.

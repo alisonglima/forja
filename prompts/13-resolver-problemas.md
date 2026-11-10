@@ -6,7 +6,10 @@ Você é meu assistente de diagnóstico do **Forja**. Algo falhou. **Não suponh
 4. Por sintoma:
    - **`build` falha por memória / "killed"**: aumente a memória do Docker Desktop (Settings → Resources) para 8 GB.
    - **`transcribe` lento ou travado na primeira vez**: está baixando o modelo (≈1,6 GB, uma vez). Confira a pasta `models/` e a conexão. Em máquina fraca troque `transcribe.model` para `small` no `config.yaml`.
-   - **`voices` com `MISSING_INPUT`**: falta o WAV em `projects/<NOME>/voices/<id>.wav`. Gere a voz com a minha conta/ferramenta (interface web ou provedor que eu escolher) e salve nesse caminho; depois rode `./kit.sh run --project /projects/<NOME> --json voices --only <id>`. No modo `files` não existe chave de API.
+   - **`voices` com `MISSING_INPUT`**: falta o WAV em `projects/<NOME>/voices/<id>.wav`. Gere a voz com a minha conta/ferramenta e salve nesse caminho; ou use `voices.provider: piper`; depois rode `./kit.sh run --project /projects/<NOME> --json voices --only <id>`. No modo `files`/`piper` não existe chave de API.
+   - **`voices` com `MISSING_PREREQ` no piper**: binário `piper` ou modelo `.onnx` ausente na imagem/config. Confira `voices.piper.binary`/`model` e rode `./kit.sh doctor`; no kit, o modelo é `/opt/piper/pt_BR-faber-medium.onnx`.
+   - **`GATE_FAILED` com "aprovacao humana pendente"**: falta `forja approve --script --voice --overlays --by <nome>` (ou `project.require_approvals` está ligado e o `approvals.json` não tem as chaves). Peça a aprovação humana; não contorne o gate.
+   - **`OVERLAY_*`/`ASSET_*` no validate**: preset/posição/texto/estilo inválido ou asset fora da raiz. Corrija o `storyboard.yaml`; não mova assets para fora do projeto.
    - **`voices` com `CONFIG_INVALID`**: o WAV não é PCM válido ou o `id` tem caractere inseguro. Use um WAV mono/estéreo válido e um `id` com letras, números, ponto, hífen ou sublinhado.
    - **`voices` erro 400/403/404 (somente provider API)**: chave inválida, API desativada ou modelo desligado — confira `voices.model` na documentação do provedor. **Mostre-me o erro literal** (sem a chave).
    - **`voices` erro 429 (somente provider API)**: limite de cota; o kit já tenta de novo com espera. Se persistir, espere ou use um projeto com faturamento.

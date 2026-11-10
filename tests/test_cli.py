@@ -332,3 +332,45 @@ def test_gate_check_fails_closed_when_check_json_is_corrupt(tmp_path):
     with pytest.raises(errors.ForjaError) as excinfo:
         cli._gate_check(project, [], strict=True)
     assert excinfo.value.code == "GATE_FAILED"
+
+
+def test_approve_writes_human_approval(tmp_path):
+    from forja import cli
+
+    root = _write_project(tmp_path)
+    code, doc, _ = _run_json(
+        cli,
+        ["--json", "--project", str(root), "approve", "--script", "--voice", "--by", "Ana"],
+    )
+    assert code == 0
+    assert doc["data"]["approvals"]["script"] is True
+    assert doc["data"]["approvals"]["voice"] is True
+    saved = json.loads((root / "approvals.json").read_text(encoding="utf-8"))
+    assert saved["by"] == "Ana" and saved["script"] is True
+
+
+def test_approve_requires_at_least_one_flag(tmp_path):
+    from forja import cli
+
+    root = _write_project(tmp_path)
+    code, doc, _ = _run_json(cli, ["--json", "--project", str(root), "approve"])
+    assert code == 2
+    assert doc["error"]["code"] == "USAGE"
+
+
+def test_init_enables_approvals_by_default(tmp_path):
+    from forja import cli
+
+    _init(cli, tmp_path)
+    text = (tmp_path / "proj" / "config.yaml").read_text(encoding="utf-8")
+    assert "require_approvals: true" in text
+    assert (tmp_path / "proj" / "brief.yaml").is_file()
+    assert (tmp_path / "proj" / "approvals.json").is_file()
+
+
+def test_init_can_disable_approvals(tmp_path):
+    from forja import cli
+
+    _init(cli, tmp_path, extra=("--no-require-approvals",))
+    text = (tmp_path / "proj" / "config.yaml").read_text(encoding="utf-8")
+    assert "require_approvals: false" in text

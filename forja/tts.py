@@ -6,7 +6,10 @@ import io
 import json
 import os
 import re
+import subprocess
+import tempfile
 import time
+import uuid
 import urllib.error
 import wave
 from collections.abc import Mapping
@@ -15,6 +18,7 @@ from typing import Any, Callable
 
 import numpy as np
 
+from . import env as env_module
 from . import ids, registry
 from .errors import ForjaError
 
@@ -236,12 +240,84 @@ def provided_wav(cue: dict, cfg: dict, root) -> Path:
     return target
 
 
-def source_for(cue: dict, cfg: dict, root, cache_dir: Path, post, env=None, sleep=time.sleep) -> Path:
+def piper_wav(cue: dict, cfg: dict, cache_dir: Path, env=None, run=None) -> bytes:
+    """Sintetiza um cue com o Piper local (sem conta/API) e devolve o WAV bruto."""
+    voices_cfg = cfg.get("voices") or {}
+    piper_cfg = voices_cfg.get("piper") if isinstance(voices_cfg.get("piper"), dict) else {}
+    binary = str(piper_cfg.get("binary") or "piper")
+    model = str(piper_cfg.get("model") or "")
+    if not model:
+        raise ForjaError(
+            "CONFIG_INVALID",
+            "voices.piper.model nao configurado",
+            hint="defina o caminho do .onnx em config.yaml",
+        )
+    text = apply_glossary(str(cue.get("text", "")), voices_cfg.get("glossary") or {})
+    directory = Path(cache_dir)
+    directory.mkdir(parents=True, exist_ok=True)
+    handle = tempfile.NamedTemporaryFile(
+        prefix="forja-piper-", suffix=".wav", dir=str(directory), delete=False
+    )
+    target = Path(handle.name)
+    handle.close()
+    cmd = [binary, "--model", model, "--output_file", str(target)]
+    length_scale = piper_cfg.get("length_scale")
+    if isinstance(length_scale, (int, float)) and not isinstance(length_scale, bool) and float(length_scale) != 1.0:
+        cmd += ["--length-scale", str(float(length_scale))]
+    speaker = piper_cfg.get("speaker")
+    if speaker is not None:
+        cmd += ["--speaker", str(int(speaker))]
+    runner = subprocess.run if run is None else run
+    try:
+        try:
+            proc = runner(
+                cmd,
+                input=text.encode("utf-8"),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=env_module.sanitized(env),
+                timeout=180,
+            )
+        except FileNotFoundError as exc:
+            raise ForjaError(
+                "MISSING_PREREQ",
+                "piper nao encontrado: %s" % binary,
+                hint="instale piper-tts na imagem ou aponte voices.piper.binary para o executavel",
+            ) from exc
+        except subprocess.TimeoutExpired as exc:
+            raise ForjaError(
+                "PROVIDER_ERROR",
+                "piper excedeu 180 s",
+                hint="encurte o texto do cue ou aumente o timeout",
+            ) from exc
+        except OSError as exc:
+            raise ForjaError("MISSING_PREREQ", "falha ao executar piper: %s" % exc) from exc
+        if proc.returncode != 0:
+            detail = (proc.stderr or b"").decode("utf-8", "replace").strip()[:500]
+            raise ForjaError(
+                "PROVIDER_ERROR",
+                "piper falhou (exit %s): %s" % (proc.returncode, detail or "sem stderr"),
+                hint="confira voices.piper.model e o modelo .onnx",
+            )
+        if not target.is_file():
+            raise ForjaError("PROVIDER_ERROR", "piper nao gerou o WAV de saida")
+        data = target.read_bytes()
+        if not data:
+            raise ForjaError("PROVIDER_ERROR", "piper gerou WAV vazio")
+        return data
+    finally:
+        try:
+            target.unlink()
+        except OSError:
+            pass
+
+
+def source_for(cue: dict, cfg: dict, root, cache_dir: Path, post, env=None, sleep=time.sleep, run=None) -> Path:
     """Resolve a fonte da voz: arquivo fornecido pelo usuario ou provedor."""
     provider = str((cfg.get("voices") or {}).get("provider", "files"))
     if provider == "files":
         return provided_wav(cue, cfg, root)
-    return synthesize(cue, cfg, cache_dir, post, env=env, sleep=sleep)
+    return synthesize(cue, cfg, cache_dir, post, env=env, sleep=sleep, run=run)
 
 
 def synthesize(
@@ -251,6 +327,7 @@ def synthesize(
     post: Callable[..., Any],
     env: Mapping[str, str] | None = None,
     sleep: Callable[[float], Any] = time.sleep,
+    run=None,
 ) -> Path:
     """Sintetiza um cue, usando cache; devolve o caminho do WAV em cache."""
     if env is None:
@@ -258,6 +335,9 @@ def synthesize(
     voices_cfg = cfg.get("voices") or {}
     provider = str(voices_cfg.get("provider", "gemini"))
     model = str(voices_cfg.get("model", ""))
+    if provider == "piper":
+        piper_cfg = voices_cfg.get("piper") if isinstance(voices_cfg.get("piper"), dict) else {}
+        model = str(piper_cfg.get("model") or "")
     voice, style = _resolve_voice(cue, voices_cfg)
     text = apply_glossary(str(cue.get("text", "")), voices_cfg.get("glossary") or {})
     key = cache_key(provider, model, voice, style, text)
@@ -278,6 +358,8 @@ def synthesize(
 
     if provider == "mock":
         wav_data = mock_wav(text)
+    elif provider == "piper":
+        wav_data = piper_wav(cue, cfg, directory, env=env, run=run)
     elif provider == "gemini":
         key_name = str(voices_cfg.get("api_key_env", "GEMINI_API_KEY"))
         api_key = env.get(key_name) if env is not None else None

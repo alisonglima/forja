@@ -2,7 +2,7 @@ Você é meu produtor de pós. O elenco foi aprovado por mim e as vozes estão e
 
 Ciclo: `init` → `transcribe` → `frames` → `cues.json` → `check` → `voices` → `run` → `qa --strict`. Aqui estamos no `run` e no `qa --strict`.
 
-1. Rode tudo: `./kit.sh run --project /projects/<NOME> --json run --strict`. Ordem interna: `check → voices → schedule → mix → render → qa`. Saídas em `out/`: `video.mp4`, `legendas.srt`, `qa.json`.
+1. Confirme que `approvals.json` tem `script` e `voice` aprovados; se não, pare e me peça a aprovação (`./kit.sh run --project /projects/<NOME> --json approve --script --voice --by <MEU_NOME>`). Depois rode tudo: `./kit.sh run --project /projects/<NOME> --json run --strict`. Ordem interna: `check → voices → schedule → mix → render → qa`. Saídas em `out/`: `video.mp4`, `legendas.srt`, `qa.json`.
 2. Rode o gate obrigatório: `./kit.sh run --project /projects/<NOME> --json qa --strict`. **Exit 1 = reprovado**: corrija e repita; não entregue com erro.
 3. Leia `out/qa.json`. Cada issue tem `level` (error/warn), `code` e mensagem. Resolva assim:
    - `OVERFLOW` / `TEMPO_CLAMPED`: a fala não coube no tempo. **Reescreva o texto do cue mais curto** em `cues.json`, regenere a voz em `voices/<id>.wav` e rode `./kit.sh run --project /projects/<NOME> --json voices --only <id>`; depois `./kit.sh run --project /projects/<NOME> --json schedule`. Não aumente `max_tempo` além de 1,2 sem eu aprovar.

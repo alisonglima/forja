@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import math
+import re
 from pathlib import Path
 
 import yaml
@@ -10,7 +11,12 @@ from . import registry
 from .errors import ForjaError
 
 DEFAULTS: dict = {
-    "project": {"name": "meu-video", "source_lang": "en", "target_lang": "pt-BR"},
+    "project": {
+        "name": "meu-video",
+        "source_lang": "en",
+        "target_lang": "pt-BR",
+        "require_approvals": False,
+    },
     "input": {"video": "input/source.mp4", "start": 0.0, "duration": None},
     "transcribe": {
         "model": "large-v3-turbo",
@@ -21,11 +27,18 @@ DEFAULTS: dict = {
     "voices": {
         # "files": voce gera as vozes com a SUA conta/ferramenta e salva em voices/<id>.wav.
         # "gemini": opcional, API do Google (exige GEMINI_API_KEY e voices.model).
+        # "piper": TTS neural local (sem conta/API), com o modelo pt-BR da imagem.
         # "mock": tom sintetico para testes.
         "provider": "files",
         "model": "gemini-3.8-flash-tts",
         "api_key_env": "GEMINI_API_KEY",
         "input_dir": "voices",
+        "piper": {
+            "binary": "piper",
+            "model": "/opt/piper/pt_BR-faber-medium.onnx",
+            "length_scale": 1.0,
+            "speaker": None,
+        },
         "min_tempo": 0.90,
         "max_tempo": 1.20,
         "glossary": {},
@@ -43,6 +56,15 @@ DEFAULTS: dict = {
         "target_lufs": -16.0,
         "true_peak": -1.5,
         "lra": 11.0,
+    },
+    "brand": {
+        "primary": "#C24B2A",
+        "ink": "#1A1714",
+        "paper": "#F6F1E8",
+        "accent": "#C24B2A",
+        "font": "Liberation Sans",
+        "logo": "",
+        "safe_margin": 48,
     },
     "render": {
         "width": 1280,
@@ -104,14 +126,17 @@ def _number(section: dict, section_name: str, key: str, minimum=None, maximum=No
 
 
 def _validate(cfg: dict) -> None:
+    project = _section(cfg, "project")
+    if not isinstance(project.get("require_approvals", False), bool):
+        raise ConfigError("project.require_approvals deve ser booleano")
     voices = _section(cfg, "voices")
     provider = voices.get("provider")
-    if provider not in ("files", "gemini", "mock"):
+    if provider not in ("files", "gemini", "mock", "piper"):
         try:
             registry.get("tts", provider)
         except ForjaError:
             raise ConfigError(
-                f"voices.provider invalido: {provider!r} (esperado 'files', 'gemini', 'mock' ou um provedor registrado)"
+                f"voices.provider invalido: {provider!r} (esperado 'files', 'gemini', 'mock', 'piper' ou um provedor registrado)"
             ) from None
     input_dir = voices.get("input_dir")
     if not isinstance(input_dir, str) or not input_dir.strip():
@@ -119,6 +144,20 @@ def _validate(cfg: dict) -> None:
     input_path = Path(input_dir)
     if input_path.is_absolute() or ".." in input_path.parts:
         raise ConfigError("voices.input_dir deve ficar dentro do projeto (sem caminho absoluto nem '..')")
+    if provider == "piper":
+        piper = voices.get("piper")
+        if not isinstance(piper, dict):
+            raise ConfigError("voices.piper deve ser um mapeamento quando provider = 'piper'")
+        binary = piper.get("binary")
+        model = piper.get("model")
+        if not isinstance(binary, str) or not binary.strip():
+            raise ConfigError("voices.piper.binary deve ser o nome/caminho do executavel piper")
+        if not isinstance(model, str) or not model.strip():
+            raise ConfigError("voices.piper.model deve ser o caminho do .onnx")
+        _number(piper, "voices.piper", "length_scale", 0.5, 2.0)
+        speaker = piper.get("speaker")
+        if speaker is not None and (isinstance(speaker, bool) or not isinstance(speaker, int) or speaker < 0):
+            raise ConfigError("voices.piper.speaker deve ser inteiro >= 0 ou null")
     if provider == "gemini":
         model = voices.get("model")
         if not isinstance(model, str) or not model.strip():
@@ -133,6 +172,25 @@ def _validate(cfg: dict) -> None:
         raise ConfigError(
             f"voices.min_tempo ({min_tempo}) maior que voices.max_tempo ({max_tempo})"
         )
+    brand = _section(cfg, "brand")
+    for key in ("primary", "ink", "paper", "accent"):
+        color = brand.get(key)
+        if not isinstance(color, str) or not re.fullmatch(r"#[0-9A-Fa-f]{6}", color):
+            raise ConfigError(f"brand.{key} deve ser uma cor hex #RRGGBB")
+    font = brand.get("font")
+    if not isinstance(font, str) or not font.strip():
+        raise ConfigError("brand.font deve ser o nome de uma fonte instalada")
+    logo = brand.get("logo")
+    if logo is not None and not isinstance(logo, str):
+        raise ConfigError("brand.logo deve ser um caminho relativo ou vazio")
+    if isinstance(logo, str) and logo:
+        logo_path = Path(logo)
+        if logo_path.is_absolute() or ".." in logo_path.parts:
+            raise ConfigError("brand.logo deve ficar dentro do projeto (sem caminho absoluto nem '..')")
+    margin = brand.get("safe_margin")
+    if isinstance(margin, bool) or not isinstance(margin, (int, float)) or not (0 <= float(margin) <= 240):
+        raise ConfigError("brand.safe_margin deve ser um numero entre 0 e 240")
+
     render = _section(cfg, "render")
     _number(render, "render", "fps", 1, 240)
     _number(render, "render", "width", 16, 7680)

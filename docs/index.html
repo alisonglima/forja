@@ -270,6 +270,11 @@ marker path { fill: var(--accent); }
 }
 .copy:hover { border-color: var(--accent); color: var(--accent); }
 .copy.done { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.code-block {
+  background: var(--code); color: var(--code-ink); border-radius: 14px; padding: 18px 22px;
+  overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px;
+  line-height: 1.55; margin: 18px 0 0;
+}
 .prompt pre {
   margin: 0; padding: 0 22px 20px; max-height: 340px; overflow: auto;
   background: transparent; border: 0; border-radius: 0;
@@ -304,7 +309,12 @@ marker path { fill: var(--accent); }
   .lede, .sec-lede { font-size: 17px; }
   .prompt-head { flex-direction: column; gap: 12px; padding: 18px 18px 12px; }
   .copy { width: 100%; }
-  .prompt pre { padding: 0 18px 18px; }
+  .code-block {
+  background: var(--code); color: var(--code-ink); border-radius: 14px; padding: 18px 22px;
+  overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px;
+  line-height: 1.55; margin: 18px 0 0;
+}
+.prompt pre { padding: 0 18px 18px; }
   .card { padding: 20px; }
   .steps > li { padding: 16px 16px 16px 56px; }
   .steps > li::before { left: 14px; top: 15px; }
@@ -325,8 +335,10 @@ marker path { fill: var(--accent); }
     <nav aria-label="Seções do guia">
       <ul>
         <li><a href="#visao-geral">Visão geral</a></li>
+        <li><a href="#brief">Brief</a></li>
         <li><a href="#modo-simples">Modos</a></li>
         <li><a href="#arquitetura">Arquitetura</a></li>
+        <li><a href="#overlays">Overlays</a></li>
         <li><a href="#prompts">Prompts</a></li>
         <li><a href="#seguranca">Segurança</a></li>
         <li><a href="#licencas">Licenças</a></li>
@@ -344,7 +356,7 @@ marker path { fill: var(--accent); }
     <div class="hero-copy">
       <p class="eyebrow">Guia do kit · versão 0.1</p>
       <h1>Vídeo com voz e legenda,<br><em>operado pelo seu agente.</em></h1>
-      <p class="lede">A <strong>forja</strong> dubla vídeos para o português e monta vídeos por cenas usando as <strong>suas contas</strong>. Você conversa com o seu agente de IA; ele roda os comandos, confere o resultado e pede a sua decisão quando é hora de escolher.</p>
+      <p class="lede">A <strong>forja</strong> dubla vídeos para o português e monta vídeos por cenas usando a <strong>voz local</strong> ou as <strong>suas contas</strong>. Você conversa com o seu agente de IA; ele roda os comandos, confere o resultado e pede a sua decisão quando é hora de escolher.</p>
       <div class="actions">
         <a class="btn primary" href="#visao-geral">Entender em 2 minutos</a>
         <a class="btn" href="#prompts">Ir para os prompts</a>
@@ -353,6 +365,7 @@ marker path { fill: var(--accent); }
         <li>Roda na sua máquina</li>
         <li>Docker em x86_64</li>
         <li>Sem chave de API obrigatória</li>
+        <li>Overlays e legendas no Remotion</li>
         <li>O vídeo não é enviado para ninguém</li>
       </ul>
     </div>
@@ -463,7 +476,7 @@ marker path { fill: var(--accent); }
     <h3 style="margin-top:36px">Começar em 5 passos</h3>
     <ol class="steps">
       <li><strong>Prepare o kit.</strong><p><code>./kit.sh setup</code> cria o <code>.env</code>, uma senha aleatória do navegador e as pastas <code>projects/</code> e <code>models/</code>.</p></li>
-      <li><strong>Escolha as vozes.</strong><p>O padrão é <code>voices.provider: files</code>: você gera cada voz na interface/ferramenta da sua conta e salva em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. Provedor por API é opcional.</p></li>
+      <li><strong>Escolha as vozes.</strong><p>Use <code>piper</code> para narração local autônoma (voz pt-BR na imagem), <code>files</code> para gerar com a sua conta/ferramenta em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>, ou <code>gemini</code> como API opcional.</p></li>
       <li><strong>Construa a imagem.</strong><p><code>./kit.sh build</code>. É a parte demorada; só acontece na primeira vez (ou quando o kit muda).</p></li>
       <li><strong>Ensine o seu agente.</strong><p>Copie o <strong>prompt 02</strong> desta página e cole no seu agente. Ele instala a skill e passa a saber operar a forja.</p></li>
       <li><strong>Peça o vídeo.</strong><p>Use o <strong>prompt 03</strong> para dublar um vídeo existente ou o <strong>prompt 08</strong> para criar um vídeo por cenas.</p></li>
@@ -476,10 +489,56 @@ marker path { fill: var(--accent); }
   </div>
 </section>
 
+<section id="brief">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Brief e aprovação humana</h2></div>
+    <p class="sec-lede">O humano define o que importa; o agente faz o resto. O <code>brief.yaml</code> é a fonte dos requisitos e o <code>approvals.json</code> é o registro de quem aprovou.</p>
+
+    <div class="cards">
+      <article class="card">
+        <h4>O brief</h4>
+        <p><code>objective</code>, <code>audience</code>, <code>tone</code>, <code>duration_s</code>, <code>must_include</code>, <code>must_avoid</code> e <code>consent</code>. O agente lê e usa como restrição; o <code>check</code>/<code>validate</code> avisa quando falta algo.</p>
+      </article>
+      <article class="card">
+        <h4>A aprovação</h4>
+        <p>Quatro chaves: <code>script</code>, <code>voice</code>, <code>overlays</code> e <code>publish</code>. O render exige as três primeiras quando <code>project.require_approvals</code> está ligado.</p>
+      </article>
+      <article class="card">
+        <h4>O gate</h4>
+        <p>Sem as aprovações, o passo <code>render</code> falha com <code>GATE_FAILED</code>. É de propósito: o agente não publica nem renderiza por conta própria.</p>
+      </article>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <strong>Crie o projeto.</strong>
+        <p><code>./kit.sh new &lt;nome&gt; &lt;vídeo&gt;</code> ou <code>forja init &lt;dir&gt;</code> cria <code>brief.yaml</code>, <code>approvals.json</code> e liga <code>require_approvals</code>. Em demo/teste, <code>forja init --no-require-approvals</code> desliga o gate.</p>
+      </li>
+      <li>
+        <strong>Preencha o brief com o humano.</strong>
+        <p>Objetivo, público, tom, duração, o que não pode faltar e o que não pode aparecer. O agente pergunta; não inventa requisito.</p>
+      </li>
+      <li>
+        <strong>Revise e aprove.</strong>
+        <p>Depois de ler o roteiro, o elenco e o plano de overlays, o humano roda <code>forja approve --script --voice --overlays --by "Nome"</code>. Publicar é uma aprovação separada (<code>--publish</code>).</p>
+      </li>
+      <li>
+        <strong>Rode o pipeline.</strong>
+        <p>O render só começa com as aprovações. Se o roteiro mudar, aprove de novo: o gate não é um carimbo eterno.</p>
+      </li>
+    </ol>
+
+    <div class="note ok">
+      <span class="label">por que isso existe</span>
+      <p>O agente é ótimo no trabalho determinístico e ruim em julgamento de marca, voz e consentimento. O brief e a aprovação deixam a decisão com uma pessoa — e dão ao agente um contrato claro para seguir.</p>
+    </div>
+  </div>
+</section>
+
 <section id="modo-simples">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">02</span><h2>Modo padrão: as suas contas</h2></div>
-    <p class="sec-lede">É o caminho recomendado: <strong>sem chave de API</strong>. Você gera as vozes na interface ou na ferramenta que já usa e o kit faz o resto.</p>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Modo padrão: voz local ou suas contas</h2></div>
+    <p class="sec-lede">Dois caminhos <strong>sem chave de API</strong>: o Piper local (voz neural na imagem) ou a sua conta/ferramenta. Você escolhe com o agente e o kit faz o resto.</p>
 
     <ol class="steps">
       <li>
@@ -487,12 +546,12 @@ marker path { fill: var(--accent); }
         <p><code>./kit.sh setup</code> copia o <code>.env.example</code>, gera a senha do navegador, ajusta o seu UID/GID e cria <code>projects/</code> e <code>models/</code>.</p>
       </li>
       <li>
-        <strong>Confirme o provedor de voz.</strong>
-        <p>O padrão é <code>voices.provider: files</code> e <code>voices.input_dir: voices</code>. Você não precisa de chave; as vozes ficam em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. Um provedor por API é opcional e configurado no <code>config.yaml</code>.</p>
+        <strong>Escolha o caminho de voz.</strong>
+        <p><code>voices.provider: piper</code> sintetiza localmente com a voz pt-BR da imagem, sem conta nem API. <code>files</code> lê os WAVs que você gera com a sua conta/ferramenta em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. <code>gemini</code> é API opcional.</p>
       </li>
       <li>
-        <strong>Gere as vozes com a sua conta.</strong>
-        <p>Abra a interface do provedor que você escolher (por exemplo no navegador, com a sua conta) ou use a ferramenta local que preferir. Para cada cue do <code>cues.json</code>, gere a fala e salve um WAV PCM em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. O kit valida, normaliza e mixa.</p>
+        <strong>Gere as vozes.</strong>
+        <p>No <code>piper</code>, rode o passo <code>voices</code> e o kit sintetiza cada cue. No <code>files</code>, abra a interface/ferramenta da sua conta, gere a fala de cada cue e salve um WAV PCM em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. O kit valida, normaliza e mixa.</p>
       </li>
       <li>
         <strong>Confira o ambiente.</strong>
@@ -500,7 +559,7 @@ marker path { fill: var(--accent); }
       </li>
       <li>
         <strong>Construa a imagem.</strong>
-        <p><code>./kit.sh build</code>. O Docker baixa a base, instala ffmpeg, Python, Whisper e o Chrome Headless do Remotion. Vai demorar alguns minutos na primeira vez.</p>
+        <p><code>./kit.sh build</code>. O Docker baixa a base, instala ffmpeg, Python, Whisper, Piper + voz pt-BR e o Chrome Headless do Remotion. Vai demorar alguns minutos na primeira vez.</p>
       </li>
       <li>
         <strong>Entregue o volante ao agente.</strong>
@@ -510,7 +569,7 @@ marker path { fill: var(--accent); }
 
     <div class="note ok">
       <span class="label">nenhuma chave obrigatória</span>
-      <p>No modo <code>files</code>, o kit não fala com nenhum serviço de voz: ele só valida e mixa os arquivos que você gerou. Se você escolher um provedor por API, a chave é sua, fica no <code>.env</code> e o gasto é decidido por você.</p>
+      <p>Nos modos <code>piper</code>/<code>files</code>, o kit não fala com nenhum serviço de voz: ele sintetiza localmente ou valida/mixa os arquivos que você gerou. Se você escolher um provedor por API, a chave é sua, fica no <code>.env</code> e o gasto é decidido por você.</p>
     </div>
 
     <h3 style="margin-top:34px">O que fica onde</h3>
@@ -533,7 +592,7 @@ marker path { fill: var(--accent); }
 
 <section id="modo-avancado">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">03</span><h2>Modo avançado: navegador no container</h2></div>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Modo avançado: navegador no container</h2></div>
     <p class="sec-lede">Para quem quer a interface do provedor numa aba do navegador normal, sem ocupar a área de trabalho — e para quem optar por um provedor de voz por API.</p>
 
     <ol class="steps">
@@ -586,7 +645,7 @@ marker path { fill: var(--accent); }
 
 <section id="arquitetura">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">04</span><h2>Como as peças se encaixam</h2></div>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Como as peças se encaixam</h2></div>
     <p class="sec-lede">Você fala com o agente. Ele roda o <code>kit.sh</code>. O <code>kit.sh</code> chama o Docker. Dentro do container, a CLI orquestra ffmpeg, Whisper, Remotion e o provedor de voz que você escolher.</p>
 
     <figure class="figure">
@@ -727,7 +786,7 @@ marker path { fill: var(--accent); }
       <li><strong>Whisper (faster-whisper)</strong> — transcreve em CPU, com timestamps por palavra, sem mandar o áudio para fora.</li>
       <li><strong>Remotion + Chrome Headless Shell</strong> — desenha as legendas e o vídeo por cenas quadro a quadro.</li>
       <li><strong>CLI forja</strong> — decide o que rodar, guarda o cache, escreve os eventos e aplica o portão de QA.</li>
-      <li><strong>Provedor de voz</strong> — fora do container, recebe o texto e devolve a voz; você usa a sua conta/interface ou, se optar, uma chave de API.</li>
+      <li><strong>Provedor de voz</strong> — o Piper roda <em>dentro</em> do container, sem rede; os modos <code>files</code>/API usam a sua conta/interface ou, se optar, uma chave.</li>
     </ul>
 
     <div class="note ok">
@@ -737,9 +796,60 @@ marker path { fill: var(--accent); }
   </div>
 </section>
 
+<section id="overlays">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Overlays profissionais</h2></div>
+    <p class="sec-lede">Sete presets prontos, tema de marca e ajuste por camada. O overlay entra na timeline do <code>storyboard.yaml</code> e é desenhado pelo Remotion, junto com a legenda.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Preset</th><th>Para que serve</th><th>Posição padrão</th></tr></thead>
+        <tbody>
+          <tr><td><code>lower_third</code></td><td>Nome e cargo de quem fala, com barra de destaque.</td><td><code>bottom-left</code></td></tr>
+          <tr><td><code>title</code></td><td>Título de abertura ou capítulo, com subtítulo.</td><td><code>center</code></td></tr>
+          <tr><td><code>callout</code></td><td>Número, dado ou destaque curto com borda de acento.</td><td><code>bottom-right</code></td></tr>
+          <tr><td><code>quote</code></td><td>Citação com atribuição e aspas grandes.</td><td><code>center</code></td></tr>
+          <tr><td><code>cta</code></td><td>Chamada final em pílula, para o fechamento.</td><td><code>bottom-center</code></td></tr>
+          <tr><td><code>logo</code></td><td>Marca d'água/logo no canto (PNG ou SVG).</td><td><code>top-right</code></td></tr>
+          <tr><td><code>stat</code></td><td>Número grande com rótulo, estilo painel.</td><td><code>top-left</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="code-block"><code>- type: overlay
+  preset: lower_third
+  text: "Ana Silva"
+  subtext: "Diretora de produto"
+  position: bottom-left
+  enter: {anchor: scene_start, offset_s: 0.6}
+  hold_s: 3.5
+  style: {accent: "#C24B2A", ink: "#1A1714", paper: "#F6F1E8"}</code></pre>
+
+    <div class="cards">
+      <article class="card">
+        <h4>Tema de marca</h4>
+        <p><code>brand</code> no <code>config.yaml</code>: <code>primary</code>, <code>ink</code>, <code>paper</code>, <code>accent</code>, <code>font</code>, <code>logo</code> e <code>safe_margin</code>. Cada overlay pode sobrescrever <code>style</code> (cor, fonte, tamanho, raio, opacidade, largura e alinhamento).</p>
+      </article>
+      <article class="card">
+        <h4>Legenda sem colisão</h4>
+        <p>Quando um overlay fica na parte de baixo, o passo <code>timeline</code> marca a legenda como <em>raised</em> e o Remotion sobe o bloco. O lower-third e a legenda não se sobrepõem.</p>
+      </article>
+      <article class="card">
+        <h4>Validação</h4>
+        <p>Preset, texto, posição, <code>hold_s</code>, estilo e asset são validados no <code>validate</code>. Asset fora da raiz ou ausente vira <code>ASSET_*</code>; preset inválido vira <code>OVERLAY_*</code>.</p>
+      </article>
+    </div>
+
+    <div class="note">
+      <span class="label">regra de composição</span>
+      <p>Um overlay principal por cena. Não empilhe título + lower-third + CTA no mesmo instante; o vídeo fica limpo e o olho sabe onde olhar. O agente mostra o plano de overlays antes de renderizar.</p>
+    </div>
+  </div>
+</section>
+
 <section id="prompts">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">05</span><h2>Os prompts, na ordem</h2></div>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Os prompts, na ordem</h2></div>
     <p class="sec-lede">São mensagens prontas para colar no seu agente. Cada uma assume que a anterior foi concluída. O botão <strong>Copiar</strong> leva o texto inteiro — o mesmo que está logo abaixo.</p>
 
     <div class="route">
@@ -778,7 +888,7 @@ Critério de pronto: os dois testes do passo 5 passam. Reporte versão do Docker
     <div>
       <p class="prompt-id">01</p>
       <h3>Preparar o kit</h3>
-      <p class="when">Quando usar: Na primeira vez: cria o .env, coloca a chave e passa no doctor.</p>
+      <p class="when">Quando usar: Na primeira vez: cria o .env, escolhe o caminho de voz e passa no doctor.</p>
     </div>
     <button class="copy" type="button" data-copy="01-preparar-kit" aria-label="Copiar o prompt Preparar o kit">Copiar</button>
   </div>
@@ -792,13 +902,14 @@ Regras de segurança (valem sempre):
 
 Passos:
 1. Na pasta do kit, rode `./kit.sh setup` (Linux/macOS/Git Bash) ou `.\kit.ps1 setup` (Windows PowerShell). Isso cria o `.env`, a pasta `projects/` e a pasta `models/`.
-2. Explique em duas frases como funciona o provedor padrão (`files`): eu gero a voz na interface/ferramenta que já uso e salvo o arquivo em `projects/&lt;nome&gt;/voices/&lt;id&gt;.wav`; o kit normaliza, mixa e renderiza. Deixe claro que **não precisa de chave de API** e que provedores por API são opcionais.
+2. Explique os três caminhos de voz e me ajude a escolher: `files` (eu gero os WAVs com a minha conta/ferramenta e salvo em `projects/&lt;nome&gt;/voices/&lt;id&gt;.wav`), `piper` (TTS neural local, sem conta/API, voz pt-BR incluída na imagem) ou `gemini` (API opcional, com a minha chave). Para um fluxo autônomo, recomende `piper`; para a minha voz/elenco, `files`. Nenhum deles exige chave por padrão.
+2b. Explique que o `forja init` cria `brief.yaml` e `approvals.json` e liga `project.require_approvals`: eu preencho objetivo/público/tom e aprovo roteiro/voz/overlays antes do render.
 3. Rode `./kit.sh doctor` e confirme Docker/Compose, arquitetura `linux/x86_64` e o provedor de voz. O `forja doctor` (no kit: `./kit.sh run --json doctor`) mostra o provedor e, se for API, a chave apenas como **definida/ausente** — nunca o valor.
 4. Rode `./kit.sh build`. A primeira vez baixa e constrói a imagem `linux/amd64` (alguns minutos). Se falhar por memória, aumente a memória do Docker Desktop para 8 GB.
-5. Teste de fumaça **sem gastar API**: `./kit.sh new teste &lt;CAMINHO_DE_UM_VIDEO_CURTO&gt;`; em `projects/teste/config.yaml` ponha `voices.provider: mock`; escreva uma cue curta em `projects/teste/cues.json` (por exemplo `{"id":"A","t0":0,"t1":2,"text":"Teste de fumaça."}`); rode `./kit.sh run --project /projects/teste run --only check,voices` e confirme o WAV em `work/voices/`. Depois volte `voices.provider` para `files`.
+5. Teste de fumaça **sem gastar API**: `./kit.sh new teste &lt;CAMINHO_DE_UM_VIDEO_CURTO&gt; --no-require-approvals` (se o wrapper não aceitar, crie com `forja init`); em `projects/teste/config.yaml` ponha `voices.provider: mock`; escreva uma cue curta em `projects/teste/cues.json` (por exemplo `{"id":"A","t0":0,"t1":2,"text":"Teste de fumaça."}`); rode `./kit.sh run --project /projects/teste run --only check,voices` e confirme o WAV em `work/voices/`. Depois volte `voices.provider` para o caminho escolhido.
 6. Rode `./kit.sh run --json describe` e confirme os comandos e os workflows `dub` e `storyboard`.
 
-Critério de pronto: `doctor` sem erro essencial, `build` concluído, fumaça com `mock` gerou o WAV e `describe` lista os dois workflows. Reporte o que passou e o que ficou pendente. Diga o que **não verificou**: qualidade de voz real, transcrição e render, que dependem de mídia e do próximo prompt.</pre>
+Critério de pronto: `doctor` sem erro essencial, `build` concluído, fumaça com `mock` gerou o WAV e `describe` lista os dois workflows. Se eu escolhi `piper`, confirme com um cue real que o WAV tem fala (você não ouve; eu ouço). Reporte o que passou e o que ficou pendente. Diga o que **não verificou**: qualidade de voz real, transcrição e render, que dependem de mídia e do próximo prompt.</pre>
 </article>
 <article class="prompt" id="p-02-instalar-skill-no-seu-agente">
   <div class="prompt-head">
@@ -833,7 +944,7 @@ Critério de pronto: o agente novo responde ao `describe` e repete o ciclo sem e
     <div>
       <p class="prompt-id">03</p>
       <h3>Dublagem: transcrever e entender</h3>
-      <p class="when">Quando usar: Primeiro passo de um video para dublar: cria o projeto e transcreve.</p>
+      <p class="when">Quando usar: Primeiro passo de um video para dublar: cria o projeto, preenche o brief e transcreve.</p>
     </div>
     <button class="copy" type="button" data-copy="03-dublagem-transcrever-e-entender" aria-label="Copiar o prompt Dublagem: transcrever e entender">Copiar</button>
   </div>
@@ -841,12 +952,12 @@ Critério de pronto: o agente novo responde ao `describe` e repete o ciclo sem e
 
 Ciclo desta etapa: `init` → `transcribe` → `frames` → `cues.json` → `check` → `voices` → `run` → `qa --strict`. Nesta etapa fazemos os dois primeiros.
 
-1. Crie o projeto: `./kit.sh new &lt;NOME&gt; &lt;CAMINHO_DO_VIDEO&gt;`. Isso copia o vídeo para `projects/&lt;NOME&gt;/input/source.mp4`, mede duração/resolução/fps e grava `projects/&lt;NOME&gt;/config.yaml`.
+1. Crie o projeto: `./kit.sh new &lt;NOME&gt; &lt;CAMINHO_DO_VIDEO&gt;`. Isso copia o vídeo para `projects/&lt;NOME&gt;/input/source.mp4`, mede duração/resolução/fps, grava `config.yaml` e cria `brief.yaml`/`approvals.json` (com `require_approvals` ligado). Preencha o `brief.yaml` **comigo**: objetivo, público, tom, duração, restrições e consentimento. O gate de render só abre depois das aprovações humanas.
 2. Pergunte-me **qual trecho devo dublar** (início e duração em segundos). Se eu quiser cortar o começo, ajuste `input.start` e `input.duration` no `config.yaml`. Todos os tempos seguintes são **relativos ao início do trecho**.
 3. Rode `./kit.sh run --project /projects/&lt;NOME&gt; --json transcribe`. A primeira execução baixa o modelo de transcrição (cerca de 1,6 GB, uma vez só). O resultado fica em `projects/&lt;NOME&gt;/work/transcript.json` (segmentos e palavras com tempo).
 4. Rode `./kit.sh run --project /projects/&lt;NOME&gt; --json status` e leia `next_actions` para confirmar o próximo passo; não pule a ordem.
 5. Leia o `transcript.json` e entregue um **resumo editorial** em português: quem parece falar em cada trecho, o tom, números e nomes próprios (que não podem ser traduzidos errado), palavras que o transcritor pode ter ouvido errado (marque as duvidosas) e quantos minutos de fala efetiva existem.
-6. **Não traduza ainda.** Termine perguntando o que devo confirmar (nomes, cargos, siglas).
+6. **Não traduza ainda.** Termine perguntando o que devo confirmar (nomes, cargos, siglas). Depois que eu aprovar o roteiro, rode `./kit.sh run --project /projects/&lt;NOME&gt; --json approve --script --by &lt;MEU_NOME&gt;` (ou `forja approve`).
 
 Regras: tempos em segundos; não invente falas que não estão no transcript; use `forja status` (no kit, `./kit.sh run --project /projects/&lt;NOME&gt; --json status`) e o campo `next_actions`. Reporte o caminho do projeto, a duração do trecho, o resumo editorial e as dúvidas. Diga o que **não verificou**: a qualidade da transcrição contra o áudio (você não ouve) e a identificação de falantes, que vem no próximo prompt.</pre>
 </article>
@@ -909,20 +1020,20 @@ Use `forja status` e o campo `next_actions` para confirmar o próximo passo. Met
     <div>
       <p class="prompt-id">06</p>
       <h3>Dublagem: elenco e vozes</h3>
-      <p class="when">Quando usar: Escolhe uma voz por pessoa e salva os WAVs em voices/ (ou usa um provedor por API, se configurado).</p>
+      <p class="when">Quando usar: Escolhe uma voz por pessoa e gera/salva as vozes (Piper local, conta ou API opcional).</p>
     </div>
     <button class="copy" type="button" data-copy="06-dublagem-elenco-e-vozes" aria-label="Copiar o prompt Dublagem: elenco e vozes">Copiar</button>
   </div>
-  <pre data-prompt="06-dublagem-elenco-e-vozes">Você é meu diretor de elenco de voz. O projeto `projects/&lt;NOME&gt;` já tem `cues.json` aprovado. O provedor padrão é `files`: **eu gero as vozes com a minha conta e a ferramenta que eu escolher** e salvo os arquivos em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav`. Um provedor por API (por exemplo `gemini`) é opcional e só entra se eu tiver configurado a chave.
+  <pre data-prompt="06-dublagem-elenco-e-vozes">Você é meu diretor de elenco de voz. O projeto `projects/&lt;NOME&gt;` já tem `cues.json` aprovado. Escolha o caminho de voz comigo: `files` (eu gero os WAVs com a minha conta/ferramenta e salvo em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav`), `piper` (TTS neural local, sem conta/API) ou `gemini` (API opcional, com a minha chave). Para narração autônoma, use `piper`; para a minha voz/elenco, `files`.
 
 Ciclo: `init` → `transcribe` → `frames` → `cues.json` → `check` → `voices` → `run` → `qa --strict`. Aqui estamos no `voices`.
 
 1. Liste os falantes de `cues.json` e, para cada um, proponha uma voz **combinando timbre, ritmo e caráter da fala**. Cada pessoa diferente do vídeo precisa de uma voz diferente; a narradora/narrador do vídeo, uma voz estável. Descreva a voz em palavras (ex.: "feminina, grave, calma, ritmo lento") em vez de inventar idade ou gênero de quem aparece; meu julgamento é um palpite e você espera minha correção.
 2. Preencha `voices.cast` no `config.yaml` como **metadado**: um bloco por falante, `{voice: "&lt;nome ou descrição&gt;", style: "&lt;emoção e ritmo&gt;"}`. Para o provedor `files`, o nome é livre — ele serve para eu me organizar. Estilo = emoção e ritmo apenas, curto, em inglês (ex.: `calm, low, measured`). Cada cue pode sobrescrever com `voice`/`style`.
 3. Pronúncia: confira o `glossary` do `config.yaml` (marcas e nomes estrangeiros com grafia fonética).
-4. Gere uma frase de teste para cada voz **na interface/ferramenta da minha conta** (ou no provedor por API, se eu tiver configurado) e salve em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav` — um WAV PCM válido por cue. Use o mesmo `id` do `cues.json`.
+4. Gere uma frase de teste para cada voz **na interface/ferramenta da minha conta** (provider `files`), **com o Piper local** (`piper`) ou no provedor por API, se eu tiver configurado. No `files`, salve em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav` — um WAV PCM válido por cue, com o mesmo `id` do `cues.json`. No `piper`, ajuste `voices.provider: piper` e deixe o kit sintetizar.
 5. Rode `./kit.sh run --project /projects/&lt;NOME&gt; --json voices --only A,B,C` para o kit validar e normalizar as vozes. Os WAVs finais ficam em `work/voices/`. Mande-me os caminhos e a duração de cada um; **eu escuto** e decido. Se a duração passar do tempo do cue, reescreva o texto (não acelere).
-6. Rode `./kit.sh run --project /projects/&lt;NOME&gt; --json status` e confira `next_actions`.
+6. Depois que eu ouvir e aprovar, rode `./kit.sh run --project /projects/&lt;NOME&gt; --json approve --voice --by &lt;MEU_NOME&gt;`; depois `./kit.sh run --project /projects/&lt;NOME&gt; --json status` e confira `next_actions`.
 
 Regras: as contas são minhas; não peça nem copie login, cookie ou perfil. Não me peça chave de API no modo `files`. Se o provedor por API devolver 429/5xx, o kit tenta de novo sozinho; erro 4xx (chave, modelo, cota) você me mostra literalmente, sem a chave, em vez de tentar outro caminho. Custo de API, se houver, é decidido por mim. Reporte a tabela de vozes, os WAVs de teste e o que ficou pendente. Diga o que **não verificou**: naturalidade e emoção das vozes (você não ouve) e a adequação do timbre.</pre>
 </article>
@@ -939,7 +1050,7 @@ Regras: as contas são minhas; não peça nem copie login, cookie ou perfil. Nã
 
 Ciclo: `init` → `transcribe` → `frames` → `cues.json` → `check` → `voices` → `run` → `qa --strict`. Aqui estamos no `run` e no `qa --strict`.
 
-1. Rode tudo: `./kit.sh run --project /projects/&lt;NOME&gt; --json run --strict`. Ordem interna: `check → voices → schedule → mix → render → qa`. Saídas em `out/`: `video.mp4`, `legendas.srt`, `qa.json`.
+1. Confirme que `approvals.json` tem `script` e `voice` aprovados; se não, pare e me peça a aprovação (`./kit.sh run --project /projects/&lt;NOME&gt; --json approve --script --voice --by &lt;MEU_NOME&gt;`). Depois rode tudo: `./kit.sh run --project /projects/&lt;NOME&gt; --json run --strict`. Ordem interna: `check → voices → schedule → mix → render → qa`. Saídas em `out/`: `video.mp4`, `legendas.srt`, `qa.json`.
 2. Rode o gate obrigatório: `./kit.sh run --project /projects/&lt;NOME&gt; --json qa --strict`. **Exit 1 = reprovado**: corrija e repita; não entregue com erro.
 3. Leia `out/qa.json`. Cada issue tem `level` (error/warn), `code` e mensagem. Resolva assim:
    - `OVERFLOW` / `TEMPO_CLAMPED`: a fala não coube no tempo. **Reescreva o texto do cue mais curto** em `cues.json`, regenere a voz em `voices/&lt;id&gt;.wav` e rode `./kit.sh run --project /projects/&lt;NOME&gt; --json voices --only &lt;id&gt;`; depois `./kit.sh run --project /projects/&lt;NOME&gt; --json schedule`. Não aumente `max_tempo` além de 1,2 sem eu aprovar.
@@ -963,12 +1074,14 @@ Antes de publicar em qualquer lugar: o vídeo contém voz sintética de pessoas 
   </div>
   <pre data-prompt="08-video-por-cenas">Você é meu assistente de **vídeo por cenas**. O **Forja** já está pronto. O objetivo é criar um vídeo do zero a partir do meu briefing, sem vídeo de origem.
 
-1. Crie o projeto: `forja init &lt;DIR&gt;` **sem `--source`**. Isso cria um projeto do workflow `storyboard` com `config.yaml` e um `storyboard.yaml` inicial. No kit, use `./kit.sh run --json init /projects/&lt;NOME&gt;`.
-2. Pergunte a mim o briefing: tema, duração, tom, público, cenas e o que aparece em cada uma. **Pergunte antes de gastar API** e antes de escolher voz.
-3. Escreva `storyboard.yaml` (versão 1) com `canvas` e `scenes[]`. Camadas do v1: `clip` (arquivo, `in_s`, `fit`), `narration` (texto e voz), `captions` (a partir da narração), `card` (PNG) e `music` (trilha). `music` **exige** `license.kind`. Coloque os assets em `assets/`, sempre com caminhos **relativos** à raiz do projeto.
+1. Crie o projeto: `forja init &lt;DIR&gt;` **sem `--source`**. Isso cria `config.yaml`, `brief.yaml`, `approvals.json` e um `storyboard.yaml` inicial, com `require_approvals` ligado. No kit, use `./kit.sh run --json init /projects/&lt;NOME&gt;`.
+2. Pergunte a mim o briefing: tema, duração, tom, público, cenas, o que aparece em cada uma e as restrições. Preencha o `brief.yaml` comigo (objetivo, público, tom, duração, `must_include`, `must_avoid`, consentimento). **Pergunte antes de gastar API** e antes de escolher voz.
+3. Escreva `storyboard.yaml` (versão 1) com `canvas` e `scenes[]`. Camadas: `clip` (arquivo, `in_s`, `fit`), `narration` (texto e voz), `captions` (a partir da narração), `card` (PNG), `music` (trilha), `overlay` e `sfx`. `music` **exige** `license.kind`. Coloque os assets em `assets/`, sempre com caminhos **relativos** à raiz do projeto.
+   - Overlays profissionais: `preset` `lower_third`, `title`, `callout`, `quote`, `cta`, `logo` ou `stat`; `text`/`subtext`, `position`, `enter`, `hold_s` e `style` opcional. O tema vem de `brand` no `config.yaml` (cores, fonte, margem, logo). Quando o overlay fica embaixo, a legenda sobe sozinha.
+   - Escolha **um** overlay principal por cena; não empilhe título + lower-third + CTA no mesmo instante. Mostre o plano de overlays para eu aprovar antes de renderizar.
 4. Rode `./kit.sh run --project /projects/&lt;NOME&gt; --json run --only validate` e ajuste o `storyboard.yaml` até o gate passar. Ele valida esquema, assets e licença da música; corrija os `issues` em vez de contornar.
-5. Rode `./kit.sh run --project /projects/&lt;NOME&gt; --json run` e depois `./kit.sh run --project /projects/&lt;NOME&gt; --json qa --strict`. **Exit 1 = reprovado**; não entregue com erro.
-6. Abra `out/video.mp4` e confira **3 quadros** do resultado (início, meio, fim) com `ffmpeg` no `./kit.sh shell`: legendas legíveis, cards no lugar, nada cortado. Use `forja status` e o campo `next_actions` entre os passos.
+5. Peça minha aprovação de roteiro/overlays/voz e registre: `./kit.sh run --project /projects/&lt;NOME&gt; --json approve --script --voice --overlays --by &lt;MEU_NOME&gt;`. Só então rode `./kit.sh run --project /projects/&lt;NOME&gt; --json run` e `./kit.sh run --project /projects/&lt;NOME&gt; --json qa --strict`. **Exit 1 = reprovado**; não entregue com erro.
+6. Abra `out/video.mp4` e confira **3 quadros** do resultado (início, meio, fim) com `ffmpeg` no `./kit.sh shell`: legendas legíveis, cards e overlays no lugar, nada cortado, e a legenda não colidindo com o lower-third. Use `forja status` e o campo `next_actions` entre os passos.
 
 Limites do v1, com franqueza:
 - O áudio embutido dos clipes e os `sfx` **não entram na mixagem**; a CLI avisa com `CLIP_AUDIO_IGNORED` e `SFX_IGNORED`. Não prometa som de clipe.
@@ -983,7 +1096,7 @@ Veja o exemplo `examples/storyboard-demo/`. Reporte o projeto criado, o `storybo
     <div>
       <p class="prompt-id">09</p>
       <h3>Evoluir a forja</h3>
-      <p class="when">Quando usar: Quando voce quer um provedor ou um workflow novo, sem quebrar o resto.</p>
+      <p class="when">Quando usar: Quando voce quer um provedor, overlay ou workflow novo, sem quebrar o resto.</p>
     </div>
     <button class="copy" type="button" data-copy="09-evoluir-a-forja" aria-label="Copiar o prompt Evoluir a forja">Copiar</button>
   </div>
@@ -992,6 +1105,7 @@ Veja o exemplo `examples/storyboard-demo/`. Reporte o projeto criado, o `storybo
 1. Leia `AGENTS.md` e `DESIGN.md` antes de escrever código. Eles definem o contrato: envelope JSON, códigos de saída, passos, injeção de subprocesso/rede e a regra de segredos.
 2. **Escreva o teste de contrato antes** da implementação: pytest em `tests/`, com o módulo importado **dentro** do teste, e subprocessos/rede **injetáveis** (`run=`, `post=`). Teste o comportamento observável, não detalhes internos.
 3. Novo provedor de TTS: use `@register("tts", "nome", requires_env=(...))` em `forja/registry.py` (ou um plugin por entry point). A fábrica devolve `callable(cue, cfg, cache_dir, post=..., env=...) -&gt; bytes | Path` com o WAV bruto; `config.yaml` aceita o nome registrado e `tts.synthesize` despacha. Para STT/render/clip, registre no mesmo padrão e conecte no módulo correspondente. Nunca leia a chave no código; `requires_env` só declara o **nome** da variável.
+3b. Overlays novos: estenda `_OVERLAY_PRESETS`/`_check_overlay` em `forja/storyboard.py`, o componente `remotion-template/src/Overlay.jsx` e os testes; valide estilo, posição e assets. Brief/aprovação: estenda `forja/brief.py` e o comando `approve` sem quebrar o gate `GATE_FAILED`.
 4. Novo workflow: registre com `register_workflow` em `forja/workflows/` e devolva passos no mesmo formato (`Step` com `needs`, `inputs`, `outputs`, `run`). Reuse os módulos-biblioteca; não duplique lógica.
 5. Rode a suíte inteira: `/usr/bin/python3 -m pytest -q tests`. Corrija o que quebrar; não desabilite teste para passar.
 6. Atualize `docs/ROADMAP.md` com o que entrou e o que ficou fora. Se mudar contrato, atualize `DESIGN.md` e `skills/forja/SKILL.md` no mesmo passo.
@@ -1025,7 +1139,7 @@ Fatos medidos que decidem o desenho:
 
 Passos:
 1. Descubra onde está o Chrome (`google-chrome`, `chromium`, caminho do Windows `%ProgramFiles%\Google\Chrome\Application\chrome.exe`, ou `/Applications/Google Chrome.app`).
-2. Abra com: `--user-data-dir=&lt;pasta-do-perfil-dedicado&gt; --remote-debugging-port=9222 --no-first-run --window-size=1280,900 --window-position=60,60 https://aistudio.google.com/` (ou a interface do provedor que eu escolher). A pasta do perfil fica fora do kit e **nunca** entra em backup nem em git.
+2. Abra com: `--user-data-dir=&lt;pasta-do-perfil-dedicado&gt; --remote-debugging-port=9222 --no-first-run --window-size=1280,900 --window-position=60,60 &lt;INTERFACE_DO_SEU_PROVEDOR&gt;` (ou a interface do provedor que eu escolher). A pasta do perfil fica fora do kit e **nunca** entra em backup nem em git.
 3. Espere eu fazer o login e me avise quando a página inicial aparecer.
 4. Confirme o CDP: `GET http://127.0.0.1:9222/json/version` deve responder com a versão do Chrome. A porta **nunca** pode ser exposta fora de `127.0.0.1` (ela não tem autenticação: quem alcança controla o navegador e as sessões logadas).
 5. Para controlar, use o **Playwright MCP** do seu agente apontando para `http://127.0.0.1:9222` (`npx @playwright/mcp@latest --cdp-endpoint http://127.0.0.1:9222`) ou o seu recurso de "computer use". Uma única instância por perfil.
@@ -1047,7 +1161,7 @@ Reporte o navegador encontrado, o perfil usado, o resultado do CDP e se o login 
   <pre data-prompt="11-navegador-em-container">Você é meu assistente de infraestrutura. Quero o **Chromium rodando dentro de um container Docker**, visível numa aba do meu navegador normal, para eu fazer login com a **minha conta** e usar a interface do provedor de voz sem instalar nada nem aparecer na minha área de trabalho. Este é o caminho recomendado para contas próprias; a chave de API é opcional.
 
 1. Garanta o `.env` (`./kit.sh setup` cria `BROWSER_PASSWORD` aleatória). Não imprima a senha; eu a pego do arquivo.
-2. Suba: `./kit.sh browser-up`. Ele inicia o Chromium (imagem `linuxserver/chromium`, `linux/amd64`) e um pequeno proxy que torna o CDP alcançável **somente** em `127.0.0.1:9222` da minha máquina.
+2. Suba: `./kit.sh browser-up`. Ele inicia o Chromium (imagem `linuxserver/chromium`, `linux/amd64`) e um pequeno proxy que torna o CDP alcançável **somente** em `127.0.0.1:9222` da minha máquina. A URL inicial vem de `BROWSER_START_URL` no `.env` (ex.: a interface do provedor que eu uso).
 3. Eu abro **https://localhost:3001** (aceito o certificado autoassinado, entro com usuário/senha do `.env`) e faço o login do provedor **uma única vez nessa aba**. O perfil fica num **volume Docker** (`chromium-config`), nunca na imagem; sobrevive a reinícios. O login é feito **dentro deste ambiente final**; a sessão **não é movida** entre máquinas.
 4. Confirme o CDP: `GET http://127.0.0.1:9222/json/version` responde; um cliente Playwright consegue `connectOverCDP("http://127.0.0.1:9222")` e listar a aba. **Não** conecte pelo nome do container (`browser:9222`): o Chromium recusa Host que não seja IP/localhost (HTTP 500).
 5. Para controlar, use o Playwright MCP ou "computer use" do seu agente apontando para esse endereço. Deixe a aba `https://localhost:3001` aberta para eu acompanhar.
@@ -1102,7 +1216,10 @@ Reporte os modelos criados, o que falta assinar e os avisos. Diga o que **não v
 4. Por sintoma:
    - **`build` falha por memória / "killed"**: aumente a memória do Docker Desktop (Settings → Resources) para 8 GB.
    - **`transcribe` lento ou travado na primeira vez**: está baixando o modelo (≈1,6 GB, uma vez). Confira a pasta `models/` e a conexão. Em máquina fraca troque `transcribe.model` para `small` no `config.yaml`.
-   - **`voices` com `MISSING_INPUT`**: falta o WAV em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav`. Gere a voz com a minha conta/ferramenta (interface web ou provedor que eu escolher) e salve nesse caminho; depois rode `./kit.sh run --project /projects/&lt;NOME&gt; --json voices --only &lt;id&gt;`. No modo `files` não existe chave de API.
+   - **`voices` com `MISSING_INPUT`**: falta o WAV em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav`. Gere a voz com a minha conta/ferramenta e salve nesse caminho; ou use `voices.provider: piper`; depois rode `./kit.sh run --project /projects/&lt;NOME&gt; --json voices --only &lt;id&gt;`. No modo `files`/`piper` não existe chave de API.
+   - **`voices` com `MISSING_PREREQ` no piper**: binário `piper` ou modelo `.onnx` ausente na imagem/config. Confira `voices.piper.binary`/`model` e rode `./kit.sh doctor`; no kit, o modelo é `/opt/piper/pt_BR-faber-medium.onnx`.
+   - **`GATE_FAILED` com "aprovacao humana pendente"**: falta `forja approve --script --voice --overlays --by &lt;nome&gt;` (ou `project.require_approvals` está ligado e o `approvals.json` não tem as chaves). Peça a aprovação humana; não contorne o gate.
+   - **`OVERLAY_*`/`ASSET_*` no validate**: preset/posição/texto/estilo inválido ou asset fora da raiz. Corrija o `storyboard.yaml`; não mova assets para fora do projeto.
    - **`voices` com `CONFIG_INVALID`**: o WAV não é PCM válido ou o `id` tem caractere inseguro. Use um WAV mono/estéreo válido e um `id` com letras, números, ponto, hífen ou sublinhado.
    - **`voices` erro 400/403/404 (somente provider API)**: chave inválida, API desativada ou modelo desligado — confira `voices.model` na documentação do provedor. **Mostre-me o erro literal** (sem a chave).
    - **`voices` erro 429 (somente provider API)**: limite de cota; o kit já tenta de novo com espera. Se persistir, espere ou use um projeto com faturamento.
@@ -1135,13 +1252,13 @@ Reporte o sintoma, o comando que reproduz, o `error.code`/`error.hint` e o que j
 
 <section id="seguranca">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">06</span><h2>Segurança sem drama</h2></div>
+    <div class="sec-head"><span class="sec-num">08</span><h2>Segurança sem drama</h2></div>
     <p class="sec-lede">O kit foi desenhado para uma máquina e para as <strong>suas</strong> contas. Estas são as regras que mantêm isso simples.</p>
 
     <div class="cards">
       <article class="card">
         <h4>Sem chave obrigatória</h4>
-        <p>No modo padrão (<code>voices.provider: files</code>), o kit não fala com nenhum serviço de voz: você gera os WAVs e ele valida/mixa. Se optar por um provedor de API, a chave fica só no <code>.env</code> (0600 no Linux/macOS; no Windows, restrinja a pasta do kit), nunca em log, commit, print ou <code>--json</code>.</p>
+        <p>Nos modos <code>piper</code>/<code>files</code>, o kit não fala com nenhum serviço de voz: ele sintetiza localmente ou valida/mixa os WAVs. Se optar por um provedor de API, a chave fica só no <code>.env</code> (0600 no Linux/macOS; no Windows, restrinja a pasta do kit), nunca em log, commit, print ou <code>--json</code>.</p>
       </article>
       <article class="card">
         <h4>O container não é root</h4>
@@ -1160,6 +1277,10 @@ Reporte o sintoma, o comando que reproduz, o `error.code`/`error.hint` e o que j
         <p>Use a sua conta e a sua ferramenta de voz. Não compartilhe login, não empreste chave e não deixe a tela do Chromium aberta em máquina compartilhada.</p>
       </article>
       <article class="card">
+        <h4>Aprovação é humana</h4>
+        <p><code>brief.yaml</code> registra objetivo/público/tom; <code>forja approve</code> registra roteiro/voz/overlays. Com <code>require_approvals</code>, o render falha com <code>GATE_FAILED</code> sem essas chaves.</p>
+      </article>
+      <article class="card">
         <h4>Consentimento é de quem publica</h4>
         <p>Voz sintetizada de pessoa real pede autorização e aviso. O prompt 12 monta a pasta de conformidade com você; a decisão final é sempre humana.</p>
       </article>
@@ -1174,7 +1295,7 @@ Reporte o sintoma, o comando que reproduz, o `error.code`/`error.hint` e o que j
 
 <section id="licencas">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">07</span><h2>Licenças e direitos</h2></div>
+    <div class="sec-head"><span class="sec-num">09</span><h2>Licenças e direitos</h2></div>
     <p class="sec-lede">Você não precisa ser advogado para usar o kit — mas precisa saber o que está usando e o que vai publicar.</p>
 
     <div class="table-wrap">
@@ -1195,6 +1316,11 @@ Reporte o sintoma, o comando que reproduz, o `error.code`/`error.hint` e o que j
             <td><strong>Whisper / faster-whisper</strong></td>
             <td>MIT (modelo e implementação).</td>
             <td>Transcrição local, sem custo por minuto. O modelo é baixado uma vez.</td>
+          </tr>
+          <tr>
+            <td><strong>Piper TTS + voz pt-BR</strong></td>
+            <td><code>piper-tts</code> GPL-3.0-or-later; modelo/voz MIT e dataset CC0.</td>
+            <td>Roda local, sem conta/API. O áudio gerado não herda a GPL; a imagem inclui um binário GPL (como o ffmpeg) — se redistribuir a imagem, cumpra as obrigações de fonte.</td>
           </tr>
           <tr>
             <td><strong>Provedor de voz</strong></td>
@@ -1229,7 +1355,7 @@ Reporte o sintoma, o comando que reproduz, o `error.code`/`error.hint` e o que j
 
 <section id="navegador">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">08</span><h2>O Chromium pode rodar minimizado?</h2></div>
+    <div class="sec-head"><span class="sec-num">10</span><h2>O Chromium pode rodar minimizado?</h2></div>
     <p class="sec-lede">Pergunta curta, resposta honesta: <strong>não é confiável</strong>. Janela minimizada ou totalmente coberta conta como oculta para o navegador.</p>
 
     <div class="note">
@@ -1273,7 +1399,7 @@ Reporte o sintoma, o comando que reproduz, o `error.code`/`error.hint` e o que j
 
 <section id="problemas">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">09</span><h2>Quando algo dá errado</h2></div>
+    <div class="sec-head"><span class="sec-num">11</span><h2>Quando algo dá errado</h2></div>
     <p class="sec-lede">Não adivinhe a causa. Leia o erro literal, reproduza com o menor comando possível e só então conclua. O prompt 13 conduz o agente por essa ordem.</p>
 
     <ol class="steps">
@@ -1304,10 +1430,11 @@ Reporte o sintoma, o comando que reproduz, o `error.code`/`error.hint` e o que j
       <table>
         <thead><tr><th>Código do erro</th><th>Quase sempre é</th><th>Saída</th></tr></thead>
         <tbody>
-          <tr><td><code>MISSING_INPUT</code></td><td>Falta a voz em <code>voices/&lt;id&gt;.wav</code> ou outro arquivo de entrada.</td><td>Gere a voz com a sua conta/ferramenta e salve no caminho indicado; rode o passo de novo.</td></tr>
+          <tr><td><code>MISSING_INPUT</code></td><td>Falta a voz em <code>voices/&lt;id&gt;.wav</code> ou outro arquivo de entrada.</td><td>Gere a voz com a sua conta/ferramenta e salve no caminho indicado; ou use <code>voices.provider: piper</code>; rode o passo de novo.</td></tr>
           <tr><td><code>MISSING_KEY</code></td><td>Só no provedor por API: a chave não está no <code>.env</code>.</td><td>Se você optou por API, preencha a chave; no modo <code>files</code>, isso não se aplica.</td></tr>
-          <tr><td><code>MISSING_PREREQ</code></td><td>Falta ffmpeg, modelo ou o build não terminou.</td><td>Rode <code>./kit.sh doctor</code> e <code>./kit.sh build</code>.</td></tr>
-          <tr><td><code>GATE_FAILED</code></td><td>O check ou o QA encontrou erro.</td><td>Corrija os itens de <code>issues</code>; não force a entrega.</td></tr>
+          <tr><td><code>MISSING_PREREQ</code></td><td>Falta ffmpeg, o binário/modelo do Piper ou o build não terminou.</td><td>Rode <code>./kit.sh doctor</code> e <code>./kit.sh build</code>; confira <code>voices.piper.binary</code>/<code>model</code>.</td></tr>
+          <tr><td><code>GATE_FAILED</code></td><td>O check/QA encontrou erro ou falta aprovação humana.</td><td>Corrija os <code>issues</code>; se for aprovação, rode <code>forja approve --script --voice --overlays --by NOME</code>. Não force a entrega.</td></tr>
+          <tr><td><code>OVERLAY_* / ASSET_*</code></td><td>Preset, texto, posição, estilo ou asset do overlay inválido.</td><td>Corrija o <code>storyboard.yaml</code>; assets devem ficar dentro da raiz do projeto.</td></tr>
           <tr><td><code>RATE_LIMITED</code></td><td>Cota do provedor.</td><td>Aguarde; o kit já tenta de novo com espera.</td></tr>
           <tr><td><code>CONFIG_INVALID</code></td><td><code>config.yaml</code> ou <code>storyboard.yaml</code> inválido.</td><td>Leia a mensagem; rode <code>forja init</code> de novo se necessário.</td></tr>
           <tr><td><code>USAGE</code></td><td>Comando ou argumento errado.</td><td>Confira <code>forja --help</code> e o prompt da etapa.</td></tr>
