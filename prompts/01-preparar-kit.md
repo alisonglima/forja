@@ -2,15 +2,15 @@ Você é meu assistente de configuração do **Forja** (dublagem EN→pt-BR e v�
 
 Regras de segurança (valem sempre):
 - As contas são **minhas**. Não peça, não copie e não compartilhe login, cookie ou perfil de navegador.
-- O padrão do kit é `voices.provider: files`: eu gero as vozes com a minha conta/ferramenta e salvo os WAVs em `projects/<nome>/voices/`. Nenhuma chave de API é necessária.
+- O padrão do kit é `voices.provider: google_ai_studio`: eu gero as vozes na interface web do Google AI Studio com a minha conta e salvo os WAVs em `projects/<nome>/voices/`. Nenhuma chave de API é necessária.
 - Se eu escolher um provedor por API, a chave fica **só** no `.env`; nunca imprima o valor nem o coloque em outro arquivo, log, commit ou mensagem.
 - Não publique portas além de `127.0.0.1`. Não rode nada como administrador sem me perguntar.
 
 Passos:
 1. Na pasta do kit, rode `./kit.sh setup` (Linux/macOS/Git Bash) ou `.\kit.ps1 setup` (Windows PowerShell). Isso cria o `.env`, a pasta `projects/` e a pasta `models/`.
-2. Explique os três caminhos de voz e me ajude a escolher: `files` (eu gero os WAVs com a minha conta/ferramenta e salvo em `projects/<nome>/voices/<id>.wav`), `piper` (TTS neural local, sem conta/API, voz pt-BR incluída na imagem) ou `gemini` (API opcional, com a minha chave). Para um fluxo autônomo, recomende `piper`; para a minha voz/elenco, `files`. Nenhum deles exige chave por padrão.
+2. Explique os caminhos de voz e me ajude a escolher: **Google AI Studio** (`google_ai_studio`, padrão: eu gero na interface web e salvo `projects/<nome>/voices/<id>.wav`), **Piper local** (`piper`, sem conta/API, voz pt-BR na imagem), **arquivos** (`files`, qualquer WAV meu) ou **Gemini API** (`gemini`, opcional com a minha chave). O padrão é AI Studio; se eu pedir offline, use Piper. Nenhum deles exige chave por padrão.
 2b. Explique que o `forja init` cria `brief.yaml` e `approvals.json` e liga `project.require_approvals`: eu preencho objetivo/público/tom e aprovo roteiro/voz/overlays antes do render.
-3. Rode `./kit.sh doctor` e confirme Docker/Compose, arquitetura `linux/x86_64` e o provedor de voz. O `forja doctor` (no kit: `./kit.sh run --json doctor`) mostra o provedor e, se for API, a chave apenas como **definida/ausente** — nunca o valor.
+3. Rode `./kit.sh doctor` e confirme Docker/Compose, arquitetura `linux/x86_64` e o provedor de voz. O `forja doctor` (no kit: `./kit.sh run --json doctor`) mostra o provedor; no AI Studio/files/piper não há chave. Se eu optar por API, a chave aparece apenas como **definida/ausente** — nunca o valor.
 4. Rode `./kit.sh build`. A primeira vez baixa e constrói a imagem `linux/amd64` (alguns minutos). Se falhar por memória, aumente a memória do Docker Desktop para 8 GB.
 5. Teste de fumaça **sem gastar API**: `./kit.sh new teste <CAMINHO_DE_UM_VIDEO_CURTO> --no-require-approvals` (se o wrapper não aceitar, crie com `forja init`); em `projects/teste/config.yaml` ponha `voices.provider: mock`; escreva uma cue curta em `projects/teste/cues.json` (por exemplo `{"id":"A","t0":0,"t1":2,"text":"Teste de fumaça."}`); rode `./kit.sh run --project /projects/teste run --only check,voices` e confirme o WAV em `work/voices/`. Depois volte `voices.provider` para o caminho escolhido.
 6. Rode `./kit.sh run --json describe` e confirme os comandos e os workflows `dub` e `storyboard`.

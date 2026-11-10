@@ -356,7 +356,7 @@ marker path { fill: var(--accent); }
     <div class="hero-copy">
       <p class="eyebrow">Guia do kit · versão 0.1</p>
       <h1>Vídeo com voz e legenda,<br><em>operado pelo seu agente.</em></h1>
-      <p class="lede">A <strong>forja</strong> dubla vídeos para o português e monta vídeos por cenas usando a <strong>voz local</strong> ou as <strong>suas contas</strong>. Você conversa com o seu agente de IA; ele roda os comandos, confere o resultado e pede a sua decisão quando é hora de escolher.</p>
+      <p class="lede">A <strong>forja</strong> dubla vídeos para o português e monta vídeos por cenas com narração no <strong>Google AI Studio</strong> por padrão — ou com modelos locais, se você preferir. Você conversa com o seu agente de IA; ele roda os comandos, confere o resultado e pede a sua decisão quando é hora de escolher.</p>
       <div class="actions">
         <a class="btn primary" href="#visao-geral">Entender em 2 minutos</a>
         <a class="btn" href="#prompts">Ir para os prompts</a>
@@ -537,8 +537,8 @@ marker path { fill: var(--accent); }
 
 <section id="modo-simples">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">03</span><h2>Modo padrão: voz local ou suas contas</h2></div>
-    <p class="sec-lede">Dois caminhos <strong>sem chave de API</strong>: o Piper local (voz neural na imagem) ou a sua conta/ferramenta. Você escolhe com o agente e o kit faz o resto.</p>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Modo padrão: Google AI Studio</h2></div>
+    <p class="sec-lede">O caminho padrão é o <strong>Google AI Studio</strong>, com a sua conta, sem chave de API. O Piper local é o plano B offline; os dois alimentam o mesmo pipeline.</p>
 
     <ol class="steps">
       <li>
@@ -547,11 +547,11 @@ marker path { fill: var(--accent); }
       </li>
       <li>
         <strong>Escolha o caminho de voz.</strong>
-        <p><code>voices.provider: piper</code> sintetiza localmente com a voz pt-BR da imagem, sem conta nem API. <code>files</code> lê os WAVs que você gera com a sua conta/ferramenta em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. <code>gemini</code> é API opcional.</p>
+        <p>O padrão é <code>voices.provider: google_ai_studio</code>: você gera as vozes na interface web do AI Studio e salva em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. Para autonomia offline, troque para <code>piper</code> (voz pt-BR na imagem). <code>files</code> é alias para qualquer WAV; <code>gemini</code> é API opcional.</p>
       </li>
       <li>
         <strong>Gere as vozes.</strong>
-        <p>No <code>piper</code>, rode o passo <code>voices</code> e o kit sintetiza cada cue. No <code>files</code>, abra a interface/ferramenta da sua conta, gere a fala de cada cue e salve um WAV PCM em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. O kit valida, normaliza e mixa.</p>
+        <p>No <strong>Google AI Studio</strong> (padrão), abra a interface com a sua conta, gere a fala de cada cue e salve um WAV PCM em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. No <code>piper</code>, rode o passo <code>voices</code> e o kit sintetiza localmente. O kit valida, normaliza e mixa.</p>
       </li>
       <li>
         <strong>Confira o ambiente.</strong>
@@ -569,7 +569,7 @@ marker path { fill: var(--accent); }
 
     <div class="note ok">
       <span class="label">nenhuma chave obrigatória</span>
-      <p>Nos modos <code>piper</code>/<code>files</code>, o kit não fala com nenhum serviço de voz: ele sintetiza localmente ou valida/mixa os arquivos que você gerou. Se você escolher um provedor por API, a chave é sua, fica no <code>.env</code> e o gasto é decidido por você.</p>
+      <p>Nos modos <code>google_ai_studio</code>/<code>files</code>/<code>piper</code>, o kit não fala com nenhum serviço de voz: ele lê os WAVs que você gerou ou sintetiza localmente. Se você escolher um provedor por API, a chave é sua, fica no <code>.env</code> e o gasto é decidido por você.</p>
     </div>
 
     <h3 style="margin-top:34px">O que fica onde</h3>
@@ -614,7 +614,7 @@ marker path { fill: var(--accent); }
       </li>
       <li>
         <strong>Opcional: provedor por API.</strong>
-        <p>Se você preferir automatizar a síntese, configure <code>voices.provider: gemini</code>, <code>voices.model</code> e a sua chave no <code>.env</code>. O caminho padrão continua sendo <code>files</code>.</p>
+        <p>Se você preferir automatizar a síntese, configure <code>voices.provider: gemini</code>, <code>voices.model</code> e a sua chave no <code>.env</code>. O caminho padrão continua sendo <code>google_ai_studio</code>.</p>
       </li>
       <li>
         <strong>Termine com cuidado.</strong>
@@ -630,13 +630,13 @@ marker path { fill: var(--accent); }
     <h3 style="margin-top:34px">Padrão ou avançado?</h3>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Pergunta</th><th>Modo padrão (contas)</th><th>Modo avançado</th></tr></thead>
+        <thead><tr><th>Pergunta</th><th>Modo padrão (AI Studio)</th><th>Modo avançado</th></tr></thead>
         <tbody>
-          <tr><td><strong>Como gera as vozes</strong></td><td>Interface/ferramenta com a sua conta; <code>voices.provider: files</code></td><td>Chromium no container + interface; API opcional</td></tr>
+          <tr><td><strong>Como gera as vozes</strong></td><td>Interface web do AI Studio com a sua conta; <code>google_ai_studio</code> (ou <code>piper</code> local)</td><td>Chromium no container + interface; API opcional</td></tr>
           <tr><td><strong>Navegador</strong></td><td>O seu, em outra área de trabalho</td><td>Chromium no Docker, numa aba de <code>https://localhost:3001</code></td></tr>
           <tr><td><strong>Chave de API</strong></td><td>Nenhuma</td><td>Só se você configurar um provedor por API</td></tr>
           <tr><td><strong>O que instala</strong></td><td>Só a imagem da forja</td><td>Imagem da forja + Chromium (~2,6&nbsp;GB) + proxy</td></tr>
-          <tr><td><strong>Quando escolher</strong></td><td>Padrão. Você quer usar a sua conta sem instalar nada além do kit.</td><td>Você quer a UI numa aba do navegador ou vai automatizar por API.</td></tr>
+          <tr><td><strong>Quando escolher</strong></td><td>Padrão. AI Studio com a sua conta; Piper local se quiser offline.</td><td>Você quer a UI numa aba do navegador ou vai automatizar por API.</td></tr>
         </tbody>
       </table>
     </div>
@@ -896,15 +896,15 @@ Critério de pronto: os dois testes do passo 5 passam. Reporte versão do Docker
 
 Regras de segurança (valem sempre):
 - As contas são **minhas**. Não peça, não copie e não compartilhe login, cookie ou perfil de navegador.
-- O padrão do kit é `voices.provider: files`: eu gero as vozes com a minha conta/ferramenta e salvo os WAVs em `projects/&lt;nome&gt;/voices/`. Nenhuma chave de API é necessária.
+- O padrão do kit é `voices.provider: google_ai_studio`: eu gero as vozes na interface web do Google AI Studio com a minha conta e salvo os WAVs em `projects/&lt;nome&gt;/voices/`. Nenhuma chave de API é necessária.
 - Se eu escolher um provedor por API, a chave fica **só** no `.env`; nunca imprima o valor nem o coloque em outro arquivo, log, commit ou mensagem.
 - Não publique portas além de `127.0.0.1`. Não rode nada como administrador sem me perguntar.
 
 Passos:
 1. Na pasta do kit, rode `./kit.sh setup` (Linux/macOS/Git Bash) ou `.\kit.ps1 setup` (Windows PowerShell). Isso cria o `.env`, a pasta `projects/` e a pasta `models/`.
-2. Explique os três caminhos de voz e me ajude a escolher: `files` (eu gero os WAVs com a minha conta/ferramenta e salvo em `projects/&lt;nome&gt;/voices/&lt;id&gt;.wav`), `piper` (TTS neural local, sem conta/API, voz pt-BR incluída na imagem) ou `gemini` (API opcional, com a minha chave). Para um fluxo autônomo, recomende `piper`; para a minha voz/elenco, `files`. Nenhum deles exige chave por padrão.
+2. Explique os caminhos de voz e me ajude a escolher: **Google AI Studio** (`google_ai_studio`, padrão: eu gero na interface web e salvo `projects/&lt;nome&gt;/voices/&lt;id&gt;.wav`), **Piper local** (`piper`, sem conta/API, voz pt-BR na imagem), **arquivos** (`files`, qualquer WAV meu) ou **Gemini API** (`gemini`, opcional com a minha chave). O padrão é AI Studio; se eu pedir offline, use Piper. Nenhum deles exige chave por padrão.
 2b. Explique que o `forja init` cria `brief.yaml` e `approvals.json` e liga `project.require_approvals`: eu preencho objetivo/público/tom e aprovo roteiro/voz/overlays antes do render.
-3. Rode `./kit.sh doctor` e confirme Docker/Compose, arquitetura `linux/x86_64` e o provedor de voz. O `forja doctor` (no kit: `./kit.sh run --json doctor`) mostra o provedor e, se for API, a chave apenas como **definida/ausente** — nunca o valor.
+3. Rode `./kit.sh doctor` e confirme Docker/Compose, arquitetura `linux/x86_64` e o provedor de voz. O `forja doctor` (no kit: `./kit.sh run --json doctor`) mostra o provedor; no AI Studio/files/piper não há chave. Se eu optar por API, a chave aparece apenas como **definida/ausente** — nunca o valor.
 4. Rode `./kit.sh build`. A primeira vez baixa e constrói a imagem `linux/amd64` (alguns minutos). Se falhar por memória, aumente a memória do Docker Desktop para 8 GB.
 5. Teste de fumaça **sem gastar API**: `./kit.sh new teste &lt;CAMINHO_DE_UM_VIDEO_CURTO&gt; --no-require-approvals` (se o wrapper não aceitar, crie com `forja init`); em `projects/teste/config.yaml` ponha `voices.provider: mock`; escreva uma cue curta em `projects/teste/cues.json` (por exemplo `{"id":"A","t0":0,"t1":2,"text":"Teste de fumaça."}`); rode `./kit.sh run --project /projects/teste run --only check,voices` e confirme o WAV em `work/voices/`. Depois volte `voices.provider` para o caminho escolhido.
 6. Rode `./kit.sh run --json describe` e confirme os comandos e os workflows `dub` e `storyboard`.
@@ -1024,14 +1024,14 @@ Use `forja status` e o campo `next_actions` para confirmar o próximo passo. Met
     </div>
     <button class="copy" type="button" data-copy="06-dublagem-elenco-e-vozes" aria-label="Copiar o prompt Dublagem: elenco e vozes">Copiar</button>
   </div>
-  <pre data-prompt="06-dublagem-elenco-e-vozes">Você é meu diretor de elenco de voz. O projeto `projects/&lt;NOME&gt;` já tem `cues.json` aprovado. Escolha o caminho de voz comigo: `files` (eu gero os WAVs com a minha conta/ferramenta e salvo em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav`), `piper` (TTS neural local, sem conta/API) ou `gemini` (API opcional, com a minha chave). Para narração autônoma, use `piper`; para a minha voz/elenco, `files`.
+  <pre data-prompt="06-dublagem-elenco-e-vozes">Você é meu diretor de elenco de voz. O projeto `projects/&lt;NOME&gt;` já tem `cues.json` aprovado. O caminho padrão é **Google AI Studio** (`google_ai_studio`): eu gero os WAVs na interface web com a minha conta e salvo em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav`. Se eu pedir offline, use **Piper local** (`piper`); se eu já tiver arquivos, `files`; API (`gemini`) é opcional e só com a minha chave.
 
 Ciclo: `init` → `transcribe` → `frames` → `cues.json` → `check` → `voices` → `run` → `qa --strict`. Aqui estamos no `voices`.
 
 1. Liste os falantes de `cues.json` e, para cada um, proponha uma voz **combinando timbre, ritmo e caráter da fala**. Cada pessoa diferente do vídeo precisa de uma voz diferente; a narradora/narrador do vídeo, uma voz estável. Descreva a voz em palavras (ex.: "feminina, grave, calma, ritmo lento") em vez de inventar idade ou gênero de quem aparece; meu julgamento é um palpite e você espera minha correção.
 2. Preencha `voices.cast` no `config.yaml` como **metadado**: um bloco por falante, `{voice: "&lt;nome ou descrição&gt;", style: "&lt;emoção e ritmo&gt;"}`. Para o provedor `files`, o nome é livre — ele serve para eu me organizar. Estilo = emoção e ritmo apenas, curto, em inglês (ex.: `calm, low, measured`). Cada cue pode sobrescrever com `voice`/`style`.
 3. Pronúncia: confira o `glossary` do `config.yaml` (marcas e nomes estrangeiros com grafia fonética).
-4. Gere uma frase de teste para cada voz **na interface/ferramenta da minha conta** (provider `files`), **com o Piper local** (`piper`) ou no provedor por API, se eu tiver configurado. No `files`, salve em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav` — um WAV PCM válido por cue, com o mesmo `id` do `cues.json`. No `piper`, ajuste `voices.provider: piper` e deixe o kit sintetizar.
+4. Gere uma frase de teste para cada voz **na interface do Google AI Studio** (provider `google_ai_studio`), **com o Piper local** (`piper`) ou no provedor por API, se eu tiver configurado. No AI Studio/files, salve em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav` — um WAV PCM válido por cue, com o mesmo `id` do `cues.json`. No `piper`, ajuste `voices.provider: piper` e deixe o kit sintetizar.
 5. Rode `./kit.sh run --project /projects/&lt;NOME&gt; --json voices --only A,B,C` para o kit validar e normalizar as vozes. Os WAVs finais ficam em `work/voices/`. Mande-me os caminhos e a duração de cada um; **eu escuto** e decido. Se a duração passar do tempo do cue, reescreva o texto (não acelere).
 6. Depois que eu ouvir e aprovar, rode `./kit.sh run --project /projects/&lt;NOME&gt; --json approve --voice --by &lt;MEU_NOME&gt;`; depois `./kit.sh run --project /projects/&lt;NOME&gt; --json status` e confira `next_actions`.
 
@@ -1216,7 +1216,7 @@ Reporte os modelos criados, o que falta assinar e os avisos. Diga o que **não v
 4. Por sintoma:
    - **`build` falha por memória / "killed"**: aumente a memória do Docker Desktop (Settings → Resources) para 8 GB.
    - **`transcribe` lento ou travado na primeira vez**: está baixando o modelo (≈1,6 GB, uma vez). Confira a pasta `models/` e a conexão. Em máquina fraca troque `transcribe.model` para `small` no `config.yaml`.
-   - **`voices` com `MISSING_INPUT`**: falta o WAV em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav`. Gere a voz com a minha conta/ferramenta e salve nesse caminho; ou use `voices.provider: piper`; depois rode `./kit.sh run --project /projects/&lt;NOME&gt; --json voices --only &lt;id&gt;`. No modo `files`/`piper` não existe chave de API.
+   - **`voices` com `MISSING_INPUT`**: falta o WAV em `projects/&lt;NOME&gt;/voices/&lt;id&gt;.wav`. Gere a voz com a minha conta/ferramenta e salve nesse caminho; ou use `voices.provider: piper`; depois rode `./kit.sh run --project /projects/&lt;NOME&gt; --json voices --only &lt;id&gt;`. Nos modos `google_ai_studio`/`files`/`piper` não existe chave de API.
    - **`voices` com `MISSING_PREREQ` no piper**: binário `piper` ou modelo `.onnx` ausente na imagem/config. Confira `voices.piper.binary`/`model` e rode `./kit.sh doctor`; no kit, o modelo é `/opt/piper/pt_BR-faber-medium.onnx`.
    - **`GATE_FAILED` com "aprovacao humana pendente"**: falta `forja approve --script --voice --overlays --by &lt;nome&gt;` (ou `project.require_approvals` está ligado e o `approvals.json` não tem as chaves). Peça a aprovação humana; não contorne o gate.
    - **`OVERLAY_*`/`ASSET_*` no validate**: preset/posição/texto/estilo inválido ou asset fora da raiz. Corrija o `storyboard.yaml`; não mova assets para fora do projeto.
@@ -1258,7 +1258,7 @@ Reporte o sintoma, o comando que reproduz, o `error.code`/`error.hint` e o que j
     <div class="cards">
       <article class="card">
         <h4>Sem chave obrigatória</h4>
-        <p>Nos modos <code>piper</code>/<code>files</code>, o kit não fala com nenhum serviço de voz: ele sintetiza localmente ou valida/mixa os WAVs. Se optar por um provedor de API, a chave fica só no <code>.env</code> (0600 no Linux/macOS; no Windows, restrinja a pasta do kit), nunca em log, commit, print ou <code>--json</code>.</p>
+        <p>Nos modos <code>google_ai_studio</code>/<code>files</code>/<code>piper</code>, o kit não fala com nenhum serviço de voz: ele lê os WAVs do AI Studio ou sintetiza localmente. Se optar por um provedor de API, a chave fica só no <code>.env</code> (0600 no Linux/macOS; no Windows, restrinja a pasta do kit), nunca em log, commit, print ou <code>--json</code>.</p>
       </article>
       <article class="card">
         <h4>O container não é root</h4>
@@ -1325,7 +1325,7 @@ Reporte o sintoma, o comando que reproduz, o `error.code`/`error.hint` e o que j
           <tr>
             <td><strong>Provedor de voz</strong></td>
             <td>Termos da conta/provedor que você escolher; API opcional.</td>
-            <td>No modo <code>files</code>, você controla a geração e o áudio não passa pelo kit. Se usar uma API, o texto da narração é enviado ao provedor e valem os termos e a política dele.</td>
+            <td>No modo <code>google_ai_studio</code>/<code>files</code>, você controla a geração e o áudio não passa pelo kit. Se usar uma API, o texto da narração é enviado ao provedor e valem os termos e a política dele.</td>
           </tr>
           <tr>
             <td><strong>Música, imagens e clipes</strong></td>
@@ -1430,7 +1430,7 @@ Reporte o sintoma, o comando que reproduz, o `error.code`/`error.hint` e o que j
       <table>
         <thead><tr><th>Código do erro</th><th>Quase sempre é</th><th>Saída</th></tr></thead>
         <tbody>
-          <tr><td><code>MISSING_INPUT</code></td><td>Falta a voz em <code>voices/&lt;id&gt;.wav</code> ou outro arquivo de entrada.</td><td>Gere a voz com a sua conta/ferramenta e salve no caminho indicado; ou use <code>voices.provider: piper</code>; rode o passo de novo.</td></tr>
+          <tr><td><code>MISSING_INPUT</code></td><td>Falta a voz em <code>voices/&lt;id&gt;.wav</code> ou outro arquivo de entrada.</td><td>Gere a voz no Google AI Studio (ou na sua ferramenta) e salve no caminho indicado; ou use <code>voices.provider: piper</code>; rode o passo de novo.</td></tr>
           <tr><td><code>MISSING_KEY</code></td><td>Só no provedor por API: a chave não está no <code>.env</code>.</td><td>Se você optou por API, preencha a chave; no modo <code>files</code>, isso não se aplica.</td></tr>
           <tr><td><code>MISSING_PREREQ</code></td><td>Falta ffmpeg, o binário/modelo do Piper ou o build não terminou.</td><td>Rode <code>./kit.sh doctor</code> e <code>./kit.sh build</code>; confira <code>voices.piper.binary</code>/<code>model</code>.</td></tr>
           <tr><td><code>GATE_FAILED</code></td><td>O check/QA encontrou erro ou falta aprovação humana.</td><td>Corrija os <code>issues</code>; se for aprovação, rode <code>forja approve --script --voice --overlays --by NOME</code>. Não force a entrega.</td></tr>

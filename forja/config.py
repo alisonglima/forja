@@ -25,11 +25,11 @@ DEFAULTS: dict = {
         "vad": True,
     },
     "voices": {
-        # "files": voce gera as vozes com a SUA conta/ferramenta e salva em voices/<id>.wav.
-        # "gemini": opcional, API do Google (exige GEMINI_API_KEY e voices.model).
+        # "google_ai_studio": padrao; WAVs gerados na interface web do AI Studio, com a sua conta.
+        # "files": alias generico para qualquer WAV fornecido pelo usuario.
         # "piper": TTS neural local (sem conta/API), com o modelo pt-BR da imagem.
-        # "mock": tom sintetico para testes.
-        "provider": "files",
+        # "gemini": API opcional do Google; "mock": tom sintetico para testes.
+        "provider": "google_ai_studio",
         "model": "gemini-3.8-flash-tts",
         "api_key_env": "GEMINI_API_KEY",
         "input_dir": "voices",
@@ -131,12 +131,12 @@ def _validate(cfg: dict) -> None:
         raise ConfigError("project.require_approvals deve ser booleano")
     voices = _section(cfg, "voices")
     provider = voices.get("provider")
-    if provider not in ("files", "gemini", "mock", "piper"):
+    if provider not in ("google_ai_studio", "files", "gemini", "mock", "piper"):
         try:
             registry.get("tts", provider)
         except ForjaError:
             raise ConfigError(
-                f"voices.provider invalido: {provider!r} (esperado 'files', 'gemini', 'mock', 'piper' ou um provedor registrado)"
+                f"voices.provider invalido: {provider!r} (esperado 'google_ai_studio', 'files', 'piper', 'gemini', 'mock' ou um provedor registrado)"
             ) from None
     input_dir = voices.get("input_dir")
     if not isinstance(input_dir, str) or not input_dir.strip():

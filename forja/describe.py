@@ -174,10 +174,17 @@ def _workflow_entry(workflow):
 _BUILTIN_PROVIDERS = (
     {
         "kind": "tts",
+        "name": "google_ai_studio",
+        "requires_env": (),
+        "network": False,
+        "note": "padrao: WAVs gerados na interface web do AI Studio (sem chave)",
+    },
+    {
+        "kind": "tts",
         "name": "files",
         "requires_env": (),
         "network": False,
-        "note": "voce gera os WAVs em voices/<id>.wav (padrao)",
+        "note": "alias generico: qualquer WAV do usuario em voices/<id>.wav",
     },
     {
         "kind": "tts",

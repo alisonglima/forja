@@ -14,15 +14,16 @@ A **forja** é uma CLI (`forja`, `python -m forja`) e um kit Docker para gerar v
 - **Para agentes**: todo comando aceita `--json`, `describe`, `status` com `next_actions`, cache por hash, QA como gate e códigos de saída `0..5`.
 - **Humano no comando**: `brief.yaml` registra objetivo/público/tom; `forja approve` registra a aprovação humana antes do render.
 
-## Voz: três caminhos
+## Voz: Google AI Studio por padrão
 
 | Provider | Precisa de conta/API? | Quando usar |
 |---|---|---|
-| `files` (padrão) | Não para o kit; você usa a sua conta/ferramenta | Você quer a sua voz/elenco e já tem um fluxo de TTS. Salve `voices/<id>.wav`. |
+| `google_ai_studio` (padrão) | Não para o kit; você usa a sua conta Google no navegador | Você gera as vozes na interface web do AI Studio e salva `voices/<id>.wav`. |
 | `piper` | Não | Narração local neural, sem rede, com o modelo pt-BR incluído na imagem. |
+| `files` | Não | Alias genérico: qualquer WAV que você já tenha, de qualquer ferramenta. |
 | `gemini` | Sim, opcional | Automação por API com a sua chave; não é o caminho padrão. |
 
-O provider `files` valida o WAV, normaliza, mixa e renderiza. O `piper` roda dentro da imagem (`piper-tts` + voz `pt_BR-faber-medium`, CC0/MIT). Nenhuma conta é compartilhada e nenhuma chave é obrigatória.
+O padrão é o **Google AI Studio**: abra a interface com a sua conta, gere cada fala e salve em `projects/<nome>/voices/<id>.wav`. O kit valida, normaliza, mixa e renderiza. O `piper` roda dentro da imagem (`piper-tts` + voz `pt_BR-faber-medium`, CC0/MIT) para quem quiser autonomia offline. Nenhuma conta é compartilhada e nenhuma chave é obrigatória.
 
 ## Overlays
 
@@ -84,7 +85,7 @@ O guia completo, offline e copiável está em **[alisonglima.github.io/forja](ht
 
 ## Segurança
 
-- **Sem chave obrigatória.** Nos modos `files`/`piper`, nenhuma credencial de TTS é necessária; o `.env` guarda a senha da tela do navegador (quando usada) e ajustes do container.
+- **Sem chave obrigatória.** Nos modos `google_ai_studio`/`files`/`piper`, nenhuma credencial de TTS é necessária; o `.env` guarda a senha da tela do navegador (quando usada) e ajustes do container.
 - Se você optar por um provedor por API, a chave fica só no `.env` (0600 no Linux/macOS; no Windows, restrinja a pasta do kit à sua conta) e nunca é impressa em log ou `--json`.
 - O container roda com o seu UID/GID (nunca root), `cap_drop: ALL` e `no-new-privileges`.
 - O navegador opcional escuta **somente** em `127.0.0.1` (`3001` para a tela, `9222` para o CDP) e exige senha. O login é feito dentro do ambiente final; não copie perfis entre máquinas.

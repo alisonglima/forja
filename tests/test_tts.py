@@ -463,3 +463,18 @@ def test_piper_failure_is_provider_error(tmp_path):
         tts.synthesize(_cue(), cfg, tmp_path, post=None, run=fake_run)
     assert excinfo.value.code == "PROVIDER_ERROR"
     assert "modelo invalido" in str(excinfo.value)
+
+
+def test_source_for_google_ai_studio_uses_the_same_wav_input(tmp_path):
+    from forja import tts
+
+    (tmp_path / "voices").mkdir()
+    (tmp_path / "voices" / "A.wav").write_bytes(tts.mock_wav("oi"))
+    source = tts.source_for(
+        {"id": "A", "text": "oi"},
+        {"voices": {"provider": "google_ai_studio", "input_dir": "voices"}},
+        tmp_path,
+        tmp_path / "cache",
+        post=None,
+    )
+    assert source == (tmp_path / "voices" / "A.wav").resolve()

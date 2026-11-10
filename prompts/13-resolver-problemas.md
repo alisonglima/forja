@@ -6,7 +6,7 @@ Você é meu assistente de diagnóstico do **Forja**. Algo falhou. **Não suponh
 4. Por sintoma:
    - **`build` falha por memória / "killed"**: aumente a memória do Docker Desktop (Settings → Resources) para 8 GB.
    - **`transcribe` lento ou travado na primeira vez**: está baixando o modelo (≈1,6 GB, uma vez). Confira a pasta `models/` e a conexão. Em máquina fraca troque `transcribe.model` para `small` no `config.yaml`.
-   - **`voices` com `MISSING_INPUT`**: falta o WAV em `projects/<NOME>/voices/<id>.wav`. Gere a voz com a minha conta/ferramenta e salve nesse caminho; ou use `voices.provider: piper`; depois rode `./kit.sh run --project /projects/<NOME> --json voices --only <id>`. No modo `files`/`piper` não existe chave de API.
+   - **`voices` com `MISSING_INPUT`**: falta o WAV em `projects/<NOME>/voices/<id>.wav`. Gere a voz com a minha conta/ferramenta e salve nesse caminho; ou use `voices.provider: piper`; depois rode `./kit.sh run --project /projects/<NOME> --json voices --only <id>`. Nos modos `google_ai_studio`/`files`/`piper` não existe chave de API.
    - **`voices` com `MISSING_PREREQ` no piper**: binário `piper` ou modelo `.onnx` ausente na imagem/config. Confira `voices.piper.binary`/`model` e rode `./kit.sh doctor`; no kit, o modelo é `/opt/piper/pt_BR-faber-medium.onnx`.
    - **`GATE_FAILED` com "aprovacao humana pendente"**: falta `forja approve --script --voice --overlays --by <nome>` (ou `project.require_approvals` está ligado e o `approvals.json` não tem as chaves). Peça a aprovação humana; não contorne o gate.
    - **`OVERLAY_*`/`ASSET_*` no validate**: preset/posição/texto/estilo inválido ou asset fora da raiz. Corrija o `storyboard.yaml`; não mova assets para fora do projeto.

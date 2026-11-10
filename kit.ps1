@@ -11,7 +11,7 @@ switch ($Cmd) {
     $t = Get-Content .env -Raw
     if ($t -notmatch '(?m)^BROWSER_PASSWORD=.+') { $t = $t -replace '(?m)^BROWSER_PASSWORD=.*', "BROWSER_PASSWORD=$(Rand)"; Set-Content .env $t -NoNewline; Write-Host "senha do navegador gerada em .env" }
     New-Item -ItemType Directory -Force projects, models | Out-Null
-    Write-Host "pronto. As vozes sao geradas por voce (provider files, em voices/). GEMINI_API_KEY e opcional, so para o provider gemini via API." }
+    Write-Host "pronto. Padrao: Google AI Studio (gere as vozes e salve em voices/). Piper local e API sao opcionais." }
   "doctor" {
     docker --version; docker compose version
     "arquitetura do daemon: " + (docker info --format '{{.OSType}}/{{.Architecture}}')

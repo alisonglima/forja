@@ -176,4 +176,4 @@ def test_describe_lists_builtin_voice_providers():
     from forja import describe
 
     names = {item["name"] for item in describe.describe({}, "1.0.0")["providers"]}
-    assert {"files", "mock", "gemini"} <= names
+    assert {"google_ai_studio", "files", "piper", "mock", "gemini"} <= names

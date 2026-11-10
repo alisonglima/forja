@@ -315,7 +315,7 @@ def piper_wav(cue: dict, cfg: dict, cache_dir: Path, env=None, run=None) -> byte
 def source_for(cue: dict, cfg: dict, root, cache_dir: Path, post, env=None, sleep=time.sleep, run=None) -> Path:
     """Resolve a fonte da voz: arquivo fornecido pelo usuario ou provedor."""
     provider = str((cfg.get("voices") or {}).get("provider", "files"))
-    if provider == "files":
+    if provider in ("google_ai_studio", "files"):
         return provided_wav(cue, cfg, root)
     return synthesize(cue, cfg, cache_dir, post, env=env, sleep=sleep, run=run)
 

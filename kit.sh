@@ -26,7 +26,7 @@ case "$cmd" in
     u=$(id -u 2>/dev/null || echo 1000); g=$(id -g 2>/dev/null || echo 1000); [ "$u" = 0 ] && u=1000 && g=1000
     sed -i.bak "s/^FORJA_UID=.*/FORJA_UID=$u/; s/^FORJA_GID=.*/FORJA_GID=$g/" .env && rm -f .env.bak
     chmod 600 .env 2>/dev/null || true
-    mkdir -p projects models; echo "pronto. As vozes sao geradas por voce (provider files, em voices/). GEMINI_API_KEY e opcional, so para o provider gemini via API." ;;
+    mkdir -p projects models; echo "pronto. Padrao: Google AI Studio (gere as vozes e salve em voices/). Piper local e API sao opcionais." ;;
   doctor)
     docker --version; c version --short 2>/dev/null || { echo "ERRO: docker compose v2 ausente"; exit 1; }
     echo "arquitetura do daemon: $(docker info --format '{{.OSType}}/{{.Architecture}}')"

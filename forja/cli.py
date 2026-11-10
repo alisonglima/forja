@@ -479,6 +479,8 @@ def _cmd_doctor(project_dir, json_mode, env, out, err):
             "provider: piper; binario %s; modelo %s"
             % ("ok" if found is not None else "ausente", "ok" if model_ok else "ausente"),
         )
+    elif provider == "google_ai_studio":
+        add("tts_provider", True, "provider: google_ai_studio (sem chave; WAVs em voices/)")
     else:
         add("tts_provider", True, "provider: %s (sem chave de API)" % provider)
 

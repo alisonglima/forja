@@ -3,7 +3,7 @@
 Ferramenta de geração de vídeo operada por agentes (dublagem EN→pt-BR, legendas embutidas, vídeos por cenas). Contrato técnico: `DESIGN.md`. Skill: `skills/forja/SKILL.md`. Prompts prontos: `prompts/`.
 
 - Projeto novo: `forja init DIR [--source VIDEO] [--workflow dub|storyboard]`; sem `--source`, cria um projeto `storyboard`. O init cria `brief.yaml`/`approvals.json` e liga `require_approvals`; use `--no-require-approvals` só em demo/teste.
-- Vozes: `files` (WAVs do humano em `voices/<id>.wav`), `piper` (TTS local, sem conta/API) ou `gemini` opcional. O padrão do repo é `files`; o kit inclui Piper para narração autônoma.
+- Vozes: padrão `google_ai_studio` (WAVs gerados na interface web do AI Studio em `voices/<id>.wav`), `files` (alias para qualquer WAV), `piper` (TTS local, sem conta/API) ou `gemini` opcional. O kit inclui Piper para narração offline.
 - Teste: `python3 -m pytest -q tests`. Todo módulo novo nasce com teste de contrato.
 - Estilo: `from __future__ import annotations`; sem `print` em biblioteca; subprocessos e rede **injetáveis** (`run=`, `post=`); sem caminhos absolutos.
 - Nunca use `os.environ` como valor padrão de parâmetro (é avaliado na importação e a assinatura passa a carregar o ambiente, com segredos): use `env=None` e resolva na chamada.

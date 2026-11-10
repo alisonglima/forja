@@ -184,11 +184,18 @@ def test_load_config_rejects_out_of_range_mix(tmp_path):
     assert "lra" in str(excinfo.value)
 
 
-def test_default_voice_provider_is_files():
+def test_default_voice_provider_is_google_ai_studio():
     from forja import config
 
-    assert config.DEFAULTS["voices"]["provider"] == "files"
+    assert config.DEFAULTS["voices"]["provider"] == "google_ai_studio"
     assert config.DEFAULTS["voices"]["input_dir"] == "voices"
+
+
+def test_files_provider_remains_a_generic_alias(tmp_path):
+    from forja import config
+
+    path = _write(tmp_path, "voices:\n  provider: files\n")
+    assert config.load_config(path)["voices"]["provider"] == "files"
 
 
 def test_load_config_rejects_voice_input_dir_escape(tmp_path):
