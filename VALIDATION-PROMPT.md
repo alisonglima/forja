@@ -31,6 +31,7 @@ Você é um **auditor técnico independente** do repositório **https://github.c
    - **Não rode Docker no Mac** e não use contas reais/AI Studio/Flow.
 4. **Documentação e UX:**
    - O guia tem botão de tema claro/escuro funcional e link para o GitHub; funciona em 1280 e 360, sem rolagem horizontal.
+   - A seção **Sem Docker** e o `LOCAL.md`/`scripts/local-setup.sh`/`local-setup.ps1` cobrem Windows, macOS e Linux, sem prometer isolamento do Docker e sem exigir Docker/VPS.
    - As ressalvas de AI Studio (conta/termos/limites), Flow (créditos, termos, SynthID, não determinismo, sem áudio de clipe) e Piper (voz única, GPL, qualidade, não é padrão) estão explícitas.
    - Nenhuma instrução induz a achar que o Forja chama Flow/AI Studio por API, que Piper é o setup ou que uma chave é obrigatória.
 5. **Segurança e higiene:**

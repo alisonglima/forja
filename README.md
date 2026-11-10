@@ -65,7 +65,19 @@ forja approve --script --voice --overlays --by "Ana"
 
 O render falha com `GATE_FAILED` enquanto as aprovações exigidas não existirem. Para um teste local sem gate, use `forja init --no-require-approvals`.
 
-## Requisitos
+## Sem Docker (alternativa)
+
+Se você não tem Docker/VPS ou quer testar numa máquina simples, a CLI roda direto no sistema (Windows, macOS ou Linux). O caminho direto é uma **alternativa** ao kit Docker, com menos isolamento:
+
+```bash
+./scripts/local-setup.sh            # macOS/Linux
+.\scripts\local-setup.ps1          # Windows PowerShell
+python -m forja --json doctor
+```
+
+Requisitos: Python 3.9+, ffmpeg/ffprobe, Node 20+ e Chrome via Remotion. O passo a passo completo, por sistema, está em [`LOCAL.md`](LOCAL.md). O navegador é o seu normal (AI Studio/Flow); não há `kit.sh` nesse modo.
+
+## Requisitos (kit Docker)
 
 - Docker com Compose v2 (Windows com WSL2, Linux ou macOS).
 - Máquina **x86_64** (o alvo da imagem é `linux/amd64`; em Apple Silicon roda emulado).

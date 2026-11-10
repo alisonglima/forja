@@ -440,7 +440,7 @@ marker path { fill: var(--accent); }
 .copy:hover { border-color: var(--accent); color: var(--accent); }
 .copy.done { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
 .code-block {
-  background: var(--code); color: var(--code-ink); border-radius: 14px; padding: 18px 22px;
+  background: var(--code-bg); color: var(--code-ink); border: 1px solid var(--line); border-radius: 14px; padding: 18px 22px;
   overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px;
   line-height: 1.55; margin: 18px 0 0;
 }
@@ -479,12 +479,7 @@ marker path { fill: var(--accent); }
   .lede, .sec-lede { font-size: 17px; }
   .prompt-head { flex-direction: column; gap: 12px; padding: 18px 18px 12px; }
   .copy { width: 100%; }
-  .code-block {
-  background: var(--code); color: var(--code-ink); border-radius: 14px; padding: 18px 22px;
-  overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px;
-  line-height: 1.55; margin: 18px 0 0;
-}
-.prompt pre { padding: 0 18px 18px; }
+  .prompt pre { padding: 0 18px 18px; }
   .card { padding: 20px; }
   .steps > li { padding: 16px 16px 16px 56px; }
   .steps > li::before { left: 14px; top: 15px; }
@@ -636,6 +631,7 @@ TEMPLATE = r"""<!doctype html>
         <li><a href="#brief">Brief</a></li>
         <li><a href="#modo-simples">Modos</a></li>
         <li><a href="#flow">Flow</a></li>
+        <li><a href="#local">Local</a></li>
         <li><a href="#arquitetura">Arquitetura</a></li>
         <li><a href="#overlays">Overlays</a></li>
         <li><a href="#prompts">Prompts</a></li>
@@ -1022,9 +1018,82 @@ TEMPLATE = r"""<!doctype html>
   </div>
 </section>
 
+<section id="local">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Sem Docker: execução direta</h2></div>
+    <p class="sec-lede">Alternativa para máquina simples, sem VPS ou sem Docker. A CLI roda direto no Windows, macOS ou Linux, com Python, Node, ffmpeg e Chrome do sistema. É uma opção, não o caminho padrão do kit.</p>
+
+    <div class="cards">
+      <article class="card">
+        <h4>Quando faz sentido</h4>
+        <p>Você já tem Python/Node/ffmpeg, quer testar rápido ou não quer uma imagem de ~2 GB. Serve para edição local e para quem não tem servidor.</p>
+      </article>
+      <article class="card">
+        <h4>O que você perde</h4>
+        <p>Sem versões presas e sem isolamento de container. O `kit.sh` não é usado; você chama <code>python -m forja</code>. O navegador é o seu normal, não o Chromium do kit.</p>
+      </article>
+      <article class="card">
+        <h4>O que precisa</h4>
+        <p>Python 3.9+, ffmpeg/ffprobe com libx264, Node 20+ e Chrome Headless via Remotion. 8 GB de RAM e ~4 GB livres; o Whisper baixa o modelo na primeira vez.</p>
+      </article>
+    </div>
+
+    <h3 style="margin-top:34px">Instalação rápida</h3>
+    <pre class="code-block"><code># macOS / Linux
+git clone https://github.com/alisonglima/forja.git
+cd forja
+./scripts/local-setup.sh
+python -m forja --json doctor</code></pre>
+
+    <pre class="code-block"><code># Windows PowerShell
+git clone https://github.com/alisonglima/forja.git
+cd forja
+.\scripts\local-setup.ps1
+python -m forja --json doctor</code></pre>
+
+    <p>O script cria <code>.venv</code>, instala <code>.[test]</code>, roda <code>npm install</code> no template do Remotion, baixa o Chrome Headless Shell e chama o <code>doctor</code>. Se faltar ffmpeg/Node, ele para e diz o que instalar.</p>
+
+    <h3 style="margin-top:34px">Manual, por sistema</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Sistema</th><th>Dependências</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Windows 10/11</strong></td><td><code>winget install Python.Python.3.12</code><br><code>winget install Gyan.FFmpeg</code><br><code>winget install OpenJS.NodeJS.LTS</code><br><code>winget install Google.Chrome</code><br>depois <code>py -m venv .venv</code> e <code>.venv\Scripts\Activate.ps1</code>.</td></tr>
+          <tr><td><strong>macOS</strong></td><td><code>brew install python@3.12 ffmpeg node</code>; depois <code>python3 -m venv .venv</code> e <code>. .venv/bin/activate</code>.</td></tr>
+          <tr><td><strong>Linux (Debian/Ubuntu)</strong></td><td><code>sudo apt install python3 python3-venv ffmpeg nodejs npm chromium</code>; se o Node do apt for antigo, use NodeSource 20/22.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="code-block"><code>python -m pip install -e ".[test]"
+cd remotion-template
+npm install --no-audit --no-fund
+npx remotion browser ensure
+cd ..
+python -m forja --json doctor</code></pre>
+
+    <h3 style="margin-top:34px">Usar</h3>
+    <pre class="code-block"><code>python -m forja --json describe
+python -m forja --json init ~/videos/meu-video
+python -m forja --json --project ~/videos/meu-video status
+python -m forja --json --project ~/videos/meu-video run
+python -m forja --json --project ~/videos/meu-video qa --strict</code></pre>
+
+    <div class="note">
+      <span class="label">o que muda no fluxo</span>
+      <p>O conteúdo é o mesmo: brief humano, narração no Google AI Studio, cenas no Google Flow, overlays e legendas no Remotion. A diferença é que o navegador é o seu normal (sem <code>./kit.sh browser-up</code>) e você chama <code>python -m forja</code> em vez de <code>./kit.sh run</code>. O Forja continua não chamando AI Studio/Flow por API.</p>
+    </div>
+
+    <div class="note">
+      <span class="label">ressalvas</span>
+      <p>Sem isolamento, um comando errado pode afetar seus arquivos. Não rode como root/administrador. O caminho direto foi exercitado no macOS; Windows e Linux diretos não foram testados ponta a ponta nesta rodada. O Piper continua opcional e não é instalado por padrão. Passo a passo completo no <code>LOCAL.md</code> do repositório.</p>
+    </div>
+  </div>
+</section>
+
 <section id="arquitetura">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">06</span><h2>Como as peças se encaixam</h2></div>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Como as peças se encaixam</h2></div>
     <p class="sec-lede">Você fala com o agente. Ele roda o <code>kit.sh</code>. O <code>kit.sh</code> chama o Docker. Dentro do container, a CLI orquestra ffmpeg, Whisper, Remotion e o provedor de voz que você escolher.</p>
 
     <figure class="figure">
@@ -1070,7 +1139,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="overlays">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">07</span><h2>Overlays profissionais</h2></div>
+    <div class="sec-head"><span class="sec-num">08</span><h2>Overlays profissionais</h2></div>
     <p class="sec-lede">Sete presets prontos, tema de marca e ajuste por camada. O overlay entra na timeline do <code>storyboard.yaml</code> e é desenhado pelo Remotion, junto com a legenda.</p>
 
     <div class="table-wrap">
@@ -1121,7 +1190,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="prompts">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">08</span><h2>Os prompts, na ordem</h2></div>
+    <div class="sec-head"><span class="sec-num">09</span><h2>Os prompts, na ordem</h2></div>
     <p class="sec-lede">São mensagens prontas para colar no seu agente. Cada uma assume que a anterior foi concluída. O botão <strong>Copiar</strong> leva o texto inteiro — o mesmo que está logo abaixo.</p>
 
     <div class="route">
@@ -1143,7 +1212,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="seguranca">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">09</span><h2>Segurança sem drama</h2></div>
+    <div class="sec-head"><span class="sec-num">10</span><h2>Segurança sem drama</h2></div>
     <p class="sec-lede">O kit foi desenhado para uma máquina e para as <strong>suas</strong> contas. Estas são as regras que mantêm isso simples.</p>
 
     <div class="cards">
@@ -1190,7 +1259,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="licencas">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">10</span><h2>Licenças e direitos</h2></div>
+    <div class="sec-head"><span class="sec-num">11</span><h2>Licenças e direitos</h2></div>
     <p class="sec-lede">Você não precisa ser advogado para usar o kit — mas precisa saber o que está usando e o que vai publicar.</p>
 
     <div class="table-wrap">
@@ -1255,7 +1324,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="navegador">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">11</span><h2>O Chromium pode rodar minimizado?</h2></div>
+    <div class="sec-head"><span class="sec-num">12</span><h2>O Chromium pode rodar minimizado?</h2></div>
     <p class="sec-lede">Pergunta curta, resposta honesta: <strong>não é confiável</strong>. Janela minimizada ou totalmente coberta conta como oculta para o navegador.</p>
 
     <div class="note">
@@ -1299,7 +1368,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="problemas">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">12</span><h2>Quando algo dá errado</h2></div>
+    <div class="sec-head"><span class="sec-num">13</span><h2>Quando algo dá errado</h2></div>
     <p class="sec-lede">Não adivinhe a causa. Leia o erro literal, reproduza com o menor comando possível e só então conclua. O prompt 13 conduz o agente por essa ordem.</p>
 
     <ol class="steps">
