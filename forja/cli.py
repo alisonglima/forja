@@ -575,6 +575,9 @@ def _dispatch(args, project_dir, json_mode, env, out, err):
 def main(argv=None, env=None, out=sys.stdout, err=sys.stderr):
     if env is None:
         env = os.environ
+    # Plugins externos: uma vez por processo; falhas viram avisos em `providers`.
+    registry.load_entry_points()
+    workflows.load_entry_points()
     raw_argv = list(sys.argv[1:] if argv is None else argv)
     json_requested = "--json" in raw_argv
     _STREAMS["out"], _STREAMS["err"] = out, err

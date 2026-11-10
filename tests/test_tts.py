@@ -367,3 +367,33 @@ def test_source_for_uses_the_files_provider_without_network(tmp_path):
         post=post,
     )
     assert source == (tmp_path / "voices" / "A.wav").resolve()
+
+
+def test_custom_registered_provider_is_dispatched(tmp_path):
+    from forja import registry, tts
+
+    registry.reset_for_tests()
+    try:
+
+        @registry.register("tts", "custom-test")
+        def factory():
+            def synthesize(cue, cfg, cache_dir, post, env):
+                assert post is not None
+                return tts.mock_wav("custom")
+
+            return synthesize
+
+        cfg = _cfg()
+        cfg["voices"]["provider"] = "custom-test"
+        cfg["voices"]["model"] = ""
+        result = tts.synthesize(
+            _cue(),
+            cfg,
+            tmp_path,
+            post=lambda *args, **kwargs: (_ for _ in ()).throw(
+                AssertionError("post nao deveria ser chamado")
+            ),
+        )
+        assert result.is_file() and result.read_bytes().startswith(b"RIFF")
+    finally:
+        registry.reset_for_tests()

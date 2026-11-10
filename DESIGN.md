@@ -112,6 +112,7 @@ Lista de objetos: `{"id": "A", "speaker": "narradora", "role": "narrator"|"speec
 - `input_dir(cfg) -> str`: pasta relativa das vozes fornecidas (default `voices`).
 - `provided_wav(cue, cfg, root) -> Path`: resolve `<root>/<input_dir>/<id>.wav`, exige `id` seguro e WAV válido; ausente → `MISSING_INPUT`, inválido → `CONFIG_INVALID`.
 - `source_for(cue, cfg, root, cache_dir, post, env=None, sleep=...) -> Path`: provider `files` → `provided_wav`; senão → `synthesize`.
+- `synthesize(...)`: `mock`/`gemini` embutidos; qualquer outro `voices.provider` é resolvido por `registry.get("tts", provider)`, cuja fábrica devolve `callable(cue, cfg, cache_dir, post=..., env=...) -> bytes | Path` com o WAV bruto. Plugins de `forja.providers` são carregados no início da CLI.
 - `synthesize(cue, cfg, cache_dir, post, env=os.environ, sleep=time.sleep) -> pathlib.Path`: cache hit não chama `post`;
   3 tentativas com backoff (1, 2, 4 s) em erro 429/5xx; 4xx ≠ 429 não repete; chave ausente → `RuntimeError("variável X não definida")`;
   valida WAV (RIFF, >0 amostras, mono) e reamostra para 24 kHz se necessário.

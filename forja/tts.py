@@ -15,7 +15,7 @@ from typing import Any, Callable
 
 import numpy as np
 
-from . import ids
+from . import ids, registry
 from .errors import ForjaError
 
 _TARGET_SR = 24000
@@ -278,7 +278,7 @@ def synthesize(
 
     if provider == "mock":
         wav_data = mock_wav(text)
-    else:
+    elif provider == "gemini":
         key_name = str(voices_cfg.get("api_key_env", "GEMINI_API_KEY"))
         api_key = env.get(key_name) if env is not None else None
         if not api_key:
@@ -311,6 +311,24 @@ def synthesize(
                 sleep(2 ** attempt)
         if not wav_data:
             raise RuntimeError("falha ao sintetizar: resposta vazia")
+    else:
+        factory = registry.get("tts", provider)
+        implementation = factory()
+        if not callable(implementation):
+            raise ForjaError(
+                "CONFIG_INVALID",
+                "provedor %r nao devolveu uma funcao de sintese" % provider,
+                hint="a fabrica deve devolver callable(cue, cfg, cache_dir, post=..., env=...)",
+            )
+        wav_data = implementation(cue, cfg, directory, post=post, env=env)
+        if isinstance(wav_data, (str, Path)):
+            wav_data = Path(wav_data).read_bytes()
+        if not isinstance(wav_data, (bytes, bytearray)):
+            raise ForjaError(
+                "CONFIG_INVALID",
+                "provedor %r devolveu %s (esperado bytes ou Path)" % (provider, type(wav_data).__name__),
+            )
+        wav_data = bytes(wav_data)
 
     path.write_bytes(_normalize_wav(wav_data))
     return path

@@ -84,6 +84,12 @@ def _load_error(entry_point, group, exc):
     }
 
 
+def reset_for_tests():
+    """Limpa o estado de carregamento de plugins (usado pelas fixtures)."""
+    _LOADED_GROUPS.clear()
+    _LOAD_ERRORS.clear()
+
+
 def load_entry_points(group="forja.workflows"):
     """Carrega plugins do grupo; falha de um plugin nao derruba os demais."""
     if group in _LOADED_GROUPS:

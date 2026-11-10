@@ -2,6 +2,15 @@
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def _clean_workflows():
+    from forja import workflows
+
+    workflows.reset_for_tests()
+    yield
+    workflows.reset_for_tests()
+
+
 class _FakeEntryPoint:
     def __init__(self, group, name, callback):
         self.group = group

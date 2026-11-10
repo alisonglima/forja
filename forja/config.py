@@ -6,6 +6,9 @@ from pathlib import Path
 
 import yaml
 
+from . import registry
+from .errors import ForjaError
+
 DEFAULTS: dict = {
     "project": {"name": "meu-video", "source_lang": "en", "target_lang": "pt-BR"},
     "input": {"video": "input/source.mp4", "start": 0.0, "duration": None},
@@ -104,9 +107,12 @@ def _validate(cfg: dict) -> None:
     voices = _section(cfg, "voices")
     provider = voices.get("provider")
     if provider not in ("files", "gemini", "mock"):
-        raise ConfigError(
-            f"voices.provider invalido: {provider!r} (esperado 'files', 'gemini' ou 'mock')"
-        )
+        try:
+            registry.get("tts", provider)
+        except ForjaError:
+            raise ConfigError(
+                f"voices.provider invalido: {provider!r} (esperado 'files', 'gemini', 'mock' ou um provedor registrado)"
+            ) from None
     input_dir = voices.get("input_dir")
     if not isinstance(input_dir, str) or not input_dir.strip():
         raise ConfigError("voices.input_dir deve ser uma pasta relativa (ex.: 'voices')")

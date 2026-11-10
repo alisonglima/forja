@@ -198,3 +198,15 @@ def test_load_config_rejects_voice_input_dir_escape(tmp_path):
     with pytest.raises(config.ConfigError) as excinfo:
         config.load_config(path)
     assert "input_dir" in str(excinfo.value)
+
+
+def test_load_config_accepts_a_registered_tts_provider(tmp_path):
+    from forja import config, registry
+
+    registry.reset_for_tests()
+    try:
+        registry.register("tts", "custom-test")(lambda: None)
+        path = _write(tmp_path, "voices:\n  provider: custom-test\n")
+        assert config.load_config(path)["voices"]["provider"] == "custom-test"
+    finally:
+        registry.reset_for_tests()
