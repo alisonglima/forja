@@ -2,7 +2,6 @@
 
 **Vídeo com voz e legenda, operado pelo seu agente.** Dublagem EN→pt-BR e vídeos por cenas a partir de um `storyboard.yaml`, com as **suas contas** e sem exigir chave de API.
 
-[![CI](https://github.com/alisonglima/forja/actions/workflows/ci.yml/badge.svg)](https://github.com/alisonglima/forja/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](pyproject.toml)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-2ea44f.svg)](https://alisonglima.github.io/forja/)

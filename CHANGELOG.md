@@ -18,7 +18,7 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o 
 - Kit Docker `linux/amd64`, usuário não-root, `cap_drop: ALL` e `no-new-privileges`.
 - Chromium opcional em container, com CDP só em `127.0.0.1` e senha.
 - 14 prompts operacionais, skill para agentes, guia offline e exemplo de storyboard.
-- Documentação em GitHub Pages, CI, templates de issue/PR e política de segurança.
+- Documentação em GitHub Pages, templates de issue/PR e política de segurança.
 
 ### Segurança
 
