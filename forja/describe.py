@@ -119,6 +119,11 @@ _COMMANDS = [
         "summary": "Lista provedores registrados e o estado do ambiente.",
         "args": [],
     },
+    {
+        "name": "mcp",
+        "summary": "Servidor MCP por stdio (JSON-RPC 2.0, uma mensagem por linha).",
+        "args": [_arg("action", True, "serve")],
+    },
 ]
 
 _CUES_SCHEMA = {

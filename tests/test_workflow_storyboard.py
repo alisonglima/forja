@@ -506,7 +506,7 @@ def test_validate_rejects_missing_asset(assets, tmp_path):
     _gate_error(root, "ASSET_MISSING")
 
 
-def test_mix_warns_for_sfx_and_kept_clip_audio(simulations, assets, tmp_path):
+def test_mix_includes_sfx_and_kept_clip_audio(simulations, assets, tmp_path):
     from forja import steps
 
     root = _new_project(tmp_path / "p", assets)
@@ -515,7 +515,9 @@ def test_mix_warns_for_sfx_and_kept_clip_audio(simulations, assets, tmp_path):
     for layer in s1["layers"]:
         if layer["type"] == "clip":
             layer["audio"] = {"mode": "keep"}
-    s1["layers"].append({"type": "sfx", "file": "assets/trilha.wav"})
+    s1["layers"].append(
+        {"type": "sfx", "file": "assets/trilha.wav", "license": {"kind": "cc0"}}
+    )
     _write_storyboard(root, storyboard)
 
     ctx = _make_ctx(root)
@@ -525,10 +527,15 @@ def test_mix_warns_for_sfx_and_kept_clip_audio(simulations, assets, tmp_path):
 
     mix_step = next(step for step in steps_list if step.name == "mix")
     result = mix_step.run(ctx)
-    warnings = json.dumps(result.get("warnings") or [], ensure_ascii=False, default=str)
-    assert "SFX_IGNORED" in warnings
-    assert "CLIP_AUDIO_IGNORED" in warnings
+    assert result.get("warnings") == []
     assert (root / "work" / "mix.wav").is_file()
+    import wave
+
+    with wave.open(str(root / "work" / "bed.wav"), "rb") as handle:
+        frames = handle.getnframes()
+        data = handle.readframes(frames)
+    assert frames > 0
+    assert max(data) > 0
 
 
 def test_qa_fails_on_duration_mismatch(clone):
@@ -633,3 +640,118 @@ def test_voices_files_provider_reads_project_wavs(clone):
     voices.run(ctx)
     manifest = _read_json(clone.root / "work" / "voices" / "manifest.json")
     assert set(manifest) == {"S1"}
+
+
+def test_build_bed_mixes_clip_audio_and_mute_silences(assets, tmp_path):
+    from forja import media, storyboard as storyboard_mod
+    from forja.workflows import storyboard as workflow
+
+    root = _new_project(tmp_path / "p", assets)
+    clip_audio = root / "assets" / "clip-audio.mp4"
+    _ffmpeg(
+        [
+            "ffmpeg",
+            "-v",
+            "error",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            "testsrc=size=160x90:rate=30:duration=2",
+            "-f",
+            "lavfi",
+            "-i",
+            "sine=frequency=440:duration=2:sample_rate=48000",
+            "-shortest",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-c:a",
+            "aac",
+            str(clip_audio),
+        ]
+    )
+    ctx = _make_ctx(root)
+    sb = _storyboard()
+    sb["scenes"][0]["layers"] = [
+        layer for layer in sb["scenes"][0]["layers"] if layer.get("type") != "music"
+    ]
+    timeline = {
+        "total_s": 2.0,
+        "scenes": [
+            {
+                "id": "S1",
+                "start": 0.0,
+                "end": 2.0,
+                "layers": [
+                    {
+                        "type": "clip",
+                        "file": "assets/clip-audio.mp4",
+                        "start": 0.0,
+                        "end": 2.0,
+                        "audio": {"mode": "keep"},
+                    }
+                ],
+            }
+        ],
+    }
+    bed = root / "work" / "bed-clip.wav"
+    workflow._build_bed(ctx, sb, timeline, 2.0, bed)
+    import wave
+
+    with wave.open(str(bed), "rb") as handle:
+        data = handle.readframes(handle.getnframes())
+    assert max(data) > 0
+
+    timeline["scenes"][0]["layers"][0]["audio"] = {"mode": "mute"}
+    muted = root / "work" / "bed-muted.wav"
+    workflow._build_bed(ctx, sb, timeline, 2.0, muted)
+    with wave.open(str(muted), "rb") as handle:
+        data = handle.readframes(handle.getnframes())
+    assert max(data) == 0
+
+
+def test_timeline_resolves_word_anchor_with_transcription(monkeypatch, assets, tmp_path):
+    from forja import steps
+    from forja.workflows import storyboard as workflow
+
+    root = _new_project(tmp_path / "p", assets)
+    storyboard = _storyboard()
+    storyboard["scenes"][0]["layers"].append(
+        {
+            "type": "card",
+            "asset": "assets/card.png",
+            "enter": {"anchor": "word", "word": "comeca"},
+        }
+    )
+    _write_storyboard(root, storyboard)
+
+    calls = []
+
+    def fake_transcribe(wav, cfg, model_dir):
+        calls.append((str(wav), cfg))
+        return {
+            "segments": [
+                {
+                    "words": [
+                        {"word": "O", "start": 0.0, "end": 0.2},
+                        {"word": "comeca", "start": 1.2, "end": 1.4},
+                    ]
+                }
+            ]
+        }
+
+    monkeypatch.setattr(workflow.transcribe, "run_transcribe", fake_transcribe)
+    ctx = _make_ctx(root)
+    results = steps.run_steps(ctx, _storyboard_steps(), only=["voices", "timeline"])
+    assert all(result["status"] == "ok" for result in results), results
+    assert calls
+    timeline = _read_json(root / "work" / "timeline.json")
+    card = next(
+        layer
+        for layer in timeline["scenes"][0]["layers"]
+        if layer.get("type") == "card" and layer.get("enter", {}).get("anchor") == "word"
+    )
+    assert card["start"] == pytest.approx(PAD_BEFORE + 1.2)
+    assert not card.get("warnings")

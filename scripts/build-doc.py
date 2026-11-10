@@ -942,7 +942,7 @@ TEMPLATE = r"""<!doctype html>
 
     <div class="note">
       <span class="label">ressalvas que não podem faltar</span>
-      <p><strong>Flow é interface, não API:</strong> a automação depende da UI, da conta e dos créditos e pode quebrar quando o Google mudar a tela. <strong>Não determinístico:</strong> o mesmo prompt pode gerar resultados diferentes; guarde prompt/take/versão. <strong>Conteúdo e direitos:</strong> siga os termos do Google Flow/Labs, políticas de conteúdo e regras de uso comercial; vídeos podem ter marca d'água/SynthID. <strong>Pessoas e marcas:</strong> não gere pessoas reais, marcas ou cenas sensíveis sem autorização. <strong>Privacidade:</strong> não suba material confidencial sem autorização. <strong>Áudio:</strong> o v1 ignora o áudio do clipe e <code>sfx</code>; a narração vem do AI Studio e a trilha é uma camada licenciada.</p>
+      <p><strong>Flow é interface, não API:</strong> a automação depende da UI, da conta e dos créditos e pode quebrar quando o Google mudar a tela. <strong>Não determinístico:</strong> o mesmo prompt pode gerar resultados diferentes; guarde prompt/take/versão. <strong>Conteúdo e direitos:</strong> siga os termos do Google Flow/Labs, políticas de conteúdo e regras de uso comercial; vídeos podem ter marca d'água/SynthID. <strong>Pessoas e marcas:</strong> não gere pessoas reais, marcas ou cenas sensíveis sem autorização. <strong>Privacidade:</strong> não suba material confidencial sem autorização. <strong>Áudio:</strong> o áudio embutido do clipe entra no bed por padrão (use <code>audio: {mode: mute}</code> para remover); <code>sfx</code> entra e exige <code>license.kind</code>. A narração vem do AI Studio e a trilha é uma camada licenciada.</p>
     </div>
 
     <h3 style="margin-top:34px">Flow ou API?</h3>
@@ -1129,6 +1129,24 @@ python -m forja --json --project ~/videos/meu-video qa --strict</code></pre>
       <li><strong>CLI forja</strong> — decide o que rodar, guarda o cache, escreve os eventos e aplica o portão de QA.</li>
       <li><strong>Provedor de voz</strong> — o Piper roda <em>dentro</em> do container, sem rede; os modos <code>files</code>/API usam a sua conta/interface ou, se optar, uma chave.</li>
     </ul>
+
+    <h3 style="margin-top:34px" id="audio">Áudio, sfx e âncoras por palavra</h3>
+    <p>O bed do storyboard soma narração, música, áudio embutido do clipe e <code>sfx</code>; a narração faz ducking do bed. Cada clipe pode ajustar o próprio áudio:</p>
+    <pre class="code-block"><code>- type: clip
+  file: assets/flow/cena-01.mp4
+  audio: {mode: keep, gain_db: -6}   # mute remove; duck deixa o ducking global
+- type: sfx
+  file: assets/sfx/whoosh.wav
+  license: {kind: "cc0"}             # obrigatório
+  gain_db: -12
+  duration: 0.8
+  enter: {anchor: word, word: "começa"}</code></pre>
+    <p><code>enter</code>/<code>exit</code> com <code>{anchor: word, word: "..."}</code> usam o tempo real da palavra. O passo <code>timeline</code> transcreve só as cenas que têm âncora por palavra com <code>faster-whisper</code> e guarda em <code>work/words/&lt;cena&gt;.json</code>. Se a transcrição falhar, o passo retorna <code>MISSING_PREREQ</code>; não há alinhamento fingido.</p>
+
+    <h3 style="margin-top:34px" id="mcp">MCP (stdio)</h3>
+    <p>Para agentes que preferem tools a shell, a CLI tem um servidor MCP por stdio, JSON-RPC 2.0, uma mensagem por linha, sem SDK extra:</p>
+    <pre class="code-block"><code>forja mcp serve</code></pre>
+    <p>As tools chamam a mesma CLI e devolvem o JSON no content: <code>forja_describe</code>, <code>forja_providers</code>, <code>forja_status</code>, <code>forja_doctor</code>, <code>forja_init</code>, <code>forja_run</code>, <code>forja_qa</code>, <code>forja_approve</code>. O servidor não abre porta, não imprime segredos e não substitui as aprovações humanas.</p>
 
     <div class="note ok">
       <span class="label">por que isso importa</span>

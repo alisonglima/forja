@@ -115,6 +115,9 @@ def _build_parser():
 
     qa = command("qa")
     qa.add_argument("--strict", action="store_true")
+
+    mcp = command("mcp")
+    mcp.add_argument("action", choices=("serve",))
     return parser
 
 
@@ -451,7 +454,7 @@ def _cmd_doctor(project_dir, json_mode, env, out, err):
     for tool in ("ffmpeg", "ffprobe", "node"):
         found = _which(tool, env)
         add(tool, found is not None, "encontrado" if found is not None else "nao encontrado no PATH")
-    for library in ("numpy", "scipy", "yaml"):
+    for library in ("numpy", "scipy", "yaml", "faster_whisper"):
         try:
             spec = importlib.util.find_spec(library)
         except Exception:
@@ -622,6 +625,10 @@ def _dispatch(args, project_dir, json_mode, env, out, err):
         return _cmd_frames(args, project_dir, json_mode, env, out)
     if command in _STEP_COMMANDS:
         return _cmd_step(args, project_dir, json_mode, env, out, err)
+    if command == "mcp":
+        from . import mcp as mcp_module
+
+        return mcp_module.serve(sys.stdin, out, err, env=env)
     raise ForjaError("USAGE", "comando desconhecido: %s" % command)
 
 

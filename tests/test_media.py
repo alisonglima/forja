@@ -657,3 +657,18 @@ def test_run_checked_does_not_pass_secrets_to_subprocess(monkeypatch):
     passed = calls[0]["kwargs"].get("env") or {}
     assert "GEMINI_API_KEY" not in passed
     assert passed.get("PATH")
+
+
+def test_render_remotion_prefers_local_node_binary(tmp_path):
+    from forja import media
+
+    cwd = tmp_path / "remotion"
+    local = cwd / "node_modules" / ".bin" / "remotion"
+    local.parent.mkdir(parents=True)
+    local.write_text("#!/bin/sh\n", encoding="utf-8")
+    local.chmod(0o755)
+    run, calls = _fake_run()
+    media.render_remotion(
+        "src/index.jsx", {"a": 1}, "work", tmp_path / "out.mp4", run=run, cwd=cwd
+    )
+    assert str(calls[0]["cmd"][0]) == str(local)

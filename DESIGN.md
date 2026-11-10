@@ -259,18 +259,18 @@ Passos na ordem: `clip` (corta `input.video` com `input.start/duration` → `wor
 `cut_clip`, `extract_audio`, `trim_tempo_cmd` (trim silêncio + `atempo` de uma fala), `assemble_mix` (soma vozes+original com envelope, numpy), `measure_loudness`, `render_remotion`, `mux`, `contact_sheet`. Retornam caminhos/dicts; erro de ffmpeg → `ForjaError("PROVIDER_ERROR"|"MISSING_PREREQ")` com o final do stderr.
 
 ### `cli.py`
-`forja [--json] [--project DIR] <comando>`. Comandos: `init`, `describe`, `status`, `doctor`, `run [--only a,b] [--force] [--dry-run] [--strict]`,
+`forja [--json] [--project DIR] <comando>`. Comandos: `init`, `describe`, `status`, `doctor`, `run [--only a,b] [--force] [--dry-run] [--strict]`, `mcp serve`,
 e atalhos por passo: `transcribe`, `frames`, `check`, `voices [--only IDs]`, `schedule`, `mix`, `render`, `qa [--strict]`, `providers`.
 `main(argv=None, env=None, out=sys.stdout, err=sys.stderr) -> int` (`env=None` → `os.environ`, resolvido na chamada) (injetável para teste). Sem `--json`: texto curto em pt-BR; com `--json`: documento único.
 `doctor`: confere `ffmpeg`, `ffprobe`, `node`, navegador do Remotion, Python libs, modelo STT em cache e o provedor de voz. No provider `gemini`, mostra a variável da chave apenas como "definida"/"ausente"; nos providers `google_ai_studio`/`files`/`piper`/`mock`, não exige chave. Exit 4 se faltar o essencial.
 
 ## Workflow `storyboard` (v1 parcial, formato do vídeo por cenas; origem: inventário do YCE)
 
-`storyboard.yaml` (versão 1) descreve `canvas`, `theme`, `audio`, `providers` e `scenes[]` com `layers[]`; tipos de camada no v1: `clip` (`source: file|user`, `file`, `in_s`, `out_s`, `fit`, `audio.mode: keep|duck|mute`),
-`narration` (`text`, `lang`, `voice`), `captions` (`from: narration`), `card` (`asset` PNG, `enter`/`exit` por âncora, `full_frame`), `music` (`track`, `gain_db`, `ducking`, `license` **obrigatório**), `sfx`.
-Duração da cena: `{fixed_s}` ou `{from: narration, pad_before, pad_after}`. Âncoras de tempo: `scene_start`, `scene_end`, `{anchor: word, word, offset_s}` resolvidas contra `work/timing.lock.json`.
+`storyboard.yaml` (versão 1) descreve `canvas`, `theme`, `audio`, `providers` e `scenes[]` com `layers[]`; tipos de camada no v1: `clip` (`source: file|user`, `file`, `in_s`, `out_s`, `fit`, `playback_rate`, `audio.mode: keep|duck|mute`, `audio.gain_db`),
+`narration` (`text`, `lang`, `voice`), `captions` (`from: narration`), `card` (`asset` PNG, `enter`/`exit` por âncora, `full_frame`), `music` (`track`, `gain_db`, `ducking`, `license` **obrigatório**), `sfx` (`asset`/`file`, `gain_db`, `duration`, `license.kind` **obrigatório**).
+Duração da cena: `{fixed_s}` ou `{from: narration, pad_before, pad_after}`. Âncoras de tempo: `scene_start`, `scene_end`, `{anchor: word, word, offset_s}` resolvidas contra `work/words/<cena>.json` (transcrição da narração com faster-whisper).
 Módulos: `storyboard.py` (`validate_storyboard(sb) -> list[ISSUE]`, `resolve_timeline(sb, durations, words) -> dict`, `to_srt`), template Remotion `Storyboard` (composição genérica), `workflows/storyboard.py`.
-Itens fora do v1 (registrados em `docs/ROADMAP.md`): clipes de IA por provedor (hoje manual/Flow), sfx, transições além de crossfade, publicador.
+Itens fora do v1 (registrados em `docs/ROADMAP.md`): clipes de IA por provedor (hoje manual/Flow), transições além de crossfade, publicador.
 
 ## `storyboard.py` (contrato detalhado)
 
@@ -279,13 +279,14 @@ Entrada = dict já lido do YAML. Issue = mesmo formato de `cues.ISSUE` (`level`,
   `SCHEMA` (error: falta `version==1`, `canvas{w,h,fps}`, `scenes` lista não vazia, cena sem `id` ou sem `layers`, camada sem `type`, `type` desconhecido), `BAD_ID` (error: id de cena inseguro para nome de arquivo),
   `DUP_SCENE` (error: id de cena repetido), `NO_DURATION` (error: cena sem `duration` ou sem `fixed_s`/`from: narration` válidos, ou `from: narration` sem camada `narration`),
   `ASSET_MISSING` (error; só quando `root` é dado: `file`/`asset`/`track` inexistente sob `root`), `ASSET_OUTSIDE` (error; caminho absoluto ou que sai da raiz do projeto), `MUSIC_NO_LICENSE` (error: camada `music` sem `license.kind`),
+  `CLIP_AUDIO` (error: `clip.audio` inválido), `SFX_ASSET`/`SFX_NO_LICENSE`/`SFX_GAIN`/`SFX_DURATION` (error), `PLAYBACK_RATE` (error: fora de 0.5–2.0), `CLIP_IN_S` (error: negativo),
   `ANCHOR_UNRESOLVED` (warn: âncora `word` cuja palavra não aparece no texto da narração da cena), `FIT` (error: `fit` fora de `cover|contain`).
   Tipos de camada válidos: `clip`, `narration`, `captions`, `card`, `music`, `sfx`.
 - `resolve_timeline(sb: dict, narration_s: dict[str, float], words: dict[str, list[dict]] | None = None) -> dict`:
   `narration_s[scene_id]` = duração (s) da fala da cena (sem a camada narration → ausente). Duração da cena = `fixed_s` ou `pad_before + narration_s + pad_after` (pads default 0).
   Cenas em sequência, `start` acumulado (sem transição no v1). Retorna `{"fps","total_s","scenes":[{"id","start","end","layers":[{"type","start","end", ...cópia dos campos}]}]}`.
-  Camadas começam em `scene.start` (+ `enter.at_s` se houver, âncora `scene_start`), terminam em `scene.end` (ou `enter.at_s + hold_s`). Âncora `{"anchor":"word","word":W,"offset_s":o}`:
-  tempo = início da primeira palavra W (`words[scene_id]` = `[{"word","start","end"}]`, comparação sem pontuação/caixa) + `offset_s` + `scene.start + pad_before`; palavra não achada → cai para `scene_start` e registra `"warnings"` na camada.
+  Camadas começam em `scene.start` (+ `enter.at_s` se houver, âncora `scene_start`) e terminam em `scene.end` (ou `exit` resolvido, `enter.at_s + hold_s`). Âncora `{"anchor":"word","word":W,"offset_s":o}`:
+  tempo = início da primeira palavra W (`words[scene_id]` = `[{"word","start","end"}]`, comparação sem pontuação/caixa) + `offset_s` + `scene.start + pad_before`; palavra não achada → cai para `scene_start`/`scene_end` e registra `"warnings"` na camada. O mesmo vale para `exit.anchor: word`.
 - `to_srt(timeline: dict, texts: dict[str, list[str]]) -> str`: um bloco por cena com camada `captions`, texto de `texts[scene_id]` (lista de linhas), do início ao fim da camada.
 
 ## Envelope JSON da CLI (`--json`) — vale para CLI e para o MCP
@@ -296,11 +297,13 @@ Falha: `{"ok": false, "error": {"code","msg","hint","retryable","details"}}` (me
 `run`/passos → `{"steps": [...resultado de run_steps...]}`; `doctor` → `{"checks": [{"name","ok","detail"}]}` (nunca valor de segredo); `providers` → lista de `registry.available()`.
 `warnings` agrega avisos (ex.: `TEMPO_CLAMPED`). Sem `--json`: texto curto em pt-BR no stdout; erros no stderr.
 
+## MCP (implementado)
+- `forja mcp serve`: stdio, JSON-RPC 2.0, uma mensagem por linha, sem SDK extra; 8 tools (`describe`, `providers`, `status`, `doctor`, `init`, `run`, `qa`, `approve`) chamando a mesma CLI com `--json`. Stdout é só protocolo; segredos nunca são impressos.
+
 ## Evolução prevista (não implementar no v1; registrar em `docs/ROADMAP.md`)
-- Servidor MCP fino (`forja mcp serve`, extra `forja[mcp]`, SDK oficial, stdio, ~8 tools: describe, status, plan, run, voices, qa, artifact_get, cancel) sobre os mesmos comandos.
 - Provedores `clip` por API (ex.: geração de vídeo do Gemini/“Omni”, com `estimate()` de custo antes de gastar), `music` (Lyria ou trilha local com licença), `image`, `stt` na nuvem.
 - `plan --json` (dry-run com custo estimado e cache hits), migrações de `schema_version`, VMAF/golden por cena, SFX, transições, publicador.
-- Pacote por agente: `skills/forja/SKILL.md` + `AGENTS.md` + `mcp.json` (já incluídos no kit; o MCP vem depois).
+- Pacote por agente: `skills/forja/SKILL.md` + `AGENTS.md` + `examples/mcp.json` (servidor MCP incluído).
 
 ## `media.py` (contrato detalhado; todos os subprocessos entram por `run=subprocess.run` injetável)
 
@@ -347,8 +350,8 @@ Entrada mínima válida: `{"version": 1, "canvas": {"w": 1280, "h": 720, "fps": 
 |---|---|---|---|---|
 | `validate` | — | `storyboard.yaml`, config | `work/validate.json` | `storyboard.validate_storyboard(sb, root)` + avisos de `brief`/aprovação → `qa.summarize(issues)` gravado; **`error` ⇒ `ForjaError("GATE_FAILED", ..., details={"issues": [...]})`** |
 | `voices` | validate | `storyboard.yaml`, config | `work/voices/manifest.json` (+ `work/voices/<cena>.wav`) | para cada cena com camada `narration`: `cue = {"id": <cena>, "text": layer["text"], "voice": layer.get("voice"), "style": layer.get("style")}` (sem `voice` ⇒ o cast `default` do config); `tts.source_for(cue, cfg, ctx.root, work/"cache"/"tts", post=_http_post, env=ctx.env)` (provider `google_ai_studio`/`files` lê `voices/<cena>.wav`); ganho `mixlib.voice_gain_cmd(... cfg["mix"]["voice_lufs"])` via `media.run_checked`; manifesto `{cena: {"wav": "work/voices/<cena>.wav", "duration": seg}}` (duração do trecho com fala: `schedule.speech_bounds` ou, se `None`, a do WAV) |
-| `timeline` | voices | `storyboard.yaml`, manifesto, config | `work/timeline.json`, `work/subs.json`, `out/legendas.srt` | `storyboard.resolve_timeline(sb, {cena: duration}, words=None)` (âncoras por palavra caem em `scene_start` e viram `warnings` — v1 não alinha palavras) → `timeline.json` (com `"fps"`, `"total_s"`); legendas: para cada cena com camada `captions` e narração, `texts[cena] = cues.split_lines(texto, cfg["render"]["max_chars_line"], cfg["render"]["max_lines"])` (se `None`, quebra simples por palavras em 2 linhas) → `storyboard.to_srt(timeline, texts)` → `out/legendas.srt` e eventos `{"start","end","lines","narrador":false,"raised":false}` em `work/subs.json` |
-| `mix` | timeline | `work/timeline.json`, manifesto, `storyboard.yaml`, config | `work/mix.wav`, `work/loudness.json`, `work/bed.wav`, `work/voices/<cena>.fit.wav` | **base** `work/bed.wav` (48 kHz estéreo, `total_s`): se houver camada `music` (`track`, `gain_db` default 0), decodifica a trilha cortada em `total_s` com `volume=<gain_db>dB` (ffmpeg via `media.run_checked`); senão silêncio (`anullsrc`); a narração de cada cena entra em `scene.start + (duration.pad_before ou 0)` (voz ajustada com `media.trim_tempo_cmd(wav, fit, 1.0)` + `-ar 48000 -ac 1` antes do arquivo de saída); `duck_intervals = [(ini, fim, mixlib.db_to_gain(layer.get("ducking_db", cfg["mix"]["duck_narrator_db"])))]` para o intervalo de cada narração; `media.assemble_mix(bed, voices, duck_intervals, {**cfg, "mix": {**cfg["mix"], "orig_gain": 1.0}}, work/"mix_raw.wav")`; `media.normalize_loudness(...)` e **mede a saída** (`media.measure_loudness(work/mix.wav, cfg)`) → `loudness.json` `{"I","TP"}`. Áudio embutido dos clipes e `sfx` **não** entram no v1: se existirem, `warnings` no retorno do passo (`CLIP_AUDIO_IGNORED`, `SFX_IGNORED`), nunca erro |
+| `timeline` | voices | `storyboard.yaml`, manifesto, config | `work/timeline.json`, `work/subs.json`, `out/legendas.srt` | `storyboard.resolve_timeline(sb, {cena: duration}, words)`; se alguma cena tem `enter/exit.anchor: word`, transcreve **somente** essas narrações com `transcribe.run_transcribe(wav, {"transcribe": {..., "language": lang}}, model_dir)` e cacheia `work/words/<cena>.json` (chave = hash do WAV + config); falha vira `MISSING_PREREQ` → `timeline.json` (com `"fps"`, `"total_s"`); legendas: para cada cena com camada `captions` e narração, `texts[cena] = cues.split_lines(texto, cfg["render"]["max_chars_line"], cfg["render"]["max_lines"])` (se `None`, quebra simples por palavras em 2 linhas) → `storyboard.to_srt(timeline, texts)` → `out/legendas.srt` e eventos `{"start","end","lines","narrador":false,"raised":false}` em `work/subs.json` |
+| `mix` | timeline | `work/timeline.json`, manifesto, `storyboard.yaml`, config | `work/mix.wav`, `work/loudness.json`, `work/bed.wav`, `work/voices/<cena>.fit.wav` | **base** `work/bed.wav` (48 kHz estéreo, `total_s`): soma `music` (`track`, `gain_db`), áudio embutido de cada `clip` (default `keep`; `mute` remove; `gain_db`; `in_s`; `playback_rate`) e `sfx` (`asset`/`file`, `gain_db`, `duration`, `start` resolvido), decodificando cada fonte para 48 kHz estéreo e somando no offset da timeline; se não houver fonte, silêncio (`anullsrc`); a narração de cada cena entra em `scene.start + (duration.pad_before ou 0)` (voz ajustada com `media.trim_tempo_cmd(wav, fit, 1.0)` + `-ar 48000 -ac 1` antes do arquivo de saída); `duck_intervals = [(ini, fim, mixlib.db_to_gain(layer.get("ducking_db", cfg["mix"]["duck_narrator_db"])))]` para o intervalo de cada narração; `media.assemble_mix(bed, voices, duck_intervals, {**cfg, "mix": {**cfg["mix"], "orig_gain": 1.0}}, work/"mix_raw.wav")`; `media.normalize_loudness(...)` e **mede a saída** (`media.measure_loudness(work/mix.wav, cfg)`) → `loudness.json` `{"I","TP"}`. Áudio embutido dos clipes e `sfx` **entram** no bed; `warnings` do passo fica vazio. `sfx` exige licença no `validate`. |
 | `render` | mix | `work/timeline.json`, `work/subs.json`, `work/mix.wav`, assets | `out/video.mp4` | `brief.require_approvals(..., ("script","voice","overlays"))`; props = `{"timeline": timeline, "subs": subs, "lowerThirds": storyboard.caption_windows(timeline), "brand": cfg["brand"], "fps": canvas.fps, "width": canvas.w, "height": canvas.h, "fontSize": cfg["render"]["font_size"], "durationS": timeline["total_s"]}`; `media.render_remotion(entry, props, public_dir=<raiz do projeto>, out=work/"render.mp4", cwd=<template>, composition="Storyboard")`; `media.mux(render.mp4, mix.wav, out/video.mp4)` (entry/template como no `dub`) |
 | `qa` | render | `out/video.mp4`, `work/subs.json`, `work/loudness.json`, `work/timeline.json`, config | `out/qa.json` | `qa.check_subs` + `qa.check_loudness` + (v1) conferência de duração: `ffprobe` do `out/video.mp4` vs `timeline.total_s` (diferença > 0.5 s ⇒ `error` `DURATION_MISMATCH`) → `qa.summarize` gravado; `errors > 0` ⇒ `GATE_FAILED` |
 
@@ -356,7 +359,7 @@ Entrada mínima válida: `{"version": 1, "canvas": {"w": 1280, "h": 720, "fps": 
 
 ## Google Flow (cenas, browser)
 
-O v1 não tem integração por API com o Google Flow. O caminho padrão é o agente operar a interface web já logada (conta/creditos), baixar os MP4s para `assets/flow/` e registrar cada take no `storyboard.yaml` como camada `clip`. O `validate` só vê o arquivo local; áudio embutido e `sfx` continuam ignorados. Termos do Flow, créditos, marca d'água/SynthID e licença do plano são responsabilidade do usuário; não há contorno de limite/captcha.
+O v1 não tem integração por API com o Google Flow. O caminho padrão é o agente operar a interface web já logada (conta/creditos), baixar os MP4s para `assets/flow/` e registrar cada take no `storyboard.yaml` como camada `clip`. O `validate` só vê o arquivo local; áudio embutido e `sfx` entram no bed, com `audio.mode`/licença. Termos do Flow, créditos, marca d'água/SynthID e licença do plano são responsabilidade do usuário; não há contorno de limite/captcha.
 `music` sem `license` já é erro do `validate`. Nenhum asset é copiado: o `public_dir` é a raiz do projeto e os `file`/`asset` das camadas são relativos a ela.
 
 ## Overlays do storyboard (v1.1)

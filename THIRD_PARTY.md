@@ -18,10 +18,10 @@ Versões medidas com `docker run --rm --entrypoint /opt/venv/bin/pip forja:0.1 f
 | tokenizers | 0.23.3 | Apache-2.0 | classificador do PyPI |
 | huggingface_hub | 2.4.0 | Apache-2.0 | metadado do PyPI |
 | onnxruntime | 1.31.1 | MIT | metadado do PyPI |
-| av (PyAV) | 18.1.0 | BSD-3-Clause | **a verificar** (o PyPI não declara no metadado; conferir no pacote) |
+| av (PyAV) | >=11,<14 (testado 13.1.0) | BSD-3-Clause | **a verificar** (o PyPI não declara no metadado; conferir no pacote); 14+ removeu `metadata_errors` e quebra o faster-whisper 1.2.1 |
 | demais transitivas | — | MIT/BSD/Apache em geral | **a verificar** caso a caso (`pip freeze` lista todas) |
 
-O `pyproject.toml` declara apenas `pyyaml`, `numpy`, `scipy` e `faster-whisper`; as demais entram
+O `pyproject.toml` declara `pyyaml`, `numpy`, `scipy`, `faster-whisper` e `av>=11,<14`; as demais entram
 como dependências dessas.
 
 ## Node / Remotion

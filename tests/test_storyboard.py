@@ -744,3 +744,43 @@ def test_caption_windows_uses_default_position_for_lower_third():
         ]
     }
     assert storyboard.caption_windows(timeline) == [[0.6, 3.4]]
+
+
+def test_validate_clip_audio_rejects_bad_mode_and_gain():
+    from forja import storyboard
+
+    layer = _layer("clip", file="c.mp4", audio={"mode": "loud", "gain_db": 99})
+    issues = storyboard.validate_storyboard(_sb(scenes=[_scene(layers=[layer])]))
+    assert _has(issues, "CLIP_AUDIO")
+
+
+def test_validate_sfx_requires_asset_and_license():
+    from forja import storyboard
+
+    layer = _layer("sfx", file="s.wav")
+    issues = storyboard.validate_storyboard(_sb(scenes=[_scene(layers=[layer])]))
+    assert _has(issues, "SFX_NO_LICENSE")
+
+
+def test_resolve_timeline_exit_word_anchor():
+    from forja import storyboard
+
+    card = _layer(
+        "card",
+        asset="c.png",
+        exit={"anchor": "word", "word": "world", "offset_s": 0.1},
+    )
+    scene = _scene(
+        "a",
+        layers=[_narration("Hello world"), card],
+        duration={"fixed_s": 4.0},
+    )
+    words = {
+        "a": [
+            {"word": "Hello", "start": 0.2, "end": 0.5},
+            {"word": "world", "start": 1.0, "end": 1.4},
+        ]
+    }
+    tl = storyboard.resolve_timeline(_timeline_sb(scene), {}, words)
+    layer = next(item for item in tl["scenes"][0]["layers"] if item["type"] == "card")
+    assert layer["end"] == pytest.approx(1.1)

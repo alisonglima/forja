@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "forja": {
+      "command": "forja",
+      "args": ["mcp", "serve"]
+    }
+  }
+}

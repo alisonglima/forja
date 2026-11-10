@@ -7,7 +7,7 @@ doc:
 	python3 -I scripts/build-doc.py --out docs/index.html
 
 check-prompts:
-	python3 scripts/check-prompts.py --expect 14
+	python3 scripts/check-prompts.py --expect 15
 
 clean:
 	rm -rf .pytest_cache build dist *.egg-info

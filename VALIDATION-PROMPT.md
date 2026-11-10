@@ -20,14 +20,19 @@ Você é um **auditor técnico independente** do repositório **https://github.c
    - `forja init` cria `brief.yaml`/`approvals.json`, liga `require_approvals` e `--no-require-approvals` desliga; `forja approve` grava de forma atômica.
    - O render falha fechado (`GATE_FAILED`) sem as aprovações exigidas e com `approvals.json` inválido.
    - Overlays: validação de preset/texto/posição/estilo/asset; `caption_windows` eleva legenda; `Storyboard.jsx` renderiza `Overlay`.
+   - Áudio: o bed inclui música, áudio embutido do clipe (default keep, mute/duck/gain) e `sfx` (asset/file, license.kind, gain/duration); a narração faz ducking.
+   - Âncoras por palavra: `timeline` transcreve só cenas com `enter/exit.anchor: word`, cacheia `work/words/`, e falha com `MISSING_PREREQ` em vez de alinhar no chute.
+   - MCP: `forja mcp serve` fala JSON-RPC 2.0 por stdio, lista 8 tools e chama a CLI; stdout só protocolo, sem segredos.
    - `forja doctor` mostra o provider correto; não exige chave nos modos AI Studio/files/piper.
-   - `forja describe`/`providers` listam os providers e o comando `approve`.
+   - `forja describe`/`providers` listam os providers, o comando `approve` e `mcp serve`.
+   - `examples/mcp.json` é JSON válido e usa `forja mcp serve`.
    - Docker: Piper é opcional e não pode ser vendido como setup; Flow não tem chamada de API.
 3. **Testes e gates:**
    - `python3 -m pytest -q tests` (deve passar; reporte o número).
    - `python3 scripts/check-prompts.py --expect 15`.
    - `python3 -I scripts/build-doc.py --out /tmp/a.html` duas vezes e `cmp` (doc determinística).
    - `forja --json describe`, `forja --json init /tmp/forja-audit --no-require-approvals`, `forja --json --project /tmp/forja-audit doctor` (sem Docker).
+   - Handshake MCP manual com `initialize`, `tools/list` e `forja_status` (sem conta/API).
    - **Não rode Docker no Mac** e não use contas reais/AI Studio/Flow.
 4. **Documentação e UX:**
    - O guia tem botão de tema claro/escuro funcional e link para o GitHub; funciona em 1280 e 360, sem rolagem horizontal.

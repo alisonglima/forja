@@ -11,6 +11,9 @@ A **forja** é uma CLI (`forja`, `python -m forja`) e um kit Docker para gerar v
 - **Dublar**: transcreve o vídeo, adapta o texto para pt-BR, usa as vozes que você gerou ou a voz local, mixa com ducking, queima a legenda e passa um gate de qualidade.
 - **Criar por cenas**: monta um vídeo do zero com clipes gerados no **Google Flow**, narração no AI Studio, cards, overlays, trilha e legendas.
 - **Overlays profissionais**: lower-third, título, callout, citação, CTA, logo e estatística, com tema de marca e posição/entrada/saída por camada.
+- **Áudio completo**: voz, música, áudio embutido do clipe e `sfx` no mesmo bed, com ducking e loudness.
+- **Âncoras por palavra**: alinha card/overlay à fala transcrita pelo Whisper, sem chute.
+- **MCP**: `forja mcp serve` expõe 8 tools da CLI para agentes que preferem tools a shell.
 - **Para agentes**: todo comando aceita `--json`, `describe`, `status` com `next_actions`, cache por hash, QA como gate e códigos de saída `0..5`.
 - **Humano no comando**: `brief.yaml` registra objetivo/público/tom; `forja approve` registra a aprovação humana antes do render.
 
@@ -35,7 +38,7 @@ Ressalvas que valem para todo mundo:
 - **Créditos e plano:** cada geração consome créditos e pode exigir plano pago; confirme antes de gerar em lote. Não contorne limites, filas, captcha ou políticas.
 - **Conteúdo e direitos:** siga os termos do Google Flow/Labs e as políticas de conteúdo; vídeos podem ter marca d'água/SynthID e regras de uso comercial. Não gere pessoas reais, marcas ou cenas sensíveis sem autorização.
 - **Não determinístico:** o mesmo prompt pode gerar resultados diferentes; guarde prompt, take e versão e revise com olhos humanos.
-- **Sem áudio do clipe:** o v1 não mixa o áudio embutido do MP4 nem `sfx`; a narração vem do AI Studio e a trilha é uma camada `music` licenciada.
+- **Áudio do clipe:** o áudio embutido do MP4 entra no bed por padrão; use `audio: {mode: mute}` se o take do Flow tiver fala/ruído indesejado. `sfx` também entra e exige `license.kind`.
 
 Se você não usar Flow, traga os clipes prontos em `assets/` e use o mesmo `storyboard.yaml`. A ferramenta não gera B-roll/imagens por IA fora do seu navegador.
 
@@ -54,6 +57,52 @@ Cada camada `overlay` tem um `preset` e, opcionalmente, `text`, `subtext`, `posi
 ```
 
 Presets: `lower_third`, `title`, `callout`, `quote`, `cta`, `logo` e `stat`. O tema vem de `brand` no `config.yaml` (cores, fonte, margem segura, logo); cada overlay pode sobrescrever `style` (cores, fonte, tamanho, raio, opacidade, largura, alinhamento). Quando um overlay fica na parte de baixo, a legenda sobe automaticamente para não colidir.
+
+## Áudio, sfx e âncoras por palavra
+
+O bed do storyboard soma, na timeline:
+
+- **Narração** (voz do AI Studio/arquivo/Piper), com ducking do bed durante a fala.
+- **Música** (`music`) — `license.kind` é obrigatório.
+- **Áudio embutido do clipe** (`clip.audio`) — entra por padrão; `mode: mute` remove, `gain_db` ajusta.
+- **Efeitos** (`sfx`) — `asset`/`file`, `license.kind`, `gain_db`, `duration` opcional.
+
+```yaml
+- type: clip
+  file: assets/flow/cena-01.mp4
+  in_s: 0
+  audio: {mode: keep, gain_db: -6}
+- type: sfx
+  file: assets/sfx/whoosh.wav
+  license: {kind: "cc0"}
+  gain_db: -12
+  duration: 0.8
+  enter: {anchor: word, word: "começa"}
+```
+
+`enter`/`exit` com `{anchor: word, word: "..."}` resolvem o tempo real da palavra. O passo `timeline` transcreve **somente as cenas que usam âncora por palavra**, com `faster-whisper`, e guarda o resultado em `work/words/<cena>.json`; a primeira execução baixa o modelo e pode demorar. Se a transcrição falhar, o passo retorna `MISSING_PREREQ` em vez de fingir que alinhou.
+
+## MCP
+
+Para agentes que falam MCP em vez de shell:
+
+```bash
+forja mcp serve
+```
+
+É um servidor **stdio**, JSON-RPC 2.0, uma mensagem por linha, sem SDK extra. Ele chama a mesma CLI e devolve o JSON no content da tool. Tools: `forja_describe`, `forja_providers`, `forja_status`, `forja_doctor`, `forja_init`, `forja_run`, `forja_qa`, `forja_approve`.
+
+Exemplo de configuração (Claude Desktop/outros clientes):
+
+```json
+{
+  "mcpServers": {
+    "forja": {"command": "forja", "args": ["mcp", "serve"]}
+  }
+}
+```
+
+No modo sem Docker, use o `forja` do `.venv` (`./.venv/bin/forja`) ou `python -m forja mcp serve`. O servidor não imprime segredos e não publica porta; é stdio local. Exemplo pronto em [`examples/mcp.json`](examples/mcp.json).
 
 ## Brief e aprovação humana
 
@@ -75,7 +124,7 @@ Se você não tem Docker/VPS ou quer testar numa máquina simples, a CLI roda di
 python -m forja --json doctor
 ```
 
-Requisitos: Python 3.9+, ffmpeg/ffprobe, Node 20+ e Chrome via Remotion. O passo a passo completo, por sistema, está em [`LOCAL.md`](LOCAL.md). O navegador é o seu normal (AI Studio/Flow); não há `kit.sh` nesse modo.
+Requisitos: Python 3.9+, ffmpeg/ffprobe, Node 20+ e Chrome via Remotion. O passo a passo completo, por sistema, está em [`LOCAL.md`](LOCAL.md). O Forja acha o `remotion` local em `remotion-template/node_modules/.bin` automaticamente. O navegador é o seu normal (AI Studio/Flow); não há `kit.sh` nesse modo.
 
 ## Requisitos (kit Docker)
 
@@ -95,7 +144,7 @@ Requisitos: Python 3.9+, ffmpeg/ffprobe, Node 20+ e Chrome via Remotion. O passo
 
 ## Documentação
 
-O guia completo, offline e copiável está em **[alisonglima.github.io/forja](https://alisonglima.github.io/forja/)** (fonte em [`docs/index.html`](docs/index.html)). Ele cobre visão geral, brief/aprovação, Google AI Studio e Flow, alternativas locais/API, arquitetura, overlays, os 15 prompts, segurança, licenças, navegador e problemas.
+O guia completo, offline e copiável está em **[alisonglima.github.io/forja](https://alisonglima.github.io/forja/)** (fonte em [`docs/index.html`](docs/index.html)). Ele cobre visão geral, brief/aprovação, Google AI Studio e Flow, alternativas locais/API, arquitetura, overlays, áudio/sfx/âncoras, MCP, os 15 prompts, segurança, licenças, navegador e problemas.
 
 ## Comandos do kit
 

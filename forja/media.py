@@ -236,6 +236,13 @@ def render_remotion(entry, props, public_dir, out, run=subprocess.run, cwd=None,
     )
     cmd = render.remotion_cmd(entry, str(props_path), str(public_dir), str(out), composition)
     kwargs = {"cwd": str(cwd)} if cwd is not None else {}
+    if cwd is not None:
+        local = Path(cwd) / "node_modules" / ".bin"
+        for name in ("remotion", "remotion.cmd", "remotion.exe"):
+            candidate = local / name
+            if candidate.is_file():
+                cmd[0] = str(candidate)
+                break
     _checked(cmd, run, "remotion", **kwargs)
     return out
 

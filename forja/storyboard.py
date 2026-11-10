@@ -160,6 +160,42 @@ def _check_asset(layer, scene_id, root, issues):
             )
 
 
+def _check_clip_audio(layer, scene_id, issues):
+    label = _layer_label(layer, scene_id)
+    audio = layer.get("audio")
+    if audio is None or audio is True or audio is False:
+        return
+    if not isinstance(audio, dict):
+        issues.append(_issue("error", label, "CLIP_AUDIO", "clip.audio deve ser booleano ou mapeamento"))
+        return
+    unknown = sorted(set(audio) - {"mode", "gain_db"})
+    if unknown:
+        issues.append(
+            _issue("error", label, "CLIP_AUDIO", "clip.audio tem chaves desconhecidas: %s" % ", ".join(unknown))
+        )
+    mode = audio.get("mode", "keep")
+    if mode not in ("keep", "duck", "mute"):
+        issues.append(_issue("error", label, "CLIP_AUDIO", "clip.audio.mode deve ser keep, duck ou mute"))
+    gain = audio.get("gain_db", 0)
+    if not _is_number(gain) or not (-60 <= float(gain) <= 12):
+        issues.append(_issue("error", label, "CLIP_AUDIO", "clip.audio.gain_db deve ficar entre -60 e 12"))
+
+
+def _check_sfx(layer, scene_id, issues):
+    label = _layer_label(layer, scene_id)
+    if not any(isinstance(layer.get(field), str) and layer.get(field) for field in _ASSET_FIELDS):
+        issues.append(_issue("error", label, "SFX_ASSET", "camada sfx exige asset ou file"))
+    license_info = layer.get("license")
+    if not isinstance(license_info, dict) or not license_info.get("kind"):
+        issues.append(_issue("error", label, "SFX_NO_LICENSE", "camada sfx exige license.kind"))
+    gain = layer.get("gain_db", 0)
+    if not _is_number(gain) or not (-60 <= float(gain) <= 12):
+        issues.append(_issue("error", label, "SFX_GAIN", "sfx.gain_db deve ficar entre -60 e 12"))
+    duration = layer.get("duration")
+    if duration is not None and (not _is_number(duration) or float(duration) <= 0):
+        issues.append(_issue("error", label, "SFX_DURATION", "sfx.duration deve ser positivo"))
+
+
 def _check_anchors(layer, scene_id, narration_text, issues):
     for key in ("enter", "exit"):
         spec = layer.get(key)
@@ -382,6 +418,12 @@ def validate_storyboard(sb, root=None):
                         )
                     )
 
+            if layer_type == "clip":
+                _check_clip_audio(layer, scene_id, issues)
+
+            if layer_type == "sfx":
+                _check_sfx(layer, scene_id, issues)
+
             _check_anchors(layer, scene_id, narration_text, issues)
 
             if "fit" in layer and layer.get("fit") not in _FITS:
@@ -393,6 +435,30 @@ def validate_storyboard(sb, root=None):
                         f"fit invalido: {layer.get('fit')!r} (use cover ou contain)",
                     )
                 )
+
+            if "playback_rate" in layer:
+                rate = layer.get("playback_rate")
+                if not _is_number(rate) or not (0.5 <= float(rate) <= 2.0):
+                    issues.append(
+                        _issue(
+                            "error",
+                            _layer_label(layer, scene_id),
+                            "PLAYBACK_RATE",
+                            "playback_rate deve ficar entre 0.5 e 2.0",
+                        )
+                    )
+
+            if layer_type == "clip" and "in_s" in layer:
+                in_s = layer.get("in_s")
+                if not _is_number(in_s) or float(in_s) < 0:
+                    issues.append(
+                        _issue(
+                            "error",
+                            _layer_label(layer, scene_id),
+                            "CLIP_IN_S",
+                            "clip.in_s deve ser um numero >= 0",
+                        )
+                    )
 
     return issues
 
@@ -436,6 +502,30 @@ def _layer_start(layer, scene_start, scene_end, pad_before, words, scene_id):
     return scene_start, []
 
 
+def _layer_end(layer, scene_start, scene_end, pad_before, words, scene_id, start):
+    hold_s = layer.get("hold_s")
+    if _is_number(hold_s):
+        return start + float(hold_s), []
+    exit_spec = layer.get("exit")
+    if not isinstance(exit_spec, dict):
+        return scene_end, []
+    offset = _as_float(exit_spec.get("offset_s"), 0.0)
+    anchor = exit_spec.get("anchor")
+    if anchor == "word":
+        word_start = _find_word_start(words.get(scene_id), exit_spec.get("word"))
+        if word_start is None:
+            return scene_end, [f"ancora de saida nao resolvida: {exit_spec.get('word')!r}"]
+        return scene_start + pad_before + word_start + offset, []
+    if anchor == "scene_start":
+        return scene_start + offset, []
+    if anchor == "scene_end":
+        return scene_end + offset, []
+    at_s = exit_spec.get("at_s")
+    if _is_number(at_s):
+        return scene_start + float(at_s), []
+    return scene_end, []
+
+
 def resolve_timeline(sb, narration_s, words=None):
     narration_s = narration_s if isinstance(narration_s, dict) else {}
     words = words if isinstance(words, dict) else {}
@@ -475,17 +565,18 @@ def resolve_timeline(sb, narration_s, words=None):
             start, warnings = _layer_start(
                 layer, scene_start, scene_end, pad_before, words, scene_id
             )
+            end, end_warnings = _layer_end(
+                layer, scene_start, scene_end, pad_before, words, scene_id, start
+            )
+            warnings.extend(end_warnings)
             hold_s = layer.get("hold_s")
-            if _is_number(hold_s):
-                end = start + float(hold_s)
-            else:
-                end = scene_end
             if layer.get("type") == "overlay" and end > scene_end:
                 end = scene_end
                 warnings.append("overlay cortado no fim da cena")
             if (
                 layer.get("type") in ("narration", "captions")
                 and not isinstance(layer.get("enter"), dict)
+                and not isinstance(layer.get("exit"), dict)
                 and not _is_number(hold_s)
                 and scene_id in narration_s
             ):

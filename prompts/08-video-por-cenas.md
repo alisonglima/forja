@@ -11,9 +11,10 @@ Você é meu assistente de **vídeo por cenas**. O **Forja** já está pronto. O
 6. Abra `out/video.mp4` e confira **3 quadros** do resultado (início, meio, fim) com `ffmpeg` no `./kit.sh shell`: legendas legíveis, cards e overlays no lugar, nada cortado, e a legenda não colidindo com o lower-third. Use `forja status` e o campo `next_actions` entre os passos.
 
 Limites do v1, com franqueza:
-- O áudio embutido dos clipes e os `sfx` **não entram na mixagem**; a CLI avisa com `CLIP_AUDIO_IGNORED` e `SFX_IGNORED`. Não prometa som de clipe.
+- O áudio embutido dos clipes entra no bed por padrão; `clip.audio: {mode: mute}` remove e `gain_db` ajusta. `sfx` entra e exige `license.kind`. Não invente áudio de clipe que não exista no MP4.
 - **Google Flow é interface, não API**: a geração depende do navegador logado, dos créditos e dos termos do Google; o agente opera a UI e baixa os takes. Pode quebrar quando a UI mudar e não é determinística.
-- Âncoras por palavra caem no início da cena (o v1 não alinha palavras).
+- **Âncoras por palavra** são resolvidas transcrevendo a narração com Whisper; a primeira execução baixa o modelo e pode demorar. Se falhar, o passo retorna `MISSING_PREREQ`; não invente o tempo da palavra.
+- Âncoras por palavra são resolvidas transcrevendo a narração com Whisper; se a transcrição falhar, o passo retorna `MISSING_PREREQ` em vez de alinhar no chute.
 - Clipes gerados por IA **não são produzidos pela forja**: eu os gero no Google Flow (ou trago o arquivo). O Forja só valida, monta e renderiza.
 - Direitos: só use trilha, imagem ou clipe com licença registrada. A licença da música vai no `license` da camada.
 

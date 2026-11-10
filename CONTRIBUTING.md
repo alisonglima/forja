@@ -46,7 +46,7 @@ O `docs/index.html` é gerado; edite `scripts/build-doc.py` e os `prompts/*.md`,
 1. Descreva o problema e a solução; linke a issue quando houver.
 2. Inclua testes e rode `python -m pytest -q tests`.
 3. Atualize `README.md`, `DESIGN.md`, `docs/ROADMAP.md` e `prompts/` se o contrato mudar.
-4. Rode `python scripts/check-prompts.py --expect 14` se mexer em prompts.
+4. Rode `python scripts/check-prompts.py --expect 15` se mexer em prompts.
 5. Mantenha o commit focado; use mensagens no estilo Conventional Commits (`feat:`, `fix:`,
    `docs:`, `test:`, `chore:`).
 

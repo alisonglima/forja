@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 import numpy as np
@@ -9,7 +11,7 @@ from scipy.io import wavfile
 from .. import brief
 from .. import cues as cues_mod
 from .. import ids
-from .. import media, mixlib, probe, qa, schedule, storyboard as storyboard_mod, tts
+from .. import media, mixlib, probe, qa, schedule, storyboard as storyboard_mod, transcribe, tts
 from ..errors import ForjaError
 from ..steps import Step
 from . import WORKFLOWS, register_workflow
@@ -133,18 +135,9 @@ def _asset_paths(ctx, sb) -> list:
 
 
 def _mix_warnings(sb) -> list:
-    warnings = []
-    for scene in _scenes(sb):
-        for layer in _layers(scene):
-            layer_type = layer.get("type")
-            if layer_type == "clip":
-                audio = layer.get("audio")
-                mode = audio.get("mode") if isinstance(audio, dict) else None
-                if mode in ("keep", "duck") and "CLIP_AUDIO_IGNORED" not in warnings:
-                    warnings.append("CLIP_AUDIO_IGNORED")
-            elif layer_type == "sfx" and "SFX_IGNORED" not in warnings:
-                warnings.append("SFX_IGNORED")
-    return warnings
+    # O v1 passou a mixar audio de clipe e sfx; mantido para compatibilidade
+    # do envelope de `mix` e para futuros avisos nao bloqueantes.
+    return []
 
 
 def _narration_duration(path) -> float:
@@ -187,30 +180,146 @@ def _db(value) -> str:
     return ("%g" % number) + "dB"
 
 
-def _build_bed(ctx, sb, total_s, out) -> None:
-    total = "%.6f" % float(total_s)
+def _is_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _as_float(value, default=0.0):
+    return float(value) if _is_number(value) else default
+
+
+def _gain(value):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _audio_plan(ctx, sb, timeline, total_s):
+    """Lista de fontes de audio do bed: musica, audio de clipe e sfx."""
+    plan = []
     music = _music_layer(sb)
     if music is not None:
-        track = _root_path(ctx, music.get("track", ""))
-        cmd = [
-            "ffmpeg",
-            "-y",
-            "-i",
-            str(track),
-            "-af",
-            "volume=%s,apad" % _db(music.get("gain_db", 0)),
-            "-t",
-            total,
-            "-ar",
-            "48000",
-            "-ac",
-            "2",
-            "-c:a",
-            "pcm_s16le",
-            str(out),
-        ]
+        track = music.get("track")
+        if isinstance(track, str) and track:
+            plan.append(
+                {
+                    "kind": "music",
+                    "path": _root_path(ctx, track),
+                    "start": 0.0,
+                    "offset": 0.0,
+                    "duration": float(total_s),
+                    "gain_db": _gain(music.get("gain_db", 0)),
+                    "rate": 1.0,
+                    "pad": True,
+                }
+            )
+
+    for scene in (timeline or {}).get("scenes") or []:
+        if not isinstance(scene, dict):
+            continue
+        scene_start = _as_float(scene.get("start"), 0.0)
+        scene_end = _as_float(scene.get("end"), scene_start)
+        for layer in scene.get("layers") or []:
+            if not isinstance(layer, dict):
+                continue
+            layer_type = layer.get("type")
+            if layer_type == "clip":
+                audio = layer.get("audio")
+                if audio is False:
+                    continue
+                if isinstance(audio, dict) and audio.get("mode") == "mute":
+                    continue
+                value = layer.get("file")
+                if not isinstance(value, str) or not value:
+                    continue
+                path = _root_path(ctx, value)
+                if not path.is_file():
+                    continue
+                try:
+                    has_audio = bool(probe.probe_video(path).get("has_audio"))
+                except (RuntimeError, OSError, ValueError):
+                    has_audio = False
+                if not has_audio:
+                    continue
+                plan.append(
+                    {
+                        "kind": "clip",
+                        "path": path,
+                        "start": scene_start,
+                        "offset": max(0.0, _as_float(layer.get("in_s"), 0.0)),
+                        "duration": max(0.0, scene_end - scene_start),
+                        "gain_db": _gain(audio.get("gain_db", 0)) if isinstance(audio, dict) else 0.0,
+                        "rate": _as_float(layer.get("playback_rate"), 1.0),
+                        "pad": False,
+                    }
+                )
+            elif layer_type == "sfx":
+                value = layer.get("asset") or layer.get("file") or layer.get("track")
+                if not isinstance(value, str) or not value:
+                    continue
+                path = _root_path(ctx, value)
+                if not path.is_file():
+                    continue
+                start = max(0.0, _as_float(layer.get("start"), scene_start))
+                duration = layer.get("duration")
+                if not _is_number(duration) or float(duration) <= 0:
+                    duration = max(0.0, float(total_s) - start)
+                plan.append(
+                    {
+                        "kind": "sfx",
+                        "path": path,
+                        "start": start,
+                        "offset": 0.0,
+                        "duration": min(float(duration), max(0.0, float(total_s) - start)),
+                        "gain_db": _gain(layer.get("gain_db", 0)),
+                        "rate": _as_float(layer.get("playback_rate"), 1.0),
+                        "pad": False,
+                    }
+                )
+    return [item for item in plan if item["duration"] > 0]
+
+
+def _decode_audio(item, out) -> None:
+    cmd = ["ffmpeg", "-y"]
+    if item["offset"] > 0:
+        cmd += ["-ss", "%.6f" % item["offset"]]
+    cmd += ["-i", str(item["path"])]
+    if item["duration"] > 0:
+        cmd += ["-t", "%.6f" % item["duration"]]
+    filters = []
+    if abs(item["rate"] - 1.0) > 1e-6:
+        filters.append("atempo=%.6f" % item["rate"])
+    if abs(item["gain_db"]) > 1e-6:
+        filters.append("volume=%sdB" % ("%g" % item["gain_db"]))
+    if item["pad"]:
+        filters.append("apad")
+    cmd += ["-vn"]
+    if filters:
+        cmd += ["-af", ",".join(filters)]
+    cmd += ["-ar", "48000", "-ac", "2", "-c:a", "pcm_s16le", str(out)]
+    media.run_checked(cmd)
+
+
+def _read_audio(path):
+    rate, data = wavfile.read(str(path))
+    data = np.asarray(data)
+    if data.dtype.kind == "f":
+        data = data.astype(np.float32)
     else:
-        cmd = [
+        data = data.astype(np.float32) / 32768.0
+    if data.ndim == 1:
+        data = np.column_stack([data, data])
+    elif data.shape[1] == 1:
+        data = np.repeat(data, 2, axis=1)
+    else:
+        data = data[:, :2]
+    return int(rate), data
+
+
+def _silence_bed(total_s, out) -> None:
+    media.run_checked(
+        [
             "ffmpeg",
             "-y",
             "-f",
@@ -218,7 +327,7 @@ def _build_bed(ctx, sb, total_s, out) -> None:
             "-i",
             "anullsrc=r=48000:cl=stereo",
             "-t",
-            total,
+            "%.6f" % float(total_s),
             "-ar",
             "48000",
             "-ac",
@@ -227,7 +336,42 @@ def _build_bed(ctx, sb, total_s, out) -> None:
             "pcm_s16le",
             str(out),
         ]
-    media.run_checked(cmd)
+    )
+
+
+def _build_bed(ctx, sb, timeline, total_s, out) -> None:
+    plan = _audio_plan(ctx, sb, timeline, total_s)
+    if not plan:
+        _silence_bed(total_s, out)
+        return
+
+    parts_dir = ctx.work / "bed_parts"
+    parts_dir.mkdir(parents=True, exist_ok=True)
+    for stale in parts_dir.glob("*.wav"):
+        stale.unlink()
+    parts = []
+    for index, item in enumerate(plan):
+        part = parts_dir / ("%03d.wav" % index)
+        _decode_audio(item, part)
+        parts.append((item, part))
+
+    bed = np.zeros((max(1, int(round(float(total_s) * 48000))), 2), dtype=np.float32)
+    for item, part in parts:
+        _rate, data = _read_audio(part)
+        pos = int(round(item["start"] * 48000))
+        if pos < 0:
+            data = data[-pos:]
+            pos = 0
+        if pos >= bed.shape[0]:
+            continue
+        data = data[: bed.shape[0] - pos]
+        if data.shape[0] <= 0:
+            continue
+        bed[pos : pos + data.shape[0]] += data
+    peak = float(np.max(np.abs(bed))) if bed.size else 0.0
+    if peak > 1.0:
+        bed *= 0.98 / peak
+    wavfile.write(str(out), 48000, np.clip(np.rint(bed * 32767.0), -32768, 32767).astype(np.int16))
 
 
 def _remotion_entry(ctx):
@@ -294,6 +438,86 @@ def _run_voices(ctx):
     return {"voices": len(manifest)}
 
 
+def _needs_word_anchor(scene) -> bool:
+    for layer in _layers(scene):
+        for key in ("enter", "exit"):
+            spec = layer.get(key)
+            if isinstance(spec, dict) and spec.get("anchor") == "word":
+                return True
+    return False
+
+
+def _word_language(ctx, layer) -> str:
+    value = layer.get("lang")
+    if not isinstance(value, str) or not value.strip():
+        project = ctx.cfg.get("project") or {}
+        value = project.get("target_lang") or "pt-BR"
+    return str(value).replace("_", "-").split("-", 1)[0] or "pt"
+
+
+def _words_for_timeline(ctx, sb) -> dict:
+    """Transcreve apenas as narracoes de cenas que usam ancora por palavra."""
+    if not any(_needs_word_anchor(scene) for scene in _scenes(sb)):
+        return {}
+    result = {}
+    words_dir = ctx.work / "words"
+    words_dir.mkdir(parents=True, exist_ok=True)
+    for scene_id, layer, scene in _narrated_scenes(sb):
+        if not _needs_word_anchor(scene):
+            continue
+        wav = ctx.work / "voices" / (str(scene_id) + ".wav")
+        if not wav.is_file():
+            continue
+        language = _word_language(ctx, layer)
+        tcfg = dict(ctx.cfg.get("transcribe") or {})
+        tcfg["language"] = language
+        cache_key = {
+            "wav_sha256": hashlib.sha256(wav.read_bytes()).hexdigest(),
+            "language": language,
+            "model": tcfg.get("model"),
+            "compute_type": tcfg.get("compute_type"),
+            "vad": bool(tcfg.get("vad", True)),
+        }
+        cache_path = words_dir / (str(scene_id) + ".json")
+        cached = None
+        if cache_path.is_file():
+            try:
+                cached = json.loads(cache_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                cached = None
+        if isinstance(cached, dict) and cached.get("key") == cache_key:
+            result[str(scene_id)] = cached.get("words") or []
+            continue
+        model_dir = ctx.env.get("FORJA_MODEL_DIR")
+        if not model_dir:
+            model_dir = Path.home() / ".cache" / "forja" / "models"
+        try:
+            data = transcribe.run_transcribe(wav, {"transcribe": tcfg}, model_dir)
+        except Exception as exc:
+            raise ForjaError(
+                "MISSING_PREREQ",
+                "nao foi possivel transcrever a narracao para ancoras por palavra: %s" % exc,
+                hint="instale faster-whisper/baixe o modelo ou remova anchor: word; rode `forja doctor`",
+                details={"scene": str(scene_id)},
+            ) from exc
+        words = []
+        for segment in data.get("segments") or []:
+            if not isinstance(segment, dict):
+                continue
+            for word in segment.get("words") or []:
+                if isinstance(word, dict):
+                    words.append(
+                        {
+                            "word": word.get("word", ""),
+                            "start": word.get("start", 0.0),
+                            "end": word.get("end", 0.0),
+                        }
+                    )
+        result[str(scene_id)] = words
+        _write_json(cache_path, {"key": cache_key, "words": words})
+    return result
+
+
 def _run_timeline(ctx):
     sb = _load_storyboard(ctx)
     manifest = _read_json(ctx.work / "voices" / "manifest.json", {})
@@ -302,7 +526,8 @@ def _run_timeline(ctx):
         for scene_id, entry in (manifest or {}).items()
         if isinstance(entry, dict)
     }
-    timeline = storyboard_mod.resolve_timeline(sb, narration_s, words=None)
+    words = _words_for_timeline(ctx, sb)
+    timeline = storyboard_mod.resolve_timeline(sb, narration_s, words=words)
     _write_json(ctx.work / "timeline.json", timeline)
 
     render_cfg = ctx.cfg.get("render") or {}
@@ -367,7 +592,7 @@ def _run_mix(ctx):
     total_s = float(timeline.get("total_s", 0.0))
 
     bed = ctx.work / "bed.wav"
-    _build_bed(ctx, sb, total_s, bed)
+    _build_bed(ctx, sb, timeline, total_s, bed)
 
     voices_dir = ctx.work / "voices"
     voices_dir.mkdir(parents=True, exist_ok=True)
@@ -527,7 +752,7 @@ def _inputs_timeline(ctx):
             ctx.work / "voices" / "manifest.json",
             ctx.root / "config.yaml",
         ],
-        {"render": ctx.cfg.get("render")},
+        {"render": ctx.cfg.get("render"), "transcribe": ctx.cfg.get("transcribe")},
     )
 
 
@@ -539,11 +764,7 @@ def _inputs_mix(ctx):
         _storyboard_path(ctx),
         ctx.root / "config.yaml",
     ]
-    music = _music_layer(sb)
-    if music is not None:
-        track = music.get("track")
-        if isinstance(track, str) and track:
-            paths.append(_root_path(ctx, track))
+    paths.extend(_asset_paths(ctx, sb))
     return paths, {"mix": ctx.cfg.get("mix")}
 
 

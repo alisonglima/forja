@@ -43,7 +43,7 @@ cd forja
 .\scripts\local-setup.ps1
 ```
 
-O script cria `.venv`, instala o pacote com `pip install -e ".[test]"`, instala as dependências do Remotion, baixa o Chrome Headless Shell e roda `python -m forja --json doctor`. Se o `doctor` reclamar de ffmpeg/Node, instale o que falta e rode de novo.
+O script cria `.venv`, instala o pacote com `pip install -e ".[test]"`, instala as dependências do Remotion, baixa o Chrome Headless Shell e roda `python -m forja --json doctor`. O Forja procura o `remotion` no `PATH` e, se não achar, usa `remotion-template/node_modules/.bin/remotion` automaticamente; não precisa exportar `PATH`. Se o `doctor` reclamar de ffmpeg/Node, instale o que falta e rode de novo.
 
 ## Instalação manual
 
