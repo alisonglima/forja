@@ -36,7 +36,8 @@ def test_starter_storyboard_passes_validation(tmp_path):
 def test_status_of_a_fresh_storyboard_project_uses_the_storyboard_workflow(tmp_path):
     _run(["--json", "init", str(tmp_path / "p")])
     code, doc = _run(["--json", "--project", str(tmp_path / "p"), "status"])
-    assert code == 0 and doc["workflow"] == "storyboard" and doc["steps"][0]["name"] == "validate"
+    assert code == 0 and doc["ok"] is True
+    assert doc["data"]["workflow"] == "storyboard" and doc["data"]["steps"][0]["name"] == "validate"
 
 
 def test_init_dub_without_source_is_a_usage_error(tmp_path):

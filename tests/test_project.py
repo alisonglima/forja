@@ -220,6 +220,8 @@ def test_status_next_points_to_the_first_missing_step(tmp_path):
     assert (
         result["next"] is not None
         and "clip" in result["next"]["command"]
+        and "--project" in result["next"]["command"]
+        and str(root) in result["next"]["command"]
         and isinstance(result["next"]["why"], str)
         and result["next"]["why"]
     )
@@ -277,5 +279,6 @@ def test_status_next_mentions_a_stale_step(tmp_path):
     assert (
         result["next"] is not None
         and "check" in result["next"]["command"]
+        and "--project" in result["next"]["command"]
         and result["next"]["why"]
     )

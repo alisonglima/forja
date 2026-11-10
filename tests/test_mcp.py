@@ -70,8 +70,10 @@ def test_status_tool_returns_cli_envelope(tmp_path):
     result = response["result"]
     assert result["isError"] is False
     envelope = json.loads(result["content"][0]["text"])
-    assert envelope["project"] == "p"
-    assert envelope["steps"]
+    assert envelope["ok"] is True
+    assert envelope["data"]["project"] == "p"
+    assert envelope["data"]["steps"]
+    assert envelope["next_actions"] == [envelope["data"]["next"]]
 
 
 def test_unknown_tool_is_a_protocol_error():

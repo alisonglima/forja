@@ -62,7 +62,9 @@ def test_describe_json_has_documented_top_level_keys():
     from forja import cli
 
     _, doc, _ = _run_json(cli, ["--json", "describe"], env={})
-    assert set(doc) == {
+    assert doc["ok"] is True
+    assert set(doc) == {"ok", "data", "next_actions", "artifacts", "warnings", "cost"}
+    assert set(doc["data"]) == {
         "version",
         "exit_codes",
         "error_codes",
@@ -71,13 +73,15 @@ def test_describe_json_has_documented_top_level_keys():
         "providers",
         "schemas",
     }
+    assert doc["next_actions"] == []
+    assert doc["cost"] is None
 
 
 def test_describe_lists_the_documented_commands():
     from forja import cli
 
     _, doc, _ = _run_json(cli, ["--json", "describe"], env={})
-    names = {command["name"] for command in doc["commands"]}
+    names = {command["name"] for command in doc["data"]["commands"]}
     assert {
         "init",
         "describe",
@@ -100,7 +104,7 @@ def test_describe_exposes_config_defaults_as_schema():
     from forja import cli, config
 
     _, doc, _ = _run_json(cli, ["--json", "describe"], env={})
-    assert doc["schemas"]["config"] == config.DEFAULTS
+    assert doc["data"]["schemas"]["config"] == config.DEFAULTS
 
 
 def test_describe_exposes_the_documented_error_codes():
@@ -118,21 +122,21 @@ def test_describe_exposes_the_documented_error_codes():
         "MISSING_KEY",
         "MISSING_INPUT",
         "INTERNAL",
-    } <= set(doc["error_codes"])
+    } <= set(doc["data"]["error_codes"])
 
 
 def test_describe_registers_dub_and_storyboard_workflows():
     from forja import cli
 
     _, doc, _ = _run_json(cli, ["--json", "describe"], env={})
-    assert {"dub", "storyboard"} <= set(doc["workflows"])
+    assert {"dub", "storyboard"} <= set(doc["data"]["workflows"])
 
 
 def test_describe_providers_is_a_list():
     from forja import cli
 
     _, doc, _ = _run_json(cli, ["--json", "describe"], env={})
-    assert isinstance(doc["providers"], list)
+    assert isinstance(doc["data"]["providers"], list)
 
 
 def test_status_json_reports_the_documented_keys(tmp_path):
@@ -142,7 +146,9 @@ def test_status_json_reports_the_documented_keys(tmp_path):
     code, doc, _ = _run_json(
         cli, ["--json", "--project", str(root), "status"], env={}
     )
-    assert code == 0 and {"project", "workflow", "steps", "next"} <= set(doc)
+    assert code == 0 and doc["ok"] is True
+    assert set(doc) == {"ok", "data", "next_actions", "artifacts", "warnings", "cost"}
+    assert {"project", "workflow", "steps", "next"} <= set(doc["data"])
 
 
 def test_status_reports_the_project_name(tmp_path):
@@ -152,7 +158,7 @@ def test_status_reports_the_project_name(tmp_path):
     _, doc, _ = _run_json(
         cli, ["--json", "--project", str(root), "status"], env={}
     )
-    assert doc["project"] == "meu-video"
+    assert doc["data"]["project"] == "meu-video"
 
 
 def test_status_steps_use_the_documented_states(tmp_path):
@@ -162,10 +168,10 @@ def test_status_steps_use_the_documented_states(tmp_path):
     _, doc, _ = _run_json(
         cli, ["--json", "--project", str(root), "status"], env={}
     )
-    assert doc["steps"] and all(
+    assert doc["data"]["steps"] and all(
         {"name", "state", "reason"} <= set(step)
         and step["state"] in {"fresh", "stale", "missing"}
-        for step in doc["steps"]
+        for step in doc["data"]["steps"]
     )
 
 
@@ -176,9 +182,11 @@ def test_status_next_points_to_a_forja_command(tmp_path):
     _, doc, _ = _run_json(
         cli, ["--json", "--project", str(root), "status"], env={}
     )
-    assert isinstance(doc["next"], dict) and doc["next"]["command"].startswith(
+    nxt = doc["data"]["next"]
+    assert isinstance(nxt, dict) and nxt["command"].startswith(
         "forja"
-    ) and doc["next"]["why"]
+    ) and nxt["why"]
+    assert doc["next_actions"] == [{"command": nxt["command"], "why": nxt["why"]}]
 
 
 def test_status_on_missing_project_exits_two_with_json_error(tmp_path):
