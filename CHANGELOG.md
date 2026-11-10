@@ -17,6 +17,12 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o 
 - `DESIGN.md` registra `MISSING_PREREQ` em âncora por palavra não resolvida, `sfx.start` relativo à
   cena, aviso `CLIP_OUT_S_UNSUPPORTED`, cache de `voices/*.wav`, WAV estéreo convertido e
   `next_actions` com `--project`.
+- `DESIGN.md` registra os novos erros `SFX_START_AND_ENTER` (`sfx` com `start` numérico e `enter`),
+  `SFX_START` para `start` não numérico, `DUPLICATE_SCENE_ID` para ids de cena duplicados e `sfx`
+  com `enter` resolvido como as demais camadas; no passo `timeline`, âncora por palavra não
+  resolvida ou WAV da narração ausente é `MISSING_PREREQ`, e `sfx` fora da cena é `CONFIG_INVALID`.
+  A tabela de problemas do guia e o `README.md` dizem que `MISSING_PREREQ` também vem do passo
+  `timeline` quando a âncora por palavra não é resolvida ou falta a narração (WAV) da cena.
 
 ## [0.1.0] — 2026-11-10
 

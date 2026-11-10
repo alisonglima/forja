@@ -533,23 +533,16 @@ def _words_for_timeline(ctx, sb) -> dict:
 
 
 def _check_word_anchors(sb, timeline, words):
-    """Falha se resolve_timeline teve de alinhar uma ancora por palavra no chute."""
-    resolved = {
-        str(scene.get("id")): scene
-        for scene in (timeline.get("scenes") or [])
-        if isinstance(scene, dict)
-    }
+    """Falha se qualquer ancora ``word`` nao foi resolvida na transcricao.
+
+    Verifica todas as camadas e os dois lados (``enter``/``exit``), sem depender
+    de ``warnings``: a funcao pura ``resolve_timeline`` pode cair no inicio da
+    cena, mas o passo ``timeline`` nunca persiste uma timeline alinhada no chute.
+    As cenas e camadas sao percorridas pela posicao, nao por ``scene.id``.
+    """
     for scene in _scenes(sb):
         scene_id = str(scene.get("id"))
-        out_scene = resolved.get(scene_id) or {}
-        out_layers = [
-            layer
-            for layer in (out_scene.get("layers") or [])
-            if isinstance(layer, dict)
-        ]
-        for layer, out_layer in zip(_layers(scene), out_layers):
-            if not out_layer.get("warnings"):
-                continue
+        for layer in _layers(scene):
             for key in ("enter", "exit"):
                 spec = layer.get(key)
                 if not isinstance(spec, dict) or spec.get("anchor") != "word":
@@ -565,6 +558,91 @@ def _check_word_anchors(sb, timeline, words):
                     )
 
 
+def _resolve_sfx_enters(sb, timeline, words):
+    """Resolve ``sfx.enter`` pela mesma regra das demais camadas.
+
+    A funcao pura ``resolve_timeline`` tambem faz isso; recalcular aqui mantem o
+    passo ``timeline`` correto mesmo quando o resolvedor ainda tratar ``sfx``
+    como caso especial, sem depender dos ``warnings`` que ele emite.
+    """
+    out_scenes = [
+        scene for scene in (timeline.get("scenes") or []) if isinstance(scene, dict)
+    ]
+    for scene_index, scene in enumerate(_scenes(sb)):
+        if scene_index >= len(out_scenes):
+            break
+        out_scene = out_scenes[scene_index]
+        scene_id = str(scene.get("id"))
+        scene_start = _as_float(out_scene.get("start"), 0.0)
+        scene_end = _as_float(out_scene.get("end"), scene_start)
+        pad_before = _pad_before(scene)
+        out_layers = [
+            layer
+            for layer in (out_scene.get("layers") or [])
+            if isinstance(layer, dict)
+        ]
+        for layer_index, layer in enumerate(_layers(scene)):
+            if layer_index >= len(out_layers):
+                break
+            if layer.get("type") != "sfx":
+                continue
+            if not isinstance(layer.get("enter"), dict):
+                continue
+            out_layer = out_layers[layer_index]
+            start, warnings = storyboard_mod._layer_start(
+                layer, scene_start, scene_end, pad_before, words, scene_id
+            )
+            end, end_warnings = storyboard_mod._layer_end(
+                layer, scene_start, scene_end, pad_before, words, scene_id, start
+            )
+            warnings.extend(end_warnings)
+            out_layer["start"] = start
+            out_layer["end"] = end
+            if warnings:
+                out_layer["warnings"] = warnings
+
+
+def _check_sfx_inside_scenes(timeline):
+    """Falha se um ``sfx`` resolvido cai fora da cena em que foi declarado.
+
+    A duracao por ``from: narration`` so e conhecida depois de resolver a
+    timeline; por isso a checagem fica aqui, antes de gravar ``timeline.json``.
+    """
+    for scene in timeline.get("scenes") or []:
+        if not isinstance(scene, dict):
+            continue
+        scene_id = str(scene.get("id"))
+        scene_start = _as_float(scene.get("start"), 0.0)
+        scene_end = _as_float(scene.get("end"), scene_start)
+        for layer in scene.get("layers") or []:
+            if not isinstance(layer, dict) or layer.get("type") != "sfx":
+                continue
+            start_value = layer.get("start")
+            if not _is_number(start_value):
+                continue
+            start = float(start_value)
+            if scene_start <= start < scene_end:
+                continue
+            hint = (
+                "ajuste sfx.start para cair dentro da cena %s "
+                "(de %.3fs ate %.3fs) ou use enter.anchor"
+                % (scene_id, scene_start, scene_end)
+            )
+            raise ForjaError(
+                "CONFIG_INVALID",
+                "sfx.start fora da cena %s: %.3fs nao esta em [%.3f, %.3f)"
+                % (scene_id, start, scene_start, scene_end),
+                hint=hint,
+                details={
+                    "scene": scene_id,
+                    "start": start,
+                    "scene_start": scene_start,
+                    "scene_end": scene_end,
+                    "hint": hint,
+                },
+            )
+
+
 def _run_timeline(ctx):
     sb = _load_storyboard(ctx)
     manifest = _read_json(ctx.work / "voices" / "manifest.json", {})
@@ -575,7 +653,9 @@ def _run_timeline(ctx):
     }
     words = _words_for_timeline(ctx, sb)
     timeline = storyboard_mod.resolve_timeline(sb, narration_s, words=words)
+    _resolve_sfx_enters(sb, timeline, words)
     _check_word_anchors(sb, timeline, words)
+    _check_sfx_inside_scenes(timeline)
     _write_json(ctx.work / "timeline.json", timeline)
 
     render_cfg = ctx.cfg.get("render") or {}

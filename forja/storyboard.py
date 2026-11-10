@@ -366,6 +366,9 @@ def validate_storyboard(sb, root=None):
                 issues.append(
                     _issue("error", scene_id, "DUP_SCENE", f"id de cena duplicado: {scene_id}")
                 )
+                issues.append(
+                    _issue("error", scene_id, "DUPLICATE_SCENE_ID", f"id de cena duplicado: {scene_id}")
+                )
 
         layers = scene.get("layers")
         if not isinstance(layers, list):
@@ -471,27 +474,46 @@ def validate_storyboard(sb, root=None):
                 )
 
             if layer_type == "sfx":
-                start_value = layer.get("start")
-                if _is_number(start_value):
-                    start_f = float(start_value)
-                    duration = scene.get("duration")
-                    fixed_s = (
-                        duration.get("fixed_s")
-                        if isinstance(duration, dict)
-                        else None
-                    )
-                    out_of_scene = start_f < 0
-                    if _is_number(fixed_s):
-                        out_of_scene = out_of_scene or start_f >= float(fixed_s)
-                    if out_of_scene:
+                if "start" in layer:
+                    start_value = layer.get("start")
+                    if not _is_number(start_value):
                         issues.append(
                             _issue(
                                 "error",
                                 _layer_label(layer, scene_id),
                                 "SFX_START",
-                                "sfx.start fora da cena: deve ser >= 0 e menor que a duracao",
+                                "sfx.start deve ser um numero >= 0",
                             )
                         )
+                    else:
+                        start_f = float(start_value)
+                        duration = scene.get("duration")
+                        fixed_s = (
+                            duration.get("fixed_s")
+                            if isinstance(duration, dict)
+                            else None
+                        )
+                        out_of_scene = start_f < 0
+                        if _is_number(fixed_s):
+                            out_of_scene = out_of_scene or start_f >= float(fixed_s)
+                        if out_of_scene:
+                            issues.append(
+                                _issue(
+                                    "error",
+                                    _layer_label(layer, scene_id),
+                                    "SFX_START",
+                                    "sfx.start fora da cena: deve ser >= 0 e menor que a duracao",
+                                )
+                            )
+                        if isinstance(layer.get("enter"), dict):
+                            issues.append(
+                                _issue(
+                                    "error",
+                                    _layer_label(layer, scene_id),
+                                    "SFX_START_AND_ENTER",
+                                    "sfx com start e enter ao mesmo tempo e ambiguo",
+                                )
+                            )
 
     return issues
 
@@ -596,11 +618,16 @@ def resolve_timeline(sb, narration_s, words=None):
                 continue
             out_layer = dict(layer)
             if layer.get("type") == "sfx":
-                if _is_number(layer.get("start")):
+                if isinstance(layer.get("enter"), dict):
+                    start, warnings = _layer_start(
+                        layer, scene_start, scene_end, pad_before, words, scene_id
+                    )
+                elif _is_number(layer.get("start")):
                     start = scene_start + float(layer.get("start"))
+                    warnings = []
                 else:
                     start = scene_start
-                warnings = []
+                    warnings = []
             else:
                 start, warnings = _layer_start(
                     layer, scene_start, scene_end, pad_before, words, scene_id

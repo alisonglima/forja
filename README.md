@@ -81,7 +81,7 @@ O bed do storyboard soma, na timeline:
   enter: {anchor: word, word: "começa"}
 ```
 
-`enter`/`exit` com `{anchor: word, word: "..."}` resolvem o tempo real da palavra. O passo `timeline` transcreve **somente as cenas que usam âncora por palavra**, com `faster-whisper`, e guarda o resultado em `work/words/<cena>.json`; a primeira execução baixa o modelo e pode demorar. Se a transcrição falhar, o passo retorna `MISSING_PREREQ` em vez de fingir que alinhou.
+`enter`/`exit` com `{anchor: word, word: "..."}` resolvem o tempo real da palavra. O passo `timeline` transcreve **somente as cenas que usam âncora por palavra**, com `faster-whisper`, e guarda o resultado em `work/words/<cena>.json`; a primeira execução baixa o modelo e pode demorar. Se a transcrição falhar, se a palavra não for encontrada na narração ou se faltar o WAV da narração (`work/voices/<cena>.wav`), o passo `timeline` retorna `MISSING_PREREQ` em vez de fingir que alinhou.
 
 ## MCP
 

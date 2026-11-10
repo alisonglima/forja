@@ -1173,7 +1173,7 @@ python -m forja --json --project ~/videos/meu-video qa --strict</code></pre>
   gain_db: -12
   duration: 0.8
   enter: {anchor: word, word: "começa"}</code></pre>
-    <p><code>enter</code>/<code>exit</code> com <code>{anchor: word, word: "..."}</code> usam o tempo real da palavra. O passo <code>timeline</code> transcreve só as cenas que têm âncora por palavra com <code>faster-whisper</code> e guarda em <code>work/words/&lt;cena&gt;.json</code>. Se a transcrição falhar, o passo retorna <code>MISSING_PREREQ</code>; não há alinhamento fingido.</p>
+    <p><code>enter</code>/<code>exit</code> com <code>{anchor: word, word: "..."}</code> usam o tempo real da palavra. O passo <code>timeline</code> transcreve só as cenas que têm âncora por palavra com <code>faster-whisper</code> e guarda em <code>work/words/&lt;cena&gt;.json</code>. Se a transcrição falhar, se a palavra não for encontrada na narração ou se faltar o WAV da narração (<code>work/voices/&lt;cena&gt;.wav</code>), o passo <code>timeline</code> retorna <code>MISSING_PREREQ</code>; não há alinhamento fingido.</p>
 
     <h3 id="mcp">MCP (stdio)</h3>
     <p>Para agentes que preferem tools a shell, a CLI tem um servidor MCP por stdio, JSON-RPC 2.0, uma mensagem por linha, sem SDK extra:</p>
@@ -1451,7 +1451,7 @@ python -m forja --json --project ~/videos/meu-video qa --strict</code></pre>
         <tbody>
           <tr><td><code>MISSING_INPUT</code></td><td>Falta a voz em <code>voices/&lt;id&gt;.wav</code> ou outro arquivo de entrada.</td><td>Gere a voz no Google AI Studio (ou na sua ferramenta) e salve no caminho indicado; ou use <code>voices.provider: piper</code>; rode o passo de novo.</td></tr>
           <tr><td><code>MISSING_KEY</code></td><td>Só no provedor por API: a chave não está no <code>.env</code>.</td><td>Se você optou por API, preencha a chave; no modo <code>files</code>, isso não se aplica.</td></tr>
-          <tr><td><code>MISSING_PREREQ</code></td><td>Falta ffmpeg, o binário/modelo do Piper ou o build não terminou.</td><td>Rode <code>./kit.sh doctor</code> e <code>./kit.sh build</code>; confira <code>voices.piper.binary</code>/<code>model</code>.</td></tr>
+          <tr><td><code>MISSING_PREREQ</code></td><td>Falta ffmpeg, o binário/modelo do Piper ou o build não terminou. No passo <code>timeline</code>, também é âncora por palavra não resolvida ou WAV da narração ausente.</td><td>Rode <code>./kit.sh doctor</code> e <code>./kit.sh build</code>; confira <code>voices.piper.binary</code>/<code>model</code>. No <code>timeline</code>, confira a palavra na narração transcrita e gere a narração (<code>work/voices/&lt;cena&gt;.wav</code>) com <code>forja voices</code>.</td></tr>
           <tr><td><code>GATE_FAILED</code></td><td>O check/QA encontrou erro ou falta aprovação humana.</td><td>Corrija os <code>issues</code>; se for aprovação, rode <code>forja approve --script --voice --overlays --by NOME</code>. Não force a entrega.</td></tr>
           <tr><td><code>FLOW_UI / FLOW_LIMIT</code></td><td>Não é erro da CLI: a UI do Flow mudou, pediu verificação ou acabou o crédito.</td><td>Pare, mostre a tela ao humano e ajuste o plano; não tente contornar captcha/limite.</td></tr>
           <tr><td><code>OVERLAY_* / ASSET_*</code></td><td>Preset, texto, posição, estilo ou asset do overlay inválido.</td><td>Corrija o <code>storyboard.yaml</code>; assets devem ficar dentro da raiz do projeto.</td></tr>
