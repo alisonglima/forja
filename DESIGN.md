@@ -353,6 +353,10 @@ Entrada mínima válida: `{"version": 1, "canvas": {"w": 1280, "h": 720, "fps": 
 | `qa` | render | `out/video.mp4`, `work/subs.json`, `work/loudness.json`, `work/timeline.json`, config | `out/qa.json` | `qa.check_subs` + `qa.check_loudness` + (v1) conferência de duração: `ffprobe` do `out/video.mp4` vs `timeline.total_s` (diferença > 0.5 s ⇒ `error` `DURATION_MISMATCH`) → `qa.summarize` gravado; `errors > 0` ⇒ `GATE_FAILED` |
 
 `_http_post` e o resolvedor do template/entry: **reuse** os de `forja/workflows/dub.py` (importe-os de lá; não duplique).
+
+## Google Flow (cenas, browser)
+
+O v1 não tem integração por API com o Google Flow. O caminho padrão é o agente operar a interface web já logada (conta/creditos), baixar os MP4s para `assets/flow/` e registrar cada take no `storyboard.yaml` como camada `clip`. O `validate` só vê o arquivo local; áudio embutido e `sfx` continuam ignorados. Termos do Flow, créditos, marca d'água/SynthID e licença do plano são responsabilidade do usuário; não há contorno de limite/captcha.
 `music` sem `license` já é erro do `validate`. Nenhum asset é copiado: o `public_dir` é a raiz do projeto e os `file`/`asset` das camadas são relativos a ela.
 
 ## Overlays do storyboard (v1.1)

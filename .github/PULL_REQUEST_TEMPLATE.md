@@ -14,7 +14,7 @@
 
 - [ ] Teste de contrato escrito/atualizado e passando
 - [ ] `python -m pytest -q tests` verde
-- [ ] `python scripts/check-prompts.py --expect 14` (se mexeu em prompts)
+- [ ] `python scripts/check-prompts.py --expect 15` (se mexeu em prompts)
 - [ ] `README.md`/`DESIGN.md`/`docs/ROADMAP.md` atualizados quando o contrato mudou
 - [ ] `docs/index.html` regenerado (se mexeu em `scripts/build-doc.py` ou `prompts/`)
 - [ ] Sem chave, senha, cookie ou dado pessoal no diff

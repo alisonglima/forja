@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "build-doc.py"
-SECTIONS = ["visao-geral", "brief", "modo-simples", "modo-avancado", "arquitetura", "overlays", "prompts", "seguranca", "licencas", "navegador", "problemas"]
+SECTIONS = ["visao-geral", "brief", "modo-simples", "flow", "modo-avancado", "arquitetura", "overlays", "prompts", "seguranca", "licencas", "navegador", "problemas"]
 
 
 def _build(tmp_path, name="guia.html"):
@@ -36,7 +36,7 @@ def test_has_every_required_section(tmp_path):
 def test_embeds_every_prompt_verbatim_with_a_copy_button(tmp_path):
     page = _build(tmp_path)
     files = _prompts()
-    assert len(files) >= 14
+    assert len(files) >= 15
     for path in files:
         slug = path.stem
         assert f'data-prompt="{slug}"' in page, slug

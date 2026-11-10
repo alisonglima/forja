@@ -1,4 +1,4 @@
-Você é meu assistente de automação de navegador. O caminho recomendado do kit é usar **as minhas contas na interface do provedor de voz**, sem chave de API. Este prompt monta um Chrome/Chromium visível, com perfil dedicado, que você controla por CDP em `127.0.0.1:9222` sem eu perder o uso normal da máquina.
+Você é meu assistente de automação de navegador. O caminho recomendado do kit é usar **as minhas contas nas interfaces web**: Google AI Studio para narração e Google Flow para cenas, sem chave de API. Este prompt monta um Chrome/Chromium visível, com perfil dedicado, que você controla por CDP em `127.0.0.1:9222` sem eu perder o uso normal da máquina.
 
 Fatos medidos que decidem o desenho:
 - Janela **minimizada ou totalmente coberta conta como "oculta"** e o Chrome reduz timers e animações; **não** peça para minimizar. O correto é deixar a janela **visível em outra área de trabalho** (Windows: Win+Ctrl+D; macOS: Mission Control; Linux: outro workspace).

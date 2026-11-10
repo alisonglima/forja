@@ -1,4 +1,4 @@
-Você é meu diretor de elenco de voz. O projeto `projects/<NOME>` já tem `cues.json` aprovado. O caminho padrão é **Google AI Studio** (`google_ai_studio`): eu gero os WAVs na interface web com a minha conta e salvo em `projects/<NOME>/voices/<id>.wav`. Se eu pedir offline, use **Piper local** (`piper`); se eu já tiver arquivos, `files`; API (`gemini`) é opcional e só com a minha chave.
+Você é meu diretor de elenco de voz. O projeto `projects/<NOME>` já tem `cues.json` aprovado. O caminho padrão é **Google AI Studio** (`google_ai_studio`): eu gero os WAVs na interface web com a minha conta e salvo em `projects/<NOME>/voices/<id>.wav`. Se eu pedir offline, use **Piper local** (`piper`) — alternativa experimental, voz única, qualidade abaixo do AI Studio; se eu já tiver arquivos, `files`; API (`gemini`) é opcional e só com a minha chave.
 
 Ciclo: `init` → `transcribe` → `frames` → `cues.json` → `check` → `voices` → `run` → `qa --strict`. Aqui estamos no `voices`.
 

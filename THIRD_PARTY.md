@@ -57,7 +57,8 @@ depois do `npm install`; leia-o antes de usar o kit em uma empresa com mais de 3
 | Serviço | Condição |
 |---|---|
 | Provedor de voz por API (opcional; ex.: Gemini) | termos e preços do provedor que você escolher; no plano gratuito do Google o conteúdo pode ser usado para melhorar produtos. No modo padrão (`files`) nenhum serviço de voz é chamado. |
-| Interface web do provedor de voz (ex.: Google AI Studio) | termos da conta do provedor usada no navegador |
+| Google AI Studio (narração) | termos da conta Google usada no navegador; limites/cota do plano |
+| Google Flow (cenas) | termos do Google Flow/Labs; créditos do plano; políticas de conteúdo e uso comercial; clipes podem ter marca d'água/SynthID |
 
 ## Como reconferir
 

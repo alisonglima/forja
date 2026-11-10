@@ -73,6 +73,10 @@ PROMPT_INFO = {
         "Consentimento e aviso de IA",
         "Antes de publicar: direitos, consentimento e o aviso de voz sintetizada.",
     ),
+    "14-google-flow-cenas": (
+        "Cenas no Google Flow",
+        "Gera clipes no navegador logado, com creditos, e registra os takes.",
+    ),
     "13-resolver-problemas": (
         "Resolver problemas",
         "Quando algo falha: diagnostico na ordem certa, sem adivinhar a causa.",
@@ -579,6 +583,7 @@ TEMPLATE = r"""<!doctype html>
         <li><a href="#visao-geral">Visão geral</a></li>
         <li><a href="#brief">Brief</a></li>
         <li><a href="#modo-simples">Modos</a></li>
+        <li><a href="#flow">Flow</a></li>
         <li><a href="#arquitetura">Arquitetura</a></li>
         <li><a href="#overlays">Overlays</a></li>
         <li><a href="#prompts">Prompts</a></li>
@@ -642,7 +647,7 @@ TEMPLATE = r"""<!doctype html>
       <article class="card">
         <span class="kicker">workflow storyboard</span>
         <h3>Criar por cenas</h3>
-        <p>Monta um vídeo do zero a partir de um <code>storyboard.yaml</code>: clipes, narração que você gerou, cards, trilha e legendas, cena por cena, com a duração vindo da fala.</p>
+        <p>Monta um vídeo do zero a partir de um <code>storyboard.yaml</code>: clipes (gerados no Google Flow ou locais), narração que você gerou, cards, trilha e legendas, cena por cena.</p>
         <ul class="flow">
           <li><b>Entra:</b> <code>storyboard.yaml</code> + <code>assets/</code> + <code>voices/&lt;cena&gt;.wav</code></li>
           <li><b>Sai:</b> <code>out/video.mp4</code>, <code>legendas.srt</code>, <code>qa.json</code></li>
@@ -726,7 +731,7 @@ TEMPLATE = r"""<!doctype html>
 
     <div class="note">
       <span class="label">mapa do kit</span>
-      <p><code>kit.sh</code> (atalhos) · <code>compose.yaml</code> (container) · <code>.env</code> (senha do navegador e opções; fora do git) · <code>voices/</code> (suas vozes) · <code>prompts/</code> (14 mensagens) · <code>projects/</code> (seus vídeos) · <code>docs/index.html</code> (esta página) · <code>skills/forja/</code> (a skill do agente).</p>
+      <p><code>kit.sh</code> (atalhos) · <code>compose.yaml</code> (container) · <code>.env</code> (senha do navegador e opções; fora do git) · <code>voices/</code> (suas vozes) · <code>prompts/</code> (15 mensagens) · <code>projects/</code> (seus vídeos) · <code>docs/index.html</code> (esta página) · <code>skills/forja/</code> (a skill do agente).</p>
     </div>
   </div>
 </section>
@@ -805,9 +810,14 @@ TEMPLATE = r"""<!doctype html>
       </li>
       <li>
         <strong>Entregue o volante ao agente.</strong>
-        <p>Copie o <strong>prompt 02</strong> para instalar a skill. Depois use o <strong>prompt 03</strong> (dublar) ou o <strong>prompt 08</strong> (cenas) e responda às perguntas dele.</p>
+        <p>Copie o <strong>prompt 02</strong> para instalar a skill. Depois use o <strong>prompt 03</strong> (dublar) ou os <strong>prompts 08 + 14</strong> (cenas + Google Flow) e responda às perguntas dele.</p>
       </li>
     </ol>
+
+    <div class="note">
+      <span class="label">AI Studio é o padrão; Piper é alternativa</span>
+      <p>O AI Studio usa a sua conta Google, os termos do Google e pode ter limites/cota; pare se pedir verificação. O <code>piper</code> não é o setup atual: é um TTS local opcional, com <strong>uma voz</strong>, qualidade abaixo do AI Studio, <code>piper-tts</code> GPL-3.0 e modelo MIT/CC0. Use-o só para autonomia offline ou teste; para elenco e qualidade, prefira o AI Studio.</p>
+    </div>
 
     <div class="note ok">
       <span class="label">nenhuma chave obrigatória</span>
@@ -822,7 +832,7 @@ TEMPLATE = r"""<!doctype html>
           <tr><td><code>.env</code></td><td>Senha do navegador, UID/GID e limites do container; chave só se você optar por API.</td><td>Nunca.</td></tr>
           <tr><td><code>projects/&lt;nome&gt;/voices/</code></td><td>Os WAVs que você gerou, um por cue ou cena.</td><td>Não.</td></tr>
           <tr><td><code>projects/&lt;nome&gt;/</code></td><td>O vídeo de entrada, as cues, o storyboard e as saídas.</td><td>Não.</td></tr>
-          <tr><td><code>prompts/</code></td><td>As 14 mensagens prontas para o seu agente.</td><td>Sim.</td></tr>
+          <tr><td><code>prompts/</code></td><td>As 15 mensagens prontas para o seu agente.</td><td>Sim.</td></tr>
           <tr><td><code>docs/index.html</code></td><td>Este guia, offline, num arquivo só.</td><td>Sim.</td></tr>
           <tr><td><code>models/</code></td><td>Cache do modelo de transcrição; pode apagar (ele baixa de novo).</td><td>Não.</td></tr>
           <tr><td><code>work/</code> e <code>out/</code> (no projeto)</td><td>Intermediários e resultado. <code>work/</code> é descartável.</td><td>Não.</td></tr>
@@ -832,9 +842,77 @@ TEMPLATE = r"""<!doctype html>
   </div>
 </section>
 
+<section id="flow">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Cenas: Google Flow por padrão</h2></div>
+    <p class="sec-lede">O caminho padrão para os clipes é o <strong>Google Flow</strong>, aberto no navegador já logado com a <strong>sua conta e os seus créditos</strong>. O agente opera a interface e baixa os takes; o Forja não chama o Flow por API.</p>
+
+    <div class="cards">
+      <article class="card">
+        <h4>Como funciona</h4>
+        <p>Você loga no Flow no navegador (desktop ou container). O agente escreve os prompts de cena, gera 2–4 takes, baixa o melhor MP4 e salva em <code>assets/flow/</code>; depois atualiza o <code>storyboard.yaml</code>.</p>
+      </article>
+      <article class="card">
+        <h4>O que o Forja faz</h4>
+        <p>Valida o storyboard, resolve a timeline, mixa a narração/trilha e renderiza no Remotion. Ele <strong>não</strong> gera o clipe nem chama o Flow: a integração é o navegador, não uma API.</p>
+      </article>
+      <article class="card">
+        <h4>Custo e limites</h4>
+        <p>Cada geração consome créditos e pode exigir plano pago. Confirme o custo com o humano antes de gerar em lote; não contorne fila, captcha, limite ou política de conteúdo.</p>
+      </article>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <strong>Feche o plano de cenas.</strong>
+        <p>Leia o <code>brief.yaml</code> e o <code>storyboard.yaml</code>: duração, enquadramento, câmera, luz, estilo e o que não pode aparecer. Se o storyboard ainda não existir, proponha as cenas e espere a aprovação.</p>
+      </li>
+      <li>
+        <strong>Abra o Flow na conta certa.</strong>
+        <p>Use o navegador do prompt 10 (desktop) ou 11 (container), já logado. Confirme a conta e o saldo de créditos na tela. Se aparecer verificação, <strong>pare e chame o humano</strong>.</p>
+      </li>
+      <li>
+        <strong>Gere e baixe os takes.</strong>
+        <p>Para cada cena, escreva um prompt específico e gere 2–4 takes. Baixe o melhor MP4 para <code>assets/flow/&lt;cena&gt;-v1.mp4</code> e registre prompt, take, data e créditos gastos.</p>
+      </li>
+      <li>
+        <strong>Atualize o storyboard.</strong>
+        <p>Adicione as camadas <code>clip</code> com <code>file</code>, <code>in_s</code> e <code>fit</code>. Rode <code>forja run --only validate</code> e corrija os <code>issues</code>. Não use o áudio embutido do Flow no v1.</p>
+      </li>
+      <li>
+        <strong>Aprove e renderize.</strong>
+        <p>Mostre os takes e os créditos ao humano; com roteiro/voz/overlays aprovados, rode <code>forja approve</code> e o pipeline normal.</p>
+      </li>
+    </ol>
+
+    <div class="note">
+      <span class="label">ressalvas que não podem faltar</span>
+      <p><strong>Flow é interface, não API:</strong> a automação depende da UI, da conta e dos créditos e pode quebrar quando o Google mudar a tela. <strong>Não determinístico:</strong> o mesmo prompt pode gerar resultados diferentes; guarde prompt/take/versão. <strong>Conteúdo e direitos:</strong> siga os termos do Google Flow/Labs, políticas de conteúdo e regras de uso comercial; vídeos podem ter marca d'água/SynthID. <strong>Pessoas e marcas:</strong> não gere pessoas reais, marcas ou cenas sensíveis sem autorização. <strong>Privacidade:</strong> não suba material confidencial sem autorização. <strong>Áudio:</strong> o v1 ignora o áudio do clipe e <code>sfx</code>; a narração vem do AI Studio e a trilha é uma camada licenciada.</p>
+    </div>
+
+    <h3 style="margin-top:34px">Flow ou API?</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>Google Flow (padrão)</th><th>API (opcional)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Como gera</strong></td><td>Interface web, navegador logado, conta/creditos</td><td>Chave e endpoint do provedor, se você configurar</td></tr>
+          <tr><td><strong>Automação</strong></td><td>Agente opera a UI; sujeita a mudanças</td><td>Chamada programática; sujeita a termos/cota</td></tr>
+          <tr><td><strong>Custo</strong></td><td>Créditos do plano</td><td>Cota/faturamento do provedor</td></tr>
+          <tr><td><strong>Resultado</strong></td><td>Não determinístico; revise takes</td><td>Não determinístico; revise saídas</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note ok">
+      <span class="label">sem Flow?</span>
+      <p>Se você não usar Flow, traga os clipes prontos em <code>assets/</code> e use o mesmo <code>storyboard.yaml</code>. A forja não gera B-roll/imagens por IA fora do seu navegador; ela orquestra o que você produz.</p>
+    </div>
+  </div>
+</section>
+
 <section id="modo-avancado">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">04</span><h2>Modo avançado: navegador no container</h2></div>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Modo avançado: navegador no container</h2></div>
     <p class="sec-lede">Para quem quer a interface do provedor numa aba do navegador normal, sem ocupar a área de trabalho — e para quem optar por um provedor de voz por API.</p>
 
     <ol class="steps">
@@ -887,7 +965,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="arquitetura">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">05</span><h2>Como as peças se encaixam</h2></div>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Como as peças se encaixam</h2></div>
     <p class="sec-lede">Você fala com o agente. Ele roda o <code>kit.sh</code>. O <code>kit.sh</code> chama o Docker. Dentro do container, a CLI orquestra ffmpeg, Whisper, Remotion e o provedor de voz que você escolher.</p>
 
     <figure class="figure">
@@ -933,7 +1011,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="overlays">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">06</span><h2>Overlays profissionais</h2></div>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Overlays profissionais</h2></div>
     <p class="sec-lede">Sete presets prontos, tema de marca e ajuste por camada. O overlay entra na timeline do <code>storyboard.yaml</code> e é desenhado pelo Remotion, junto com a legenda.</p>
 
     <div class="table-wrap">
@@ -984,7 +1062,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="prompts">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">07</span><h2>Os prompts, na ordem</h2></div>
+    <div class="sec-head"><span class="sec-num">08</span><h2>Os prompts, na ordem</h2></div>
     <p class="sec-lede">São mensagens prontas para colar no seu agente. Cada uma assume que a anterior foi concluída. O botão <strong>Copiar</strong> leva o texto inteiro — o mesmo que está logo abaixo.</p>
 
     <div class="route">
@@ -1006,7 +1084,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="seguranca">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">08</span><h2>Segurança sem drama</h2></div>
+    <div class="sec-head"><span class="sec-num">09</span><h2>Segurança sem drama</h2></div>
     <p class="sec-lede">O kit foi desenhado para uma máquina e para as <strong>suas</strong> contas. Estas são as regras que mantêm isso simples.</p>
 
     <div class="cards">
@@ -1031,6 +1109,10 @@ TEMPLATE = r"""<!doctype html>
         <p>Use a sua conta e a sua ferramenta de voz. Não compartilhe login, não empreste chave e não deixe a tela do Chromium aberta em máquina compartilhada.</p>
       </article>
       <article class="card">
+        <h4>Flow é conta e créditos</h4>
+        <p>A geração de cenas no Google Flow usa a sua conta e consome créditos. O agente opera a UI; não há API do Forja para o Flow. Confirme custo/limite antes de gerar em lote e não contorne captcha ou política.</p>
+      </article>
+      <article class="card">
         <h4>Aprovação é humana</h4>
         <p><code>brief.yaml</code> registra objetivo/público/tom; <code>forja approve</code> registra roteiro/voz/overlays. Com <code>require_approvals</code>, o render falha com <code>GATE_FAILED</code> sem essas chaves.</p>
       </article>
@@ -1049,7 +1131,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="licencas">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">09</span><h2>Licenças e direitos</h2></div>
+    <div class="sec-head"><span class="sec-num">10</span><h2>Licenças e direitos</h2></div>
     <p class="sec-lede">Você não precisa ser advogado para usar o kit — mas precisa saber o que está usando e o que vai publicar.</p>
 
     <div class="table-wrap">
@@ -1075,6 +1157,11 @@ TEMPLATE = r"""<!doctype html>
             <td><strong>Piper TTS + voz pt-BR</strong></td>
             <td><code>piper-tts</code> GPL-3.0-or-later; modelo/voz MIT e dataset CC0.</td>
             <td>Roda local, sem conta/API. O áudio gerado não herda a GPL; a imagem inclui um binário GPL (como o ffmpeg) — se redistribuir a imagem, cumpra as obrigações de fonte.</td>
+          </tr>
+          <tr>
+            <td><strong>Google Flow (cenas)</strong></td>
+            <td>Termos do Google Flow/Labs; créditos do seu plano; políticas de conteúdo e uso comercial.</td>
+            <td>Os clipes são gerados na sua conta, podem ter marca d'água/SynthID e exigem revisão humana. O Forja não chama o Flow por API; confirme a licença do seu plano antes de publicar.</td>
           </tr>
           <tr>
             <td><strong>Provedor de voz</strong></td>
@@ -1109,7 +1196,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="navegador">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">10</span><h2>O Chromium pode rodar minimizado?</h2></div>
+    <div class="sec-head"><span class="sec-num">11</span><h2>O Chromium pode rodar minimizado?</h2></div>
     <p class="sec-lede">Pergunta curta, resposta honesta: <strong>não é confiável</strong>. Janela minimizada ou totalmente coberta conta como oculta para o navegador.</p>
 
     <div class="note">
@@ -1153,7 +1240,7 @@ TEMPLATE = r"""<!doctype html>
 
 <section id="problemas">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">11</span><h2>Quando algo dá errado</h2></div>
+    <div class="sec-head"><span class="sec-num">12</span><h2>Quando algo dá errado</h2></div>
     <p class="sec-lede">Não adivinhe a causa. Leia o erro literal, reproduza com o menor comando possível e só então conclua. O prompt 13 conduz o agente por essa ordem.</p>
 
     <ol class="steps">
@@ -1188,6 +1275,7 @@ TEMPLATE = r"""<!doctype html>
           <tr><td><code>MISSING_KEY</code></td><td>Só no provedor por API: a chave não está no <code>.env</code>.</td><td>Se você optou por API, preencha a chave; no modo <code>files</code>, isso não se aplica.</td></tr>
           <tr><td><code>MISSING_PREREQ</code></td><td>Falta ffmpeg, o binário/modelo do Piper ou o build não terminou.</td><td>Rode <code>./kit.sh doctor</code> e <code>./kit.sh build</code>; confira <code>voices.piper.binary</code>/<code>model</code>.</td></tr>
           <tr><td><code>GATE_FAILED</code></td><td>O check/QA encontrou erro ou falta aprovação humana.</td><td>Corrija os <code>issues</code>; se for aprovação, rode <code>forja approve --script --voice --overlays --by NOME</code>. Não force a entrega.</td></tr>
+          <tr><td><code>FLOW_UI / FLOW_LIMIT</code></td><td>Não é erro da CLI: a UI do Flow mudou, pediu verificação ou acabou o crédito.</td><td>Pare, mostre a tela ao humano e ajuste o plano; não tente contornar captcha/limite.</td></tr>
           <tr><td><code>OVERLAY_* / ASSET_*</code></td><td>Preset, texto, posição, estilo ou asset do overlay inválido.</td><td>Corrija o <code>storyboard.yaml</code>; assets devem ficar dentro da raiz do projeto.</td></tr>
           <tr><td><code>RATE_LIMITED</code></td><td>Cota do provedor.</td><td>Aguarde; o kit já tenta de novo com espera.</td></tr>
           <tr><td><code>CONFIG_INVALID</code></td><td><code>config.yaml</code> ou <code>storyboard.yaml</code> inválido.</td><td>Leia a mensagem; rode <code>forja init</code> de novo se necessário.</td></tr>

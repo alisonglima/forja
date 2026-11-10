@@ -1,6 +1,6 @@
 # Forja
 
-**Vídeo com voz e legenda, operado pelo seu agente.** Dublagem EN→pt-BR e vídeos por cenas a partir de um `storyboard.yaml`, com as **suas contas** ou **voz local**, sem exigir chave de API.
+**Vídeo com voz e legenda, operado pelo seu agente.** Dublagem EN→pt-BR e vídeos por cenas a partir de um `storyboard.yaml`, com narração no **Google AI Studio** e cenas no **Google Flow** — usando as suas contas e créditos, sem exigir chave de API.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](pyproject.toml)
@@ -9,7 +9,7 @@
 A **forja** é uma CLI (`forja`, `python -m forja`) e um kit Docker para gerar vídeos com agentes de IA. Ela faz o trabalho determinístico — transcrever, montar a linha do tempo, mixar, renderizar e verificar o resultado — e deixa o julgamento (texto, voz, overlays, consentimento) para você.
 
 - **Dublar**: transcreve o vídeo, adapta o texto para pt-BR, usa as vozes que você gerou ou a voz local, mixa com ducking, queima a legenda e passa um gate de qualidade.
-- **Criar por cenas**: monta um vídeo do zero com clipes, narração, cards, overlays, trilha e legendas.
+- **Criar por cenas**: monta um vídeo do zero com clipes gerados no **Google Flow**, narração no AI Studio, cards, overlays, trilha e legendas.
 - **Overlays profissionais**: lower-third, título, callout, citação, CTA, logo e estatística, com tema de marca e posição/entrada/saída por camada.
 - **Para agentes**: todo comando aceita `--json`, `describe`, `status` com `next_actions`, cache por hash, QA como gate e códigos de saída `0..5`.
 - **Humano no comando**: `brief.yaml` registra objetivo/público/tom; `forja approve` registra a aprovação humana antes do render.
@@ -23,7 +23,21 @@ A **forja** é uma CLI (`forja`, `python -m forja`) e um kit Docker para gerar v
 | `files` | Não | Alias genérico: qualquer WAV que você já tenha, de qualquer ferramenta. |
 | `gemini` | Sim, opcional | Automação por API com a sua chave; não é o caminho padrão. |
 
-O padrão é o **Google AI Studio**: abra a interface com a sua conta, gere cada fala e salve em `projects/<nome>/voices/<id>.wav`. O kit valida, normaliza, mixa e renderiza. O `piper` roda dentro da imagem (`piper-tts` + voz `pt_BR-faber-medium`, CC0/MIT) para quem quiser autonomia offline. Nenhuma conta é compartilhada e nenhuma chave é obrigatória.
+O padrão é o **Google AI Studio**: abra a interface com a sua conta, gere cada fala e salve em `projects/<nome>/voices/<id>.wav`. O kit valida, normaliza, mixa e renderiza. O `piper` é uma **alternativa local opcional**, não o setup padrão: voz única, qualidade abaixo do AI Studio, `piper-tts` GPL-3.0 e modelo MIT/CC0; use só se quiser autonomia offline. Nenhuma conta é compartilhada e nenhuma chave é obrigatória.
+
+## Cenas: Google Flow por padrão
+
+O caminho padrão para os clipes é o **Google Flow**, aberto no navegador já logado com a **sua conta e os seus créditos**. O agente opera a interface (prompt 14), baixa os MP4s para `assets/flow/` e atualiza o `storyboard.yaml`; o Forja **não chama o Flow por API**, só valida, monta a timeline, mixa e renderiza.
+
+Ressalvas que valem para todo mundo:
+
+- **Flow é interface, não API.** A automação depende da UI, da conta e dos créditos; pode quebrar quando o Google mudar a tela.
+- **Créditos e plano:** cada geração consome créditos e pode exigir plano pago; confirme antes de gerar em lote. Não contorne limites, filas, captcha ou políticas.
+- **Conteúdo e direitos:** siga os termos do Google Flow/Labs e as políticas de conteúdo; vídeos podem ter marca d'água/SynthID e regras de uso comercial. Não gere pessoas reais, marcas ou cenas sensíveis sem autorização.
+- **Não determinístico:** o mesmo prompt pode gerar resultados diferentes; guarde prompt, take e versão e revise com olhos humanos.
+- **Sem áudio do clipe:** o v1 não mixa o áudio embutido do MP4 nem `sfx`; a narração vem do AI Studio e a trilha é uma camada `music` licenciada.
+
+Se você não usar Flow, traga os clipes prontos em `assets/` e use o mesmo `storyboard.yaml`. A ferramenta não gera B-roll/imagens por IA fora do seu navegador.
 
 ## Overlays
 
@@ -57,7 +71,7 @@ O render falha com `GATE_FAILED` enquanto as aprovações exigidas não existire
 - Máquina **x86_64** (o alvo da imagem é `linux/amd64`; em Apple Silicon roda emulado).
 - 8 GB de RAM (16 GB é melhor) e 25 GB livres.
 - A imagem do pipeline ocupa cerca de 1,9 GB (inclui Piper + voz pt-BR); o navegador opcional acrescenta ~2,6 GB.
-- Internet no primeiro `build`, para baixar o modelo de transcrição uma vez, e para o provedor de voz que você escolher.
+- Internet no primeiro `build`, para baixar o modelo de transcrição uma vez, e para o AI Studio/Flow (a conta e os créditos são seus).
 
 ## Comece em 5 passos
 
@@ -65,11 +79,11 @@ O render falha com `GATE_FAILED` enquanto as aprovações exigidas não existire
 2. **Confira o ambiente**: `./kit.sh doctor`.
 3. **Construa a imagem**: `./kit.sh build`.
 4. **Ensine o seu agente**: copie `prompts/02-instalar-skill-no-seu-agente.md`.
-5. **Peça o vídeo**: use `prompts/03-dublagem-transcrever-e-entender.md` para dublar ou `prompts/08-video-por-cenas.md` para criar por cenas. O agente conduz `status → próximo passo → run → qa --strict` e pede as aprovações humanas.
+5. **Peça o vídeo**: use `prompts/03-dublagem-transcrever-e-entender.md` para dublar ou `prompts/08-video-por-cenas.md` + `prompts/14-google-flow-cenas.md` para criar por cenas. O agente conduz `status → próximo passo → run → qa --strict` e pede as aprovações humanas.
 
 ## Documentação
 
-O guia completo, offline e copiável está em **[alisonglima.github.io/forja](https://alisonglima.github.io/forja/)** (fonte em [`docs/index.html`](docs/index.html)). Ele cobre visão geral, brief/aprovação, voz local e por conta, arquitetura, overlays, os 14 prompts, segurança, licenças, navegador e problemas.
+O guia completo, offline e copiável está em **[alisonglima.github.io/forja](https://alisonglima.github.io/forja/)** (fonte em [`docs/index.html`](docs/index.html)). Ele cobre visão geral, brief/aprovação, Google AI Studio e Flow, alternativas locais/API, arquitetura, overlays, os 15 prompts, segurança, licenças, navegador e problemas.
 
 ## Comandos do kit
 
@@ -89,11 +103,11 @@ O guia completo, offline e copiável está em **[alisonglima.github.io/forja](ht
 - Se você optar por um provedor por API, a chave fica só no `.env` (0600 no Linux/macOS; no Windows, restrinja a pasta do kit à sua conta) e nunca é impressa em log ou `--json`.
 - O container roda com o seu UID/GID (nunca root), `cap_drop: ALL` e `no-new-privileges`.
 - O navegador opcional escuta **somente** em `127.0.0.1` (`3001` para a tela, `9222` para o CDP) e exige senha. O login é feito dentro do ambiente final; não copie perfis entre máquinas.
-- Leia `prompts/12-consentimento-e-aviso.md` antes de publicar: direitos, consentimento e o aviso de voz sintetizada por IA.
+- Leia `prompts/12-consentimento-e-aviso.md` antes de publicar: direitos, consentimento e o aviso de voz sintetizada por IA. No Flow, valem também os termos do Google e as regras de créditos/conteúdo.
 
 ## Licenças
 
-O kit é distribuído sob a **MIT License** (veja [`LICENSE`](LICENSE)). Dependências e licenças estão em [`THIRD_PARTY.md`](THIRD_PARTY.md). O Remotion é gratuito para indivíduos e empresas de até 3 pessoas; acima disso, verifique a licença comercial vigente. O `piper-tts` é GPL-3.0-or-later e a voz pt-BR é MIT/CC0; o áudio gerado não herda a GPL.
+O kit é distribuído sob a **MIT License** (veja [`LICENSE`](LICENSE)). Dependências e licenças estão em [`THIRD_PARTY.md`](THIRD_PARTY.md). O Remotion é gratuito para indivíduos e empresas de até 3 pessoas; acima disso, verifique a licença comercial vigente. O `piper-tts` é GPL-3.0-or-later e a voz pt-BR é MIT/CC0; o áudio gerado não herda a GPL. Os clipes do Google Flow seguem os termos do Google e a licença do seu plano.
 
 ## Contribuindo
 

@@ -1,4 +1,4 @@
-Você é meu assistente de infraestrutura. Quero o **Chromium rodando dentro de um container Docker**, visível numa aba do meu navegador normal, para eu fazer login com a **minha conta** e usar a interface do provedor de voz sem instalar nada nem aparecer na minha área de trabalho. Este é o caminho recomendado para contas próprias; a chave de API é opcional.
+Você é meu assistente de infraestrutura. Quero o **Chromium rodando dentro de um container Docker**, visível numa aba do meu navegador normal, para eu fazer login com a **minha conta** e usar as interfaces web — Google AI Studio (narração) e Google Flow (cenas) — sem instalar nada nem aparecer na minha área de trabalho. Este é o caminho recomendado para contas próprias; a chave de API é opcional.
 
 1. Garanta o `.env` (`./kit.sh setup` cria `BROWSER_PASSWORD` aleatória). Não imprima a senha; eu a pego do arquivo.
 2. Suba: `./kit.sh browser-up`. Ele inicia o Chromium (imagem `linuxserver/chromium`, `linux/amd64`) e um pequeno proxy que torna o CDP alcançável **somente** em `127.0.0.1:9222` da minha máquina. A URL inicial vem de `BROWSER_START_URL` no `.env` (ex.: a interface do provedor que eu uso).

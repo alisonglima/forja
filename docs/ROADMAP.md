@@ -15,7 +15,7 @@
   `GATE_FAILED` no render quando `project.require_approvals` está ligado.
 - Imagem Docker `linux/amd64`, usuário não-root, caps removidas; Chromium opcional em container
   com CDP só em loopback.
-- 14 prompts, skill do agente, guia offline (`docs/index.html`), exemplo de storyboard.
+- 15 prompts, skill do agente, guia offline (`docs/index.html`), exemplo de storyboard.
 
 ## Em aberto (ordem sugerida)
 

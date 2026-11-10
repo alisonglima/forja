@@ -20,7 +20,7 @@ Você opera a CLI `forja` (no kit: `./kit.sh run ...`; instalada: `forja ...`). 
 5. Pare e **pergunte ao humano** em: escolha de voz, texto final dos cues, overlays, consentimento/aviso de IA e qualquer gasto com API. O `brief.yaml` é do humano; depois da revisão, registre `forja approve --script --voice --overlays --by <nome>`.
 
 ## Vozes
-O padrão é `google_ai_studio`: o humano gera os WAVs na interface web do Google AI Studio e salva em `<projeto>/voices/<id>.wav`. `files` é alias para qualquer WAV; `piper` é TTS neural local, sem conta/API; `gemini` é API opcional. O kit valida, normaliza, mixa e renderiza. Não peça chave de API nos modos `google_ai_studio`/`files`/`piper`.
+O padrão é `google_ai_studio`: o humano gera os WAVs na interface web do Google AI Studio e salva em `<projeto>/voices/<id>.wav`. `files` é alias para qualquer WAV; `piper` é TTS neural local, sem conta/API; `gemini` é API opcional. O kit valida, normaliza, mixa e renderiza. Não peça chave de API nos modos `google_ai_studio`/`files`/`piper`. Para cenas, o padrão é o **Google Flow** no navegador logado (prompt 14); o Forja não chama o Flow por API.
 
 ## Descobrir
 `forja --json describe` lista comandos, workflows, passos (entradas/saídas), provedores (e se a variável da chave está definida), códigos de erro e o schema do `config.yaml`.
