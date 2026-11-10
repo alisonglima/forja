@@ -1,0 +1,15 @@
+.env
+.git
+.work
+projects
+spike
+work
+out
+models
+profile
+**/node_modules
+**/__pycache__
+*.mp4
+*.wav
+*.png
+*.jpg

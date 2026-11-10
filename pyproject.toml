@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forja"
+version = "0.1.0"
+description = "Video com voz e legenda, operado pelo seu agente: dublagem EN->pt-BR e videos por cenas, com as suas contas."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Forja contributors" }]
+keywords = ["video", "dubbing", "subtitles", "storyboard", "ffmpeg", "remotion", "ai-agents", "cli"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Multimedia :: Sound/Audio",
+  "Topic :: Multimedia :: Video",
+]
+dependencies = ["pyyaml>=6", "numpy>=1.24", "scipy>=1.10", "faster-whisper>=1.1"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://alisonglima.github.io/forja/"
+Repository = "https://github.com/alisonglima/forja"
+Issues = "https://github.com/alisonglima/forja/issues"
+Documentation = "https://alisonglima.github.io/forja/"
+Changelog = "https://github.com/alisonglima/forja/blob/main/CHANGELOG.md"
+
+[project.scripts]
+forja = "forja.cli:main"
+
+[tool.setuptools]
+packages = ["forja", "forja.workflows"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

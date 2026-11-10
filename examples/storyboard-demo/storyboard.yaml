@@ -1,0 +1,16 @@
+# Exemplo minimo de video por cenas. Gere os assets com: ./make-assets.sh (usa o ffmpeg da imagem).
+version: 1
+canvas: {w: 1280, h: 720, fps: 30}
+scenes:
+  - id: abertura
+    duration: {from: narration, pad_before: 0.4, pad_after: 0.5}
+    layers:
+      - {type: clip, file: assets/clip.mp4, in_s: 0, fit: cover}
+      - {type: narration, text: "Bem-vindo ao exemplo de video por cenas."}
+      - {type: captions, from: narration}
+      - {type: music, track: assets/trilha.wav, gain_db: -14, license: {kind: cc0, source: "gerada localmente (seno)"}}
+  - id: cartao
+    duration: {fixed_s: 3}
+    layers:
+      - {type: clip, file: assets/clip.mp4, in_s: 1, fit: cover}
+      - {type: card, asset: assets/card.png, pop: true}

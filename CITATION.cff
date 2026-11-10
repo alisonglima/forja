@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "Se você usar o Forja em trabalho acadêmico ou produto, cite este repositório."
+title: "Forja"
+abstract: "CLI e kit Docker para dublagem EN→pt-BR e vídeos por cenas operados por agentes de IA, com as contas do usuário."
+type: software
+license: MIT
+repository-code: "https://github.com/alisonglima/forja"
+url: "https://alisonglima.github.io/forja/"
+authors:
+  - name: "Forja contributors"
+version: "0.1.0"
+date-released: "2026-11-10"
+keywords:
+  - video
+  - dubbing
+  - subtitles
+  - storyboard
+  - ffmpeg
+  - remotion
+  - ai-agents

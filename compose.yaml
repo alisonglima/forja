@@ -1,0 +1,60 @@
+# Forja — tudo numa maquina so.
+#   forja    : o pipeline (CLI forja). Sobe sob demanda: ./kit.sh run <comando>
+#   browser  : (OPCIONAL, perfil "browser") Chromium dentro de container, visivel numa aba do SEU navegador.
+#              So precisa se voce for usar a UI do Google AI Studio em vez da chave de API.
+name: forja
+services:
+  forja:
+    build:
+      context: .
+      dockerfile: docker/forja/Dockerfile
+    image: forja:0.1
+    platform: linux/amd64
+    shm_size: "1gb"
+    environment:
+      # A chave entra explicita: o resto do .env (ex.: senha do navegador) nao vaza para o pipeline.
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      HF_HOME: /models
+      FORJA_MODEL_DIR: /models
+      HOME: /tmp                  # UID arbitrario nao tem home; o Remotion/Chrome precisam de um HOME gravavel
+    volumes:
+      - ./projects:/projects
+      - ./models:/models
+    user: "${FORJA_UID:-1000}:${FORJA_GID:-1000}"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    deploy:
+      resources:
+        limits: {cpus: "${DUB_CPUS:-4}", memory: "${DUB_MEM:-6g}"}
+
+  browser:
+    profiles: ["browser"]
+    image: lscr.io/linuxserver/chromium:latest
+    platform: linux/amd64
+    shm_size: "1gb"
+    restart: unless-stopped
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "${TZ:-America/Sao_Paulo}"
+      CUSTOM_USER: "${BROWSER_USER:-forja}"
+      PASSWORD: "${BROWSER_PASSWORD:?rode ./kit.sh setup antes}"
+      # O CDP do Chromium so escuta em 127.0.0.1 DENTRO do container (a flag --remote-debugging-address e ignorada).
+      CHROME_CLI: "--remote-debugging-port=9222 https://aistudio.google.com/"
+    volumes:
+      - chromium-config:/config          # perfil logado: fica no volume, nunca na imagem
+    ports:
+      - "127.0.0.1:3001:3001"            # tela (HTTPS, certificado autoassinado) -> https://localhost:3001
+      - "127.0.0.1:9222:9223"            # CDP (so no seu loopback) -> via cdp-proxy abaixo
+
+  cdp-proxy:
+    profiles: ["browser"]
+    image: alpine/socat:latest
+    platform: linux/amd64
+    network_mode: "service:browser"      # mesmo namespace de rede do Chromium
+    command: ["TCP-LISTEN:9223,fork,reuseaddr", "TCP:127.0.0.1:9222"]
+    restart: unless-stopped
+    depends_on: [browser]
+
+volumes:
+  chromium-config:

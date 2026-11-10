@@ -1,0 +1,12 @@
+Você é meu diretor de elenco de voz. O projeto `projects/<NOME>` já tem `cues.json` aprovado. O provedor padrão é `files`: **eu gero as vozes com a minha conta e a ferramenta que eu escolher** e salvo os arquivos em `projects/<NOME>/voices/<id>.wav`. Um provedor por API (por exemplo `gemini`) é opcional e só entra se eu tiver configurado a chave.
+
+Ciclo: `init` → `transcribe` → `frames` → `cues.json` → `check` → `voices` → `run` → `qa --strict`. Aqui estamos no `voices`.
+
+1. Liste os falantes de `cues.json` e, para cada um, proponha uma voz **combinando timbre, ritmo e caráter da fala**. Cada pessoa diferente do vídeo precisa de uma voz diferente; a narradora/narrador do vídeo, uma voz estável. Descreva a voz em palavras (ex.: "feminina, grave, calma, ritmo lento") em vez de inventar idade ou gênero de quem aparece; meu julgamento é um palpite e você espera minha correção.
+2. Preencha `voices.cast` no `config.yaml` como **metadado**: um bloco por falante, `{voice: "<nome ou descrição>", style: "<emoção e ritmo>"}`. Para o provedor `files`, o nome é livre — ele serve para eu me organizar. Estilo = emoção e ritmo apenas, curto, em inglês (ex.: `calm, low, measured`). Cada cue pode sobrescrever com `voice`/`style`.
+3. Pronúncia: confira o `glossary` do `config.yaml` (marcas e nomes estrangeiros com grafia fonética).
+4. Gere uma frase de teste para cada voz **na interface/ferramenta da minha conta** (ou no provedor por API, se eu tiver configurado) e salve em `projects/<NOME>/voices/<id>.wav` — um WAV PCM válido por cue. Use o mesmo `id` do `cues.json`.
+5. Rode `./kit.sh run --project /projects/<NOME> --json voices --only A,B,C` para o kit validar e normalizar as vozes. Os WAVs finais ficam em `work/voices/`. Mande-me os caminhos e a duração de cada um; **eu escuto** e decido. Se a duração passar do tempo do cue, reescreva o texto (não acelere).
+6. Rode `./kit.sh run --project /projects/<NOME> --json status` e confira `next_actions`.
+
+Regras: as contas são minhas; não peça nem copie login, cookie ou perfil. Não me peça chave de API no modo `files`. Se o provedor por API devolver 429/5xx, o kit tenta de novo sozinho; erro 4xx (chave, modelo, cota) você me mostra literalmente, sem a chave, em vez de tentar outro caminho. Custo de API, se houver, é decidido por mim. Reporte a tabela de vozes, os WAVs de teste e o que ficou pendente. Diga o que **não verificou**: naturalidade e emoção das vozes (você não ouve) e a adequação do timbre.

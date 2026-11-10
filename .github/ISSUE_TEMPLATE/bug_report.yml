@@ -1,0 +1,45 @@
+name: Bug
+description: Algo não funcionou como esperado
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar. **Não inclua chaves, senhas, cookies ou dados pessoais.**
+        Se for uma vulnerabilidade, use o canal privado em SECURITY.md.
+  - type: textarea
+    id: what
+    attributes:
+      label: O que aconteceu
+      description: Descreva o comportamento observado e o esperado.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Como reproduzir
+      description: Comandos exatos, do menor para o maior.
+      placeholder: |
+        ./kit.sh run --project /projects/meu --json status
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Saída do doctor
+      description: "`./kit.sh doctor` e/ou `./kit.sh run --json doctor`, sem segredos."
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: Versão
+      description: Versão do Forja, do Docker/Compose e do sistema.
+      placeholder: "Forja 0.1.0, Docker 27.x, Ubuntu 24.04 x86_64"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Saída literal
+      description: "Cole o `--json` ou o log relevante. Remova chaves e dados pessoais."
+      render: text
