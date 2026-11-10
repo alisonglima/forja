@@ -6,7 +6,7 @@ c() { docker compose "$@"; }
 usage() { cat <<'U'
 uso: ./kit.sh <comando>
   setup                 cria .env (com senha aleatoria do navegador) e a pasta projects/
-  doctor                confere Docker, Compose, arquitetura, chave e espaco em disco
+  doctor                confere Docker, Compose, arquitetura, provedor de voz e espaco em disco
   build                 constroi a imagem do pipeline (a primeira vez demora alguns minutos)
   new <nome> <video>    cria projects/<nome>/ com o video e roda `forja init`
   run <args...>         roda o CLI dentro do container, ex.: ./kit.sh run --project /projects/meu qa --strict
@@ -18,7 +18,7 @@ U
 }
 rand() { od -An -N18 -tx1 /dev/urandom | tr -d ' \n'; }
 cmd=${1:-}; shift || true
-if [ -n "$cmd" ] && [ "$cmd" != "setup" ] && [ ! -f .env ]; then bash "$0" setup >/dev/null; echo ".env criado automaticamente (a chave de API e opcional; o padrao e o provider files)"; fi
+if [ -n "$cmd" ] && [ "$cmd" != "setup" ] && [ ! -f .env ]; then bash "$0" setup >/dev/null; echo ".env criado automaticamente (a chave de API e opcional; o padrao e Google AI Studio)"; fi
 case "$cmd" in
   setup)
     [ -f .env ] || cp .env.example .env

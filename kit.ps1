@@ -4,7 +4,7 @@ $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 function C { docker compose @args; if ($LASTEXITCODE -ne 0) { throw "docker compose falhou ($LASTEXITCODE)" } }
 function Rand { -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 24 | ForEach-Object {[char]$_}) }
-if ($Cmd -and $Cmd -ne "setup" -and -not (Test-Path .env)) { & $PSCommandPath setup | Out-Null; Write-Host ".env criado automaticamente (a chave de API e opcional; o padrao e o provider files)" }
+if ($Cmd -and $Cmd -ne "setup" -and -not (Test-Path .env)) { & $PSCommandPath setup | Out-Null; Write-Host ".env criado automaticamente (a chave de API e opcional; o padrao e Google AI Studio)" }
 switch ($Cmd) {
   "setup" {
     if (-not (Test-Path .env)) { Copy-Item .env.example .env }
