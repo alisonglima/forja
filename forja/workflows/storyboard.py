@@ -657,7 +657,7 @@ def steps_factory():
 
 
 FILES = {
-    "agent_writes": ["storyboard.yaml", "config.yaml"],
+    "agent_writes": ["storyboard.yaml", "config.yaml", "voices/<cena>.wav"],
     "generated": ["work/", "out/video.mp4", "out/legendas.srt", "out/qa.json"],
 }
 

@@ -104,7 +104,10 @@ def _http_post(url, headers, body) -> dict:
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=120) as response:
+        # A URL ja foi validada como https:// acima; o destino vem do provedor configurado.
+        with urllib.request.urlopen(  # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
+            request, timeout=120
+        ) as response:
             raw = response.read()
     except urllib.error.HTTPError as exc:
         raise _HTTPStatusError(exc.code, "HTTP %s" % exc.code) from exc
@@ -579,7 +582,7 @@ def steps_factory():
 
 
 FILES = {
-    "agent_writes": ["cues.json", "lower_thirds.json", "config.yaml"],
+    "agent_writes": ["cues.json", "lower_thirds.json", "config.yaml", "voices/<id>.wav"],
     "generated": ["work/", "out/video.mp4", "out/legendas.srt", "out/qa.json"],
 }
 

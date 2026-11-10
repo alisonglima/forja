@@ -170,3 +170,10 @@ def test_describe_init_matches_the_optional_source_contract():
     assert args["dir"]["required"] is True
     assert args["--source"]["required"] is False
     assert "--workflow" in args
+
+
+def test_describe_lists_builtin_voice_providers():
+    from forja import describe
+
+    names = {item["name"] for item in describe.describe({}, "1.0.0")["providers"]}
+    assert {"files", "mock", "gemini"} <= names

@@ -377,7 +377,7 @@ def _cmd_status(project_dir, json_mode, out):
 
 
 def _cmd_providers(json_mode, env, out):
-    items = registry.available(env=env)
+    items = describe_module.builtin_providers(env) + registry.available(env=env)
     if json_mode:
         _write_json(out, _envelope(items))
         return 0

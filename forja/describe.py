@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import os
 
 from . import config, registry
 from .errors import ERROR_CODES
@@ -157,6 +158,50 @@ def _workflow_entry(workflow):
     }
 
 
+# Provedores embutidos: existem sem registro/entry point e aparecem em `providers`.
+_BUILTIN_PROVIDERS = (
+    {
+        "kind": "tts",
+        "name": "files",
+        "requires_env": (),
+        "network": False,
+        "note": "voce gera os WAVs em voices/<id>.wav (padrao)",
+    },
+    {
+        "kind": "tts",
+        "name": "mock",
+        "requires_env": (),
+        "network": False,
+        "note": "tom sintetico para testes",
+    },
+    {
+        "kind": "tts",
+        "name": "gemini",
+        "requires_env": ("GEMINI_API_KEY",),
+        "network": True,
+        "note": "API opcional do Google",
+    },
+)
+
+
+def builtin_providers(env=None) -> list[dict]:
+    env = os.environ if env is None else env
+    items = []
+    for provider in _BUILTIN_PROVIDERS:
+        requires = tuple(provider["requires_env"])
+        items.append(
+            {
+                "kind": provider["kind"],
+                "name": provider["name"],
+                "requires_env": requires,
+                "env_ok": all(bool((env.get(name) or "").strip()) for name in requires),
+                "network": provider["network"],
+                "note": provider["note"],
+            }
+        )
+    return items
+
+
 def describe(workflows: dict, version: str) -> dict:
     """Documento unico que descreve a plataforma para agentes e humanos."""
     return {
@@ -167,7 +212,7 @@ def describe(workflows: dict, version: str) -> dict:
         "workflows": {
             name: _workflow_entry(workflow) for name, workflow in workflows.items()
         },
-        "providers": registry.available(),
+        "providers": builtin_providers() + registry.available(),
         "schemas": {
             "config": copy.deepcopy(config.DEFAULTS),
             "cues": copy.deepcopy(_CUES_SCHEMA),
