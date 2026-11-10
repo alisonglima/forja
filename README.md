@@ -38,7 +38,8 @@ Ressalvas que valem para todo mundo:
 - **Créditos e plano:** cada geração consome créditos e pode exigir plano pago; confirme antes de gerar em lote. Não contorne limites, filas, captcha ou políticas.
 - **Conteúdo e direitos:** siga os termos do Google Flow/Labs e as políticas de conteúdo; vídeos podem ter marca d'água/SynthID e regras de uso comercial. Não gere pessoas reais, marcas ou cenas sensíveis sem autorização.
 - **Não determinístico:** o mesmo prompt pode gerar resultados diferentes; guarde prompt, take e versão e revise com olhos humanos.
-- **Áudio do clipe:** o áudio embutido do MP4 entra no bed por padrão; use `audio: {mode: mute}` se o take do Flow tiver fala/ruído indesejado. `sfx` também entra e exige `license.kind`.
+- **Áudio no Flow:** peça **somente SFX e som ambiente** — sem fala, sem narração, sem diálogo, sem música e sem legenda na imagem; a narração vem do AI Studio e a trilha é a camada `music` licenciada. O áudio embutido (só SFX) entra no bed por padrão; `audio: {mode: mute}` remove se o Flow gerar fala/música por engano. `sfx` exige `license.kind`.
+- **Exceção de áudio original:** vídeo que já traz áudio que não pode ser removido (ex.: dublagem de um vídeo gravado) é trabalhado sobre o **áudio original**, que fica ao fundo com ducking sob a narração.
 
 Se você não usar Flow, traga os clipes prontos em `assets/` e use o mesmo `storyboard.yaml`. A ferramenta não gera B-roll/imagens por IA fora do seu navegador.
 

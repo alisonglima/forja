@@ -460,6 +460,39 @@ def validate_storyboard(sb, root=None):
                         )
                     )
 
+            if layer_type == "clip" and "out_s" in layer:
+                issues.append(
+                    _issue(
+                        "warn",
+                        _layer_label(layer, scene_id),
+                        "CLIP_OUT_S_UNSUPPORTED",
+                        "clip.out_s ignorado; o corte final segue a duracao da cena",
+                    )
+                )
+
+            if layer_type == "sfx":
+                start_value = layer.get("start")
+                if _is_number(start_value):
+                    start_f = float(start_value)
+                    duration = scene.get("duration")
+                    fixed_s = (
+                        duration.get("fixed_s")
+                        if isinstance(duration, dict)
+                        else None
+                    )
+                    out_of_scene = start_f < 0
+                    if _is_number(fixed_s):
+                        out_of_scene = out_of_scene or start_f >= float(fixed_s)
+                    if out_of_scene:
+                        issues.append(
+                            _issue(
+                                "error",
+                                _layer_label(layer, scene_id),
+                                "SFX_START",
+                                "sfx.start fora da cena: deve ser >= 0 e menor que a duracao",
+                            )
+                        )
+
     return issues
 
 
@@ -562,9 +595,16 @@ def resolve_timeline(sb, narration_s, words=None):
             if not isinstance(layer, dict):
                 continue
             out_layer = dict(layer)
-            start, warnings = _layer_start(
-                layer, scene_start, scene_end, pad_before, words, scene_id
-            )
+            if layer.get("type") == "sfx":
+                if _is_number(layer.get("start")):
+                    start = scene_start + float(layer.get("start"))
+                else:
+                    start = scene_start
+                warnings = []
+            else:
+                start, warnings = _layer_start(
+                    layer, scene_start, scene_end, pad_before, words, scene_id
+                )
             end, end_warnings = _layer_end(
                 layer, scene_start, scene_end, pad_before, words, scene_id, start
             )

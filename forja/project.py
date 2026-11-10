@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import shlex
 import shutil
 from pathlib import Path
 
@@ -242,7 +243,7 @@ def status(project, steps) -> dict:
         entries.append({"name": step.name, "state": state, "reason": reason})
         if next_action is None and state != "fresh":
             next_action = {
-                "command": f"forja run --only {step.name}",
+                "command": f"forja run --project {shlex.quote(str(project.root))} --only {step.name}",
                 "why": reason,
             }
 

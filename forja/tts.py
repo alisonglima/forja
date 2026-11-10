@@ -130,13 +130,17 @@ def _read_wav(data: bytes) -> tuple[np.ndarray, int]:
             frames = wav.readframes(wav.getnframes())
     except (wave.Error, EOFError) as exc:
         raise RuntimeError("WAV invalido: " + str(exc)) from exc
-    if channels != 1:
-        raise RuntimeError("WAV deve ser mono")
+    if channels not in (1, 2):
+        raise RuntimeError("WAV com %d canais: somente mono ou estereo e suportado" % channels)
     if not frames:
         raise RuntimeError("WAV sem amostras")
     if width != 2:
         raise RuntimeError("WAV deve ser PCM 16-bit")
-    return np.frombuffer(frames, dtype="<i2").astype(np.float64), rate
+    arr = np.frombuffer(frames, dtype="<i2")
+    if channels == 2:
+        stereo = arr.reshape(-1, 2).astype(np.float64)
+        return stereo.mean(axis=1), rate
+    return arr.astype(np.float64), rate
 
 
 def _resample(samples: np.ndarray, sr: int, target_sr: int) -> np.ndarray:
@@ -151,9 +155,14 @@ def _resample(samples: np.ndarray, sr: int, target_sr: int) -> np.ndarray:
 
 
 def _normalize_wav(data: bytes, target_sr: int = _TARGET_SR) -> bytes:
-    """Valida (RIFF, mono, com amostras) e reamostra para target_sr."""
+    """Valida (RIFF, PCM 16-bit mono/estereo, com amostras) e normaliza para mono target_sr."""
     samples, sr = _read_wav(data)
-    if sr == target_sr:
+    try:
+        with wave.open(io.BytesIO(data), "rb") as wav:
+            in_channels = wav.getnchannels()
+    except (wave.Error, EOFError):
+        in_channels = 1
+    if sr == target_sr and in_channels == 1:
         return data
     resampled = _resample(samples, sr, target_sr)
     pcm = np.clip(np.rint(resampled), -32768, 32767).astype("<i2")
@@ -229,14 +238,18 @@ def provided_wav(cue: dict, cfg: dict, root) -> Path:
             details={"path": str(target), "cue": cid},
         )
     try:
-        _normalize_wav(target.read_bytes())
+        data = target.read_bytes()
+        _, sr = _read_wav(data)
+        normalized = _normalize_wav(data, target_sr=sr)
     except RuntimeError as exc:
         raise ForjaError(
             "CONFIG_INVALID",
             "WAV invalido em %s: %s" % (target, exc),
-            hint="use um WAV PCM mono ou estereo valido",
+            hint="use um WAV PCM 16-bit mono ou estereo valido",
             details={"path": str(target), "cue": cid},
         ) from exc
+    if normalized != data:
+        target.write_bytes(normalized)
     return target
 
 

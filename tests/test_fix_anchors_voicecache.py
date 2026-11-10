@@ -381,7 +381,7 @@ def _status(root: Path):
         ["--json", "--project", str(root), "status"]
     )
     assert code == 0, (document, err)
-    return {entry["name"]: entry for entry in document["steps"]}
+    return {entry["name"]: entry for entry in document["data"]["steps"]}
 
 
 def _assert_voices_cache_tracks_provided_wav(root: Path, scene_id: str) -> None:

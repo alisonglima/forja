@@ -390,7 +390,10 @@ def _inputs_check(ctx):
 def _inputs_voices(ctx):
     mix_cfg = ctx.cfg.get("mix") or {}
     paths = [ctx.root / "cues.json", ctx.root / "config.yaml"]
-    if str((ctx.cfg.get("voices") or {}).get("provider", "files")) == "files":
+    if str((ctx.cfg.get("voices") or {}).get("provider", "files")) in (
+        "files",
+        "google_ai_studio",
+    ):
         paths.extend(sorted((ctx.root / tts.input_dir(ctx.cfg)).glob("*.wav")))
     return (
         paths,

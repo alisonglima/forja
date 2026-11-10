@@ -326,7 +326,7 @@ def _artifacts_from(results):
 def _cmd_describe(json_mode, out):
     document = describe_module.describe(workflows.WORKFLOWS, __version__)
     if json_mode:
-        _write_json(out, document)
+        _write_json(out, _envelope(document))
         return 0
     commands = [item.get("name", "") for item in document.get("commands", [])]
     lines = [
@@ -381,7 +381,8 @@ def _cmd_status(project_dir, json_mode, out):
     document = project_module.status(project, _workflow_steps(workflow))
     document["workflow"] = workflow
     if json_mode:
-        _write_json(out, document)
+        next_action = document.get("next")
+        _write_json(out, _envelope(document, next_actions=[next_action] if next_action else []))
         return 0
     lines = ["projeto: %s (%s)" % (document.get("project"), workflow)]
     for entry in document.get("steps", []):

@@ -7,7 +7,9 @@ Pré-condições:
 
 1. Leia o brief e o `storyboard.yaml`. Liste as cenas que precisam de clipe, com duração, enquadramento, movimento de câmera, luz, estilo e o que **não** pode aparecer. Se o storyboard ainda não existir, proponha a lista de cenas e espere minha aprovação.
 2. Abra o **Google Flow** na interface web (confirme a URL atual; ex.: `https://labs.google/flow`) na janela já logada. Confirme visualmente a conta e o saldo de créditos. Se aparecer captcha, verificação extra ou limite, **pare e me chame**; não tente contornar.
-3. Para cada cena, escreva um prompt de geração específico: sujeito, ação, cenário, câmera, lente, luz, paleta, duração e aspect ratio. Gere **2 a 4 takes** por cena; baixe o melhor MP4 e salve em `projects/<NOME>/assets/flow/<cena>-v1.mp4` (numere os takes). O áudio do take entra no bed por padrão; use `clip.audio: {mode: mute}` se ele tiver fala/ruído indesejado.
+3. Para cada cena, escreva um prompt de geração específico: sujeito, ação, cenário, câmera, lente, luz, paleta, duração e aspect ratio. No Flow, peça **somente SFX e som ambiente** — sem fala, sem narração, sem diálogo, sem música e sem legenda na imagem. Modelo curto:
+   `[cena]: [sujeito/ação], [cenário], [câmera/lente], [luz/paleta], [duração/aspect ratio]. Áudio: apenas SFX e som ambiente; sem fala, sem narração, sem diálogo e sem música.`
+   Gere **2 a 4 takes** por cena; baixe o melhor MP4 e salve em `projects/<NOME>/assets/flow/<cena>-v1.mp4` (numere os takes). O áudio do take entra no bed por padrão; use `clip.audio: {mode: mute}` se o Flow gerar fala/música por engano.
 4. Registre por take: cena, prompt usado, modelo/configuração visível, data, créditos gastos e motivo da escolha. Se o Flow mostrar marca d'água/SynthID ou restrição de uso, anote; não remova marca d'água.
 5. Atualize o `storyboard.yaml` com as camadas `clip` (`file: assets/flow/...`, `in_s`, `fit`) e a duração correta. Rode `./kit.sh run --project /projects/<NOME> --json run --only validate`; corrija os `issues` em vez de contornar.
 6. Mostre-me os takes escolhidos e os créditos gastos. Depois que eu aprovar roteiro, voz e overlays, rode `./kit.sh run --project /projects/<NOME> --json approve --script --voice --overlays --by <MEU_NOME>` e siga para o render/QA.
@@ -18,6 +20,7 @@ Ressalvas obrigatórias (leia para mim):
 - **Conteúdo e direitos:** siga os termos do Google Flow/Labs e as políticas de conteúdo. Vídeos gerados podem ter marca d'água/SynthID e regras de uso comercial; verifique a licença do seu plano. Não gere pessoas reais, marcas ou cenas sensíveis sem autorização.
 - **Não determinístico:** o mesmo prompt pode gerar resultados diferentes; guarde prompt, take e versão. Revise com olhos humanos antes de publicar.
 - **Privacidade:** não faça upload de material confidencial sem autorização; a conta e os créditos são pessoais.
-- **Sem áudio do clipe:** o v1 do Forja não mixa o áudio embutido do MP4 nem `sfx`; a narração vem do AI Studio e a trilha é uma camada `music` licenciada.
+- **Áudio do clipe:** o áudio embutido (no Flow, só SFX) entra no bed por padrão; `clip.audio: {mode: mute}` remove se vier fala/música por engano. `sfx` entra e exige `license.kind`. A narração vem do AI Studio e a trilha é uma camada `music` licenciada.
+- **Exceção de áudio original:** vídeo que já traz áudio que não pode ser removido (ex.: dublagem de um vídeo gravado) é trabalhado **sobre o áudio original**, que fica ao fundo com ducking sob a narração.
 
 Reporte: cenas cobertas, arquivos baixados, prompts/takes, créditos gastos, avisos de licença/marca e o que **não verificou** (qualidade artística, continuidade entre takes e adequação do plano).

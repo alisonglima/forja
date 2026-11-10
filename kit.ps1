@@ -15,7 +15,7 @@ switch ($Cmd) {
   "doctor" {
     docker --version; docker compose version
     "arquitetura do daemon: " + (docker info --format '{{.OSType}}/{{.Architecture}}')
-    if ((Test-Path .env) -and ((Get-Content .env -Raw) -match '(?m)^GEMINI_API_KEY=.+')) { "GEMINI_API_KEY: definida (opcional)" } else { "GEMINI_API_KEY: ausente (opcional; o padrao e o provider files)" } }
+    if ((Test-Path .env) -and ((Get-Content .env -Raw) -match '(?m)^GEMINI_API_KEY=.+')) { "GEMINI_API_KEY: definida (opcional)" } else { "GEMINI_API_KEY: ausente (opcional; o padrao e o provider google_ai_studio)" } }
   "build" { C build forja }
   "new" {
     if ($Rest.Count -lt 2) { throw "uso: .\kit.ps1 new <nome> <video> [opcoes do init]" }

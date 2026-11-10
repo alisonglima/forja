@@ -447,6 +447,15 @@ def _needs_word_anchor(scene) -> bool:
     return False
 
 
+def _first_word_anchor(scene):
+    for layer in _layers(scene):
+        for key in ("enter", "exit"):
+            spec = layer.get(key)
+            if isinstance(spec, dict) and spec.get("anchor") == "word":
+                return spec.get("word")
+    return None
+
+
 def _word_language(ctx, layer) -> str:
     value = layer.get("lang")
     if not isinstance(value, str) or not value.strip():
@@ -467,7 +476,12 @@ def _words_for_timeline(ctx, sb) -> dict:
             continue
         wav = ctx.work / "voices" / (str(scene_id) + ".wav")
         if not wav.is_file():
-            continue
+            raise ForjaError(
+                "MISSING_PREREQ",
+                "narracao ausente para ancoras por palavra na cena %s" % scene_id,
+                hint="gere a narracao com `forja voices` antes de resolver a timeline",
+                details={"scene": str(scene_id), "word": _first_word_anchor(scene)},
+            )
         language = _word_language(ctx, layer)
         tcfg = dict(ctx.cfg.get("transcribe") or {})
         tcfg["language"] = language
@@ -518,6 +532,39 @@ def _words_for_timeline(ctx, sb) -> dict:
     return result
 
 
+def _check_word_anchors(sb, timeline, words):
+    """Falha se resolve_timeline teve de alinhar uma ancora por palavra no chute."""
+    resolved = {
+        str(scene.get("id")): scene
+        for scene in (timeline.get("scenes") or [])
+        if isinstance(scene, dict)
+    }
+    for scene in _scenes(sb):
+        scene_id = str(scene.get("id"))
+        out_scene = resolved.get(scene_id) or {}
+        out_layers = [
+            layer
+            for layer in (out_scene.get("layers") or [])
+            if isinstance(layer, dict)
+        ]
+        for layer, out_layer in zip(_layers(scene), out_layers):
+            if not out_layer.get("warnings"):
+                continue
+            for key in ("enter", "exit"):
+                spec = layer.get(key)
+                if not isinstance(spec, dict) or spec.get("anchor") != "word":
+                    continue
+                word = spec.get("word")
+                if storyboard_mod._find_word_start(words.get(scene_id), word) is None:
+                    raise ForjaError(
+                        "MISSING_PREREQ",
+                        "ancora por palavra nao resolvida na cena %s: %r"
+                        % (scene_id, word),
+                        hint="confira a palavra na narracao transcrita ou remova `anchor: word`",
+                        details={"scene": scene_id, "word": word},
+                    )
+
+
 def _run_timeline(ctx):
     sb = _load_storyboard(ctx)
     manifest = _read_json(ctx.work / "voices" / "manifest.json", {})
@@ -528,6 +575,7 @@ def _run_timeline(ctx):
     }
     words = _words_for_timeline(ctx, sb)
     timeline = storyboard_mod.resolve_timeline(sb, narration_s, words=words)
+    _check_word_anchors(sb, timeline, words)
     _write_json(ctx.work / "timeline.json", timeline)
 
     render_cfg = ctx.cfg.get("render") or {}
@@ -734,7 +782,10 @@ def _inputs_validate(ctx):
 def _inputs_voices(ctx):
     mix_cfg = ctx.cfg.get("mix") or {}
     paths = [_storyboard_path(ctx), ctx.root / "config.yaml"]
-    if str((ctx.cfg.get("voices") or {}).get("provider", "files")) == "files":
+    if str((ctx.cfg.get("voices") or {}).get("provider", "files")) in (
+        "files",
+        "google_ai_studio",
+    ):
         paths.extend(sorted((ctx.root / tts.input_dir(ctx.cfg)).glob("*.wav")))
     return (
         paths,

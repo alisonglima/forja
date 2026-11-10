@@ -810,7 +810,7 @@ TEMPLATE = r"""<!doctype html>
     <h3>Começar em 5 passos</h3>
     <ol class="steps">
       <li><strong>Prepare o kit.</strong><p><code>./kit.sh setup</code> cria o <code>.env</code>, uma senha aleatória do navegador e as pastas <code>projects/</code> e <code>models/</code>.</p></li>
-      <li><strong>Escolha as vozes.</strong><p>Use <code>piper</code> para narração local autônoma (voz pt-BR na imagem), <code>files</code> para gerar com a sua conta/ferramenta em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>, ou <code>gemini</code> como API opcional.</p></li>
+      <li><strong>Escolha as vozes.</strong><p>O padrão é <code>google_ai_studio</code>: gere as vozes na interface web do AI Studio e salve em <code>projects/&lt;nome&gt;/voices/&lt;id&gt;.wav</code>. <code>piper</code> é a alternativa offline opcional; <code>files</code> é alias para qualquer WAV e <code>gemini</code> é API opcional.</p></li>
       <li><strong>Construa a imagem.</strong><p><code>./kit.sh build</code>. É a parte demorada; só acontece na primeira vez (ou quando o kit muda).</p></li>
       <li><strong>Ensine o seu agente.</strong><p>Copie o <strong>prompt 02</strong> desta página e cole no seu agente. Ele instala a skill e passa a saber operar a forja.</p></li>
       <li><strong>Peça o vídeo.</strong><p>Use o <strong>prompt 03</strong> para dublar um vídeo existente ou o <strong>prompt 08</strong> para criar um vídeo por cenas.</p></li>
@@ -960,11 +960,11 @@ TEMPLATE = r"""<!doctype html>
       </li>
       <li>
         <strong>Gere e baixe os takes.</strong>
-        <p>Para cada cena, escreva um prompt específico e gere 2–4 takes. Baixe o melhor MP4 para <code>assets/flow/&lt;cena&gt;-v1.mp4</code> e registre prompt, take, data e créditos gastos.</p>
+        <p>Para cada cena, escreva um prompt específico e gere 2–4 takes. No Flow, peça <strong>somente SFX e som ambiente</strong> — sem fala, sem narração, sem diálogo, sem música e sem legenda na imagem; a narração vem do AI Studio e a trilha é a camada <code>music</code> licenciada. Baixe o melhor MP4 para <code>assets/flow/&lt;cena&gt;-v1.mp4</code> e registre prompt, take, data e créditos gastos.</p>
       </li>
       <li>
         <strong>Atualize o storyboard.</strong>
-        <p>Adicione as camadas <code>clip</code> com <code>file</code>, <code>in_s</code> e <code>fit</code>. Rode <code>forja run --only validate</code> e corrija os <code>issues</code>. Não use o áudio embutido do Flow no v1.</p>
+        <p>Adicione as camadas <code>clip</code> com <code>file</code>, <code>in_s</code> e <code>fit</code>. Rode <code>forja run --only validate</code> e corrija os <code>issues</code>. O áudio embutido do clipe entra no bed por padrão; use <code>audio: {mode: mute}</code> se o Flow gerar fala/música por engano. <strong>Exceção:</strong> vídeo que já traz áudio que não pode ser removido (ex.: dublagem de um vídeo gravado) é trabalhado sobre o <strong>áudio original</strong>, que fica ao fundo com ducking sob a narração.</p>
       </li>
       <li>
         <strong>Aprove e renderize.</strong>

@@ -4,6 +4,20 @@ Todas as mudanças notáveis deste projeto são documentadas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adere a
 [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Não lançado]
+
+### Corrigido
+
+- `.env.example`, `kit.sh` e `kit.ps1` passam a indicar `google_ai_studio` como provider padrão
+  (`files` é alias e lê os mesmos WAVs).
+- Guia e prompts 08/14 descrevem a política de áudio do Flow: pedir somente SFX e som ambiente,
+  sem fala/narração/diálogo/música; o áudio embutido entra no bed e `audio: {mode: mute}` remove.
+- Quickstart do guia cita `google_ai_studio` antes de `piper`; `piper` fica como alternativa offline opcional.
+- Removido bullet duplicado de âncoras por palavra no prompt 08.
+- `DESIGN.md` registra `MISSING_PREREQ` em âncora por palavra não resolvida, `sfx.start` relativo à
+  cena, aviso `CLIP_OUT_S_UNSUPPORTED`, cache de `voices/*.wav`, WAV estéreo convertido e
+  `next_actions` com `--project`.
+
 ## [0.1.0] — 2026-11-10
 
 ### Adicionado

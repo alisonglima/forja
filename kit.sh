@@ -30,7 +30,7 @@ case "$cmd" in
   doctor)
     docker --version; c version --short 2>/dev/null || { echo "ERRO: docker compose v2 ausente"; exit 1; }
     echo "arquitetura do daemon: $(docker info --format '{{.OSType}}/{{.Architecture}}')"
-    [ -f .env ] && grep -q '^GEMINI_API_KEY=.\+' .env && echo "GEMINI_API_KEY: definida (opcional)" || echo "GEMINI_API_KEY: ausente (opcional; o padrao e o provider files)"
+    [ -f .env ] && grep -q '^GEMINI_API_KEY=.\+' .env && echo "GEMINI_API_KEY: definida (opcional)" || echo "GEMINI_API_KEY: ausente (opcional; o padrao e o provider google_ai_studio)"
     df -h . | tail -1 ;;
   build) c build forja ;;
   new)
