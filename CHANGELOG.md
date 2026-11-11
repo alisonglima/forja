@@ -8,6 +8,7 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o 
 
 ### Corrigido
 
+- O fim do `sfx` no mix é sempre limitado ao fim da cena (antes `exit`/`hold_s`/`duration` além da cena vazavam para a seguinte); `sfx.duration` e tempos de camada não finitos (`nan`/`inf`) viram erro de validação (`SFX_DURATION`, `LAYER_TIMING`); ids de cena ausentes ou vazios contam como duplicados no `timeline`; a dica de `enter` fora da cena cita o valor resolvido.
 - `sfx` respeita `exit`/`hold_s` e o fim da cena no mix (não vaza para a cena seguinte); a dica de `enter.anchor: scene_end` fora da cena ficou correta; `timeline` recusa ids de cena duplicados; `sfx.start` não finito vira `SFX_START` na validação.
 - `.env.example`, `kit.sh` e `kit.ps1` passam a indicar `google_ai_studio` como provider padrão
   (`files` é alias e lê os mesmos WAVs).
