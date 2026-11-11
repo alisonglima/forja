@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from pathlib import Path
 
@@ -476,7 +477,7 @@ def validate_storyboard(sb, root=None):
             if layer_type == "sfx":
                 if "start" in layer:
                     start_value = layer.get("start")
-                    if not _is_number(start_value):
+                    if not _is_number(start_value) or not math.isfinite(float(start_value)):
                         issues.append(
                             _issue(
                                 "error",

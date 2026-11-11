@@ -8,6 +8,7 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o 
 
 ### Corrigido
 
+- `sfx` respeita `exit`/`hold_s` e o fim da cena no mix (não vaza para a cena seguinte); a dica de `enter.anchor: scene_end` fora da cena ficou correta; `timeline` recusa ids de cena duplicados; `sfx.start` não finito vira `SFX_START` na validação.
 - `.env.example`, `kit.sh` e `kit.ps1` passam a indicar `google_ai_studio` como provider padrão
   (`files` é alias e lê os mesmos WAVs).
 - Guia e prompts 08/14 descrevem a política de áudio do Flow: pedir somente SFX e som ambiente,

@@ -262,16 +262,24 @@ def _audio_plan(ctx, sb, timeline, total_s):
                 if not path.is_file():
                     continue
                 start = max(0.0, _as_float(layer.get("start"), scene_start))
+                # O fim resolvido (exit/hold_s/fim da cena) limita o som; sem
+                # ele, cai no fim da cena para o sfx nao vazar para a seguinte.
+                resolved_end = layer.get("end")
+                if not _is_number(resolved_end):
+                    resolved_end = scene_end
                 duration = layer.get("duration")
-                if not _is_number(duration) or float(duration) <= 0:
-                    duration = max(0.0, float(total_s) - start)
+                if _is_number(duration) and float(duration) > 0:
+                    end = min(start + float(duration), float(resolved_end))
+                else:
+                    end = float(resolved_end)
+                duration = max(0.0, end - start)
                 plan.append(
                     {
                         "kind": "sfx",
                         "path": path,
                         "start": start,
                         "offset": 0.0,
-                        "duration": min(float(duration), max(0.0, float(total_s) - start)),
+                        "duration": min(duration, max(0.0, float(total_s) - start)),
                         "gain_db": _gain(layer.get("gain_db", 0)),
                         "rate": _as_float(layer.get("playback_rate"), 1.0),
                         "pad": False,
@@ -623,11 +631,18 @@ def _check_sfx_inside_scenes(timeline):
             start = float(start_value)
             if scene_start <= start < scene_end:
                 continue
-            hint = (
-                "ajuste sfx.start para cair dentro da cena %s "
-                "(de %.3fs ate %.3fs) ou use enter.anchor"
-                % (scene_id, scene_start, scene_end)
-            )
+            if isinstance(layer.get("enter"), dict):
+                hint = (
+                    "o enter do sfx resolveu o inicio em %.3fs, no fim da cena %s; "
+                    "use offset_s negativo para antecipar ou escolha outra ancora"
+                    % (start, scene_id)
+                )
+            else:
+                hint = (
+                    "ajuste sfx.start para cair dentro da cena %s "
+                    "(de %.3fs ate %.3fs) ou use enter.anchor"
+                    % (scene_id, scene_start, scene_end)
+                )
             raise ForjaError(
                 "CONFIG_INVALID",
                 "sfx.start fora da cena %s: %.3fs nao esta em [%.3f, %.3f)"
@@ -643,8 +658,67 @@ def _check_sfx_inside_scenes(timeline):
             )
 
 
+def _missing_word_anchor(scene):
+    """Primeira ancora ``word`` ausente do texto da narracao da cena."""
+    text = ""
+    for layer in _layers(scene):
+        if layer.get("type") == "narration":
+            text = str(layer.get("text") or "")
+            break
+    if not text:
+        return None
+    for layer in _layers(scene):
+        for key in ("enter", "exit"):
+            spec = layer.get(key)
+            if not isinstance(spec, dict) or spec.get("anchor") != "word":
+                continue
+            word = spec.get("word")
+            if not storyboard_mod._word_in_text(word, text):
+                return word
+    return None
+
+
+def _check_unique_scene_ids(sb) -> None:
+    """Recusa ids de cena repetidos antes de transcrever ou gravar a timeline.
+
+    O id da cena identifica o cache de palavras (``work/words/<id>.json``) e a
+    janela usada pelas ancoras; com ids repetidos a segunda cena herdaria as
+    palavras da primeira. Antes de recusar o id duplicado, preserva o erro mais
+    util de ancora ausente na primeira cena de cada id (a origem do cache).
+    """
+    seen = {}
+    duplicates = {}
+    for position, scene in enumerate(_scenes(sb)):
+        scene_id = scene.get("id")
+        key = str(scene_id)
+        if key in seen:
+            duplicates.setdefault(key, (seen[key][0], position))
+        else:
+            seen[key] = (position, scene)
+    for key, (first_position, position) in duplicates.items():
+        word = _missing_word_anchor(seen[key][1])
+        if word is not None:
+            raise ForjaError(
+                "MISSING_PREREQ",
+                "ancora por palavra nao resolvida na cena %s: %r" % (key, word),
+                hint="confira a palavra na narracao transcrita ou remova `anchor: word`",
+                details={"scene": key, "word": word},
+            )
+        raise ForjaError(
+            "CONFIG_INVALID",
+            "ids de cena duplicados no storyboard: %r (posicoes %d e %d)"
+            % (key, first_position, position),
+            hint=(
+                "cada cena deve ter um id unico; renomeie os ids duplicados "
+                "(o id e usado no cache de palavras e nas ancoras)"
+            ),
+            details={"scene": key},
+        )
+
+
 def _run_timeline(ctx):
     sb = _load_storyboard(ctx)
+    _check_unique_scene_ids(sb)
     manifest = _read_json(ctx.work / "voices" / "manifest.json", {})
     narration_s = {
         str(scene_id): float(entry.get("duration", 0.0))
