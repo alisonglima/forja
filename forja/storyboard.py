@@ -193,8 +193,37 @@ def _check_sfx(layer, scene_id, issues):
     if not _is_number(gain) or not (-60 <= float(gain) <= 12):
         issues.append(_issue("error", label, "SFX_GAIN", "sfx.gain_db deve ficar entre -60 e 12"))
     duration = layer.get("duration")
-    if duration is not None and (not _is_number(duration) or float(duration) <= 0):
+    if duration is not None and (
+        not _is_number(duration)
+        or not math.isfinite(float(duration))
+        or float(duration) <= 0
+    ):
         issues.append(_issue("error", label, "SFX_DURATION", "sfx.duration deve ser positivo"))
+
+
+def _check_layer_timing(layer, scene_id, issues):
+    label = _layer_label(layer, scene_id)
+    hold_s = layer.get("hold_s")
+    if _is_number(hold_s) and not math.isfinite(float(hold_s)):
+        issues.append(
+            _issue("error", label, "LAYER_TIMING", "hold_s deve ser um numero finito")
+        )
+    for key in ("enter", "exit"):
+        spec = layer.get(key)
+        if not isinstance(spec, dict):
+            continue
+        for field in ("at_s", "offset_s"):
+            if field in spec:
+                value = spec.get(field)
+                if _is_number(value) and not math.isfinite(float(value)):
+                    issues.append(
+                        _issue(
+                            "error",
+                            label,
+                            "LAYER_TIMING",
+                            f"{key}.{field} deve ser um numero finito",
+                        )
+                    )
 
 
 def _check_anchors(layer, scene_id, narration_text, issues):
@@ -427,6 +456,8 @@ def validate_storyboard(sb, root=None):
 
             if layer_type == "sfx":
                 _check_sfx(layer, scene_id, issues)
+
+            _check_layer_timing(layer, scene_id, issues)
 
             _check_anchors(layer, scene_id, narration_text, issues)
 

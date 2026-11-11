@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from pathlib import Path
 
 import numpy as np
@@ -267,11 +268,28 @@ def _audio_plan(ctx, sb, timeline, total_s):
                 resolved_end = layer.get("end")
                 if not _is_number(resolved_end):
                     resolved_end = scene_end
-                duration = layer.get("duration")
-                if _is_number(duration) and float(duration) > 0:
-                    end = min(start + float(duration), float(resolved_end))
                 else:
-                    end = float(resolved_end)
+                    resolved_end = float(resolved_end)
+                    if not math.isfinite(resolved_end):
+                        resolved_end = float(scene_end)
+                duration = layer.get("duration")
+                if (
+                    _is_number(duration)
+                    and math.isfinite(float(duration))
+                    and float(duration) > 0
+                ):
+                    end = min(start + float(duration), resolved_end)
+                else:
+                    end = resolved_end
+                # A1: o sfx nunca soa na cena seguinte, qualquer que seja a
+                # origem do fim (duration, exit, hold_s). Um fim nao finito
+                # (nan/inf) tambem cai no fim da cena.
+                limit = float(scene_end)
+                if math.isfinite(float(total_s)):
+                    limit = min(limit, float(total_s))
+                end = min(end, limit)
+                if not math.isfinite(end):
+                    end = float(scene_end)
                 duration = max(0.0, end - start)
                 plan.append(
                     {
@@ -279,7 +297,7 @@ def _audio_plan(ctx, sb, timeline, total_s):
                         "path": path,
                         "start": start,
                         "offset": 0.0,
-                        "duration": min(duration, max(0.0, float(total_s) - start)),
+                        "duration": duration,
                         "gain_db": _gain(layer.get("gain_db", 0)),
                         "rate": _as_float(layer.get("playback_rate"), 1.0),
                         "pad": False,
@@ -632,11 +650,26 @@ def _check_sfx_inside_scenes(timeline):
             if scene_start <= start < scene_end:
                 continue
             if isinstance(layer.get("enter"), dict):
-                hint = (
-                    "o enter do sfx resolveu o inicio em %.3fs, no fim da cena %s; "
-                    "use offset_s negativo para antecipar ou escolha outra ancora"
-                    % (start, scene_id)
-                )
+                enter = layer["enter"]
+                anchor = enter.get("anchor")
+                if anchor == "scene_end":
+                    hint = (
+                        "o enter do sfx resolveu o inicio em %.3fs, no fim da cena %s; "
+                        "use offset_s negativo para antecipar ou escolha outra ancora"
+                        % (start, scene_id)
+                    )
+                else:
+                    if anchor == "word":
+                        advice = "enter.word e enter.offset_s"
+                    elif anchor == "scene_start":
+                        advice = "enter.offset_s"
+                    else:
+                        advice = "enter.at_s e enter.offset_s"
+                    hint = (
+                        "o enter do sfx resolveu o inicio em %.3fs, fora de "
+                        "[%.3fs, %.3fs) da cena %s; ajuste %s para cair dentro da cena"
+                        % (start, scene_start, scene_end, scene_id, advice)
+                    )
             else:
                 hint = (
                     "ajuste sfx.start para cair dentro da cena %s "
@@ -690,24 +723,29 @@ def _check_unique_scene_ids(sb) -> None:
     duplicates = {}
     for position, scene in enumerate(_scenes(sb)):
         scene_id = scene.get("id")
-        key = str(scene_id)
+        # B1: id ausente (None) e id vazio ("") sao o mesmo id vazio; sem isso
+        # str(None) == "None" deixaria as duas cenas passarem pelo check.
+        key = "" if scene_id is None or scene_id == "" else str(scene_id)
         if key in seen:
             duplicates.setdefault(key, (seen[key][0], position))
         else:
             seen[key] = (position, scene)
     for key, (first_position, position) in duplicates.items():
-        word = _missing_word_anchor(seen[key][1])
+        label = key if key else "(id vazio)"
+        # Sem id valido nao existe cache de palavras a preservar: o erro util
+        # e sempre o id duplicado/vazio (CONFIG_INVALID).
+        word = _missing_word_anchor(seen[key][1]) if key else None
         if word is not None:
             raise ForjaError(
                 "MISSING_PREREQ",
-                "ancora por palavra nao resolvida na cena %s: %r" % (key, word),
+                "ancora por palavra nao resolvida na cena %s: %r" % (label, word),
                 hint="confira a palavra na narracao transcrita ou remova `anchor: word`",
                 details={"scene": key, "word": word},
             )
         raise ForjaError(
             "CONFIG_INVALID",
-            "ids de cena duplicados no storyboard: %r (posicoes %d e %d)"
-            % (key, first_position, position),
+            "ids de cena duplicados no storyboard: %s (posicoes %d e %d)"
+            % (label, first_position, position),
             hint=(
                 "cada cena deve ter um id unico; renomeie os ids duplicados "
                 "(o id e usado no cache de palavras e nas ancoras)"
