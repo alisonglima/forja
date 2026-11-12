@@ -260,6 +260,8 @@ empacotar_kit() {
   raiz=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
   if [ -f "$raiz/remotion-template/package.json" ]; then itens+=(remotion-template/package.json); fi
   if [ -d "$raiz/remotion-template/src" ]; then itens+=(remotion-template/src); fi
+  # peca real: caminhos extras (relativos a raiz) levados ao CT junto do kit
+  if [ -n "${EXTRA_ITENS:-}" ]; then read -r -a extra <<< "$EXTRA_ITENS"; itens+=("${extra[@]}"); fi
   tar czf "$OUT/prova-kit.tar.gz" -C "$raiz" "${itens[@]}"
 }
 

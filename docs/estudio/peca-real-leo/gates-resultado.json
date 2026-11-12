@@ -1,0 +1,297 @@
+{
+ "feed": {
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1350,
+   "bytes": 1794413,
+   "sha256": "fc23b7fe1038701b2be71db055f790ba4e9ca5804fbd35391785f6688bf2ccb1"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1350,
+   "sha256": "fc23b7fe1038701b2be71db055f790ba4e9ca5804fbd35391785f6688bf2ccb1"
+  },
+  "formato_linha": {
+   "id": "ig-feed-4x5",
+   "plataforma": "instagram",
+   "formato": "feed-retrato",
+   "largura": 1080,
+   "altura": 1350,
+   "razao": "4:5",
+   "limite_bytes": 8388608,
+   "duracao_max_s": null,
+   "safe_zone": {
+    "top": 0.05,
+    "bottom": 0.05,
+    "left": 0.05,
+    "right": 0.05,
+    "fonte": "casa: 5% + 40 px; sem % oficial (F1)",
+    "status": "provisorio"
+   },
+   "max_chars": 2200,
+   "max_hashtags": 5,
+   "alt_max": 100,
+   "alt_max_plataforma": 1000,
+   "fonte": "https://help.instagram.com/1631821640426723",
+   "fonte_secundaria": "https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/media",
+   "fonte_tipo": "oficial",
+   "checked_at": "2026-11-11",
+   "verificado_em": "2026-11-11",
+   "status": "provisorio",
+   "verificacao": "DIVERGENTE",
+   "divergencia": "F1 aceita até 3:4 (1080x1440); F2 aceita até 4:5 (1080x1350); adotado 4:5. Hashtags: API 30 x ajuda 5 (não confirmado na interface); max_hashtags=5 provisório",
+   "constantes": [],
+   "notas": "Help: 1080 px e 3:4; API: 4:5; adotado 4:5; alt 100 é casa"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "titulo",
+     "x": 72,
+     "y": 1000,
+     "w": 936,
+     "h": 69
+    },
+    {
+     "id": "corpo",
+     "x": 72,
+     "y": 1089,
+     "w": 936,
+     "h": 39
+    },
+    {
+     "id": "cta",
+     "x": 72,
+     "y": 1246,
+     "w": 230,
+     "h": 48
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 884,
+     "y": 1179,
+     "w": 124,
+     "h": 115
+    }
+   ],
+   "foto": [
+    {
+     "id": "foto",
+     "x": 0,
+     "y": 0,
+     "w": 1080,
+     "h": 900
+    }
+   ],
+   "barra": [
+    {
+     "id": "barra",
+     "x": 72,
+     "y": 960,
+     "w": 120,
+     "h": 12
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_area_54": [],
+  "overflow": [],
+  "contraste_sob_texto": {
+   "titulo": {
+    "min": 7.329813707112641,
+    "p5": 7.329813707112641,
+    "mean": 7.329813707112639,
+    "pass": true
+   },
+   "corpo": {
+    "min": 7.329813707112641,
+    "p5": 7.329813707112641,
+    "mean": 7.329813707112639,
+    "pass": true
+   },
+   "cta": {
+    "min": 7.329813707112641,
+    "p5": 7.329813707112641,
+    "mean": 7.329813707112639,
+    "pass": true
+   }
+  },
+  "contraste_no_png_final_com_texto(uso_errado)": {
+   "min": 1.0,
+   "p5": 1.0,
+   "mean": 5.388343779770356,
+   "pass": false
+  }
+ },
+ "story": {
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1920,
+   "bytes": 2013027,
+   "sha256": "9ae42cd3658e0366b8bb4c8660e0ebe5b659ab64f92c338eebec4582d5f5d4f8"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1920,
+   "sha256": "9ae42cd3658e0366b8bb4c8660e0ebe5b659ab64f92c338eebec4582d5f5d4f8"
+  },
+  "formato_linha": {
+   "id": "ig-story",
+   "plataforma": "instagram",
+   "formato": "story",
+   "largura": 1080,
+   "altura": 1920,
+   "razao": "9:16",
+   "limite_bytes": 104857600,
+   "duracao_max_s": 60,
+   "safe_zone": {
+    "top": 0.15,
+    "bottom": 0.15,
+    "left": 0.1,
+    "right": 0.1,
+    "fonte": "convenção 15/15/10/10 a validar; Meta só pede bordas livres",
+    "status": "provisorio"
+   },
+   "max_chars": 2200,
+   "max_hashtags": 5,
+   "alt_max": 100,
+   "alt_max_plataforma": null,
+   "fonte": "https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/media",
+   "fonte_secundaria": "https://help.instagram.com/1038071743007909",
+   "fonte_tipo": "oficial",
+   "checked_at": "2026-11-11",
+   "verificado_em": "2026-11-11",
+   "status": "provisorio",
+   "verificacao": "DIVERGENTE",
+   "divergencia": "Hashtags: API 30 x ajuda 5. Alt não suportado na API; casa ≤100 no HTML",
+   "constantes": [],
+   "notas": "100 MB e 60 s (F2); 9:16 recomendado"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "titulo",
+     "x": 108,
+     "y": 1144,
+     "w": 864,
+     "h": 164
+    },
+    {
+     "id": "corpo",
+     "x": 108,
+     "y": 1328,
+     "w": 864,
+     "h": 48
+    },
+    {
+     "id": "cta",
+     "x": 108,
+     "y": 1577,
+     "w": 276,
+     "h": 55
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 804,
+     "y": 1476,
+     "w": 168,
+     "h": 156
+    }
+   ],
+   "foto": [
+    {
+     "id": "foto",
+     "x": 0,
+     "y": 0,
+     "w": 1080,
+     "h": 1040
+    }
+   ],
+   "barra": [
+    {
+     "id": "barra",
+     "x": 108,
+     "y": 1104,
+     "w": 120,
+     "h": 12
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_area_gate_simetrico_108": [],
+  "safe_area_story_assimetrica": [],
+  "overflow": [],
+  "contraste_sob_texto": {
+   "titulo": {
+    "min": 7.329813707112641,
+    "p5": 7.329813707112641,
+    "mean": 7.329813707112638,
+    "pass": true
+   },
+   "corpo": {
+    "min": 7.329813707112641,
+    "p5": 7.329813707112641,
+    "mean": 7.329813707112639,
+    "pass": true
+   },
+   "cta": {
+    "min": 7.329813707112641,
+    "p5": 7.329813707112641,
+    "mean": 7.329813707112639,
+    "pass": true
+   }
+  },
+  "contraste_no_png_final_com_texto(uso_errado)": {
+   "min": 1.0,
+   "p5": 1.0,
+   "mean": 6.072518805013069,
+   "pass": false
+  }
+ },
+ "manifesto_foto": {
+  "manifest": {
+   "input_sha256": "f904dc115ed68469940a5c6f036089a19f098cbea77ae9df86c0ba1f04995d72",
+   "output_sha256": "aa0eff809a284010849d6ef84270d57262b89d479d4e7fd5290bca011be5dcd2",
+   "steps": [
+    {
+     "name": "crop_focal",
+     "params": {
+      "focal": [
+       0.5,
+       0.5
+      ],
+      "target": [
+       2160,
+       1680
+      ]
+     }
+    }
+   ],
+   "brand_id": "leo-lions",
+   "origin": "Lions Clubs International - biblioteca de fotos (box-extra/G-fotos-biblioteca/_Environment)",
+   "license": "(c) Lions Clubs International; uso autorizado a associados; termos da biblioteca NAO verificados",
+   "ai_elements": []
+  },
+  "verify": []
+ }
+}
