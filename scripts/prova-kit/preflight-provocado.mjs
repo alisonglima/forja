@@ -117,7 +117,7 @@ function plano(out) {
   const base = (arq, viewport, shots) => {
     const argv = [
       "npx", "--yes", KIT, "check", "fixtures/" + arq,
-      "--viewport", viewport, "--json", "--fail-on", "error",
+      "--viewport", viewport, "--json", "--fail-on", "warning",
       "--workspace", ws,
     ];
     if (shots) argv.push("--screenshots", path.join(ev, "screenshots", shots));
