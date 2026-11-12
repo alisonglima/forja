@@ -1,0 +1,169 @@
+[
+  {
+    "data": "01/01",
+    "nome": "Ano Novo / Confraternização Universal",
+    "dia": "sexta",
+    "pilar": "prestação de contas",
+    "formato": "carrossel de retrospectiva + story",
+    "fonte": "Lei 662/1949, Câmara dos Deputados",
+    "url": "https://www2.camara.leg.br/legin/fed/lei/1940-1949/lei-662-6-abril-1949-347136-norma-pl.html",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "01–05/06",
+    "nome": "Semana Nacional do Meio Ambiente (primeira semana de junho)",
+    "dia": "ter–sáb",
+    "pilar": "serviço/bastidores",
+    "formato": "série de 3 posts + folder digital PDF RGB",
+    "fonte": "Decreto 86.028/1981, Câmara dos Deputados",
+    "url": "https://www2.camara.leg.br/legin/fed/decret/1980-1987/decreto-86028-27-maio-1981-435339-publicacaooriginal-1-pe.html",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "05/06",
+    "nome": "Dia Mundial do Meio Ambiente",
+    "dia": "sábado",
+    "pilar": "serviço",
+    "formato": "post + story",
+    "fonte": "ONU",
+    "url": "https://www.un.org/en/observances/environment-day",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "07/06",
+    "nome": "Reunião de fundação do Lions (Hotel La Salle, Chicago, 1917)",
+    "dia": "segunda",
+    "pilar": "memória/bastidores",
+    "formato": "carrossel histórico",
+    "fonte": "Lions Distrito LA-5 (página inicial, sem URL específica da data)",
+    "url": "https://www.lionssb.org.br/inicioint",
+    "checked_at": "2026-11-11",
+    "verificada": false, "origem": "plano:634-658",
+    "observacao": "NÃO ENCONTREI confirmação em fonte oficial; lionsclubs.org deu 403. Confirmar antes de publicar."
+  },
+  {
+    "data": "14/06",
+    "nome": "Dia Mundial do Doador de Sangue",
+    "dia": "segunda",
+    "pilar": "serviço/voluntariado",
+    "formato": "carrossel + convite PDF RGB",
+    "fonte": "OMS",
+    "url": "https://www.who.int/campaigns/world-blood-donor-day",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "28/08",
+    "nome": "Dia Nacional do Voluntariado",
+    "dia": "sábado",
+    "pilar": "voluntariado",
+    "formato": "carrossel + story",
+    "fonte": "Lei 7.352/1985, Câmara dos Deputados",
+    "url": "https://www2.camara.leg.br/legin/fed/lei/1980-1987/lei-7352-28-agosto-1985-356953-publicacaooriginal-1-pl.html",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "05/09",
+    "nome": "Dia Internacional da Caridade",
+    "dia": "domingo",
+    "pilar": "arrecadação",
+    "formato": "post + carrossel",
+    "fonte": "ONU",
+    "url": "https://www.un.org/en/observances/charity-day",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "10/10",
+    "nome": "1ª convenção do Lions (Dallas, 1917); a data de fundação oficial é lembrada em 07/06",
+    "dia": "domingo",
+    "pilar": "serviço",
+    "formato": "post + carrossel",
+    "fonte": "Lions Distrito LA-5 (página inicial, sem URL específica da data)",
+    "url": "https://www.lionssb.org.br/inicioint",
+    "checked_at": "2026-11-11",
+    "verificada": false, "origem": "plano:634-658",
+    "observacao": "NÃO ENCONTREI confirmação em fonte oficial; lionsclubs.org deu 403. Confirmar antes de publicar."
+  },
+  {
+    "data": "12/10",
+    "nome": "Dia das Crianças",
+    "dia": "terça",
+    "pilar": "serviço",
+    "formato": "post 1080x1350 + story",
+    "fonte": "Arquivo Nacional",
+    "url": "https://www.gov.br/arquivonacional/pt-br/canais_atendimento/imprensa/copy_of_noticias/dia-da-crianca",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "14/10",
+    "nome": "Dia Mundial da Visão (2ª quinta-feira de outubro)",
+    "dia": "quinta",
+    "pilar": "serviço",
+    "formato": "carrossel + story",
+    "fonte": "IAPB",
+    "url": "https://www.iapb.world/world_sight_day",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "14/11",
+    "nome": "Dia Mundial do Diabetes",
+    "dia": "domingo",
+    "pilar": "serviço",
+    "formato": "post + carrossel",
+    "fonte": "IDF",
+    "url": "https://worlddiabetesday.org/",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "03/12",
+    "nome": "Dia Internacional das Pessoas com Deficiência",
+    "dia": "sexta",
+    "pilar": "serviço",
+    "formato": "post + convite PDF RGB",
+    "fonte": "ONU",
+    "url": "https://www.un.org/en/observances/day-of-persons-with-disabilities",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "05/12",
+    "nome": "Dia Internacional do Voluntário",
+    "dia": "domingo",
+    "pilar": "voluntariado",
+    "formato": "carrossel + story",
+    "fonte": "ONU",
+    "url": "https://www.un.org/en/observances/volunteer-day",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "05/12",
+    "nome": "Aniversário do Leo (carta do primeiro Leo Clube, Abington, 1957)",
+    "dia": "domingo",
+    "pilar": "voluntariado/bastidores",
+    "formato": "carrossel + story",
+    "fonte": "Lions Switzerland-Liechtenstein (oficial)",
+    "url": "https://www.lions.ch/en/leo/about-us/international-leos/the-origin-story.html",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  },
+  {
+    "data": "25/12",
+    "nome": "Natal",
+    "dia": "sábado",
+    "pilar": "serviço",
+    "formato": "post",
+    "fonte": "Lei 662/1949, Câmara dos Deputados",
+    "url": "https://www2.camara.leg.br/legin/fed/lei/1940-1949/lei-662-6-abril-1949-347136-norma-pl.html",
+    "checked_at": "2026-11-11",
+    "verificada": true, "origem": "plano:634-658"
+  }
+]
