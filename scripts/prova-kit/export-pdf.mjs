@@ -9,7 +9,7 @@ import { spawnSync } from 'node:child_process';
 
 const KIT = ['npx', '--yes', '@feimacode/open-design-agent-kit@0.4.0'];
 const EVIDENCIA = 'p5-02-pdf';
-const PECAS = [['a5', 'a5'], ['a4', 'a4'], ['folder', 'a5']];
+const PECAS = [['a5', 'a5'], ['a4', 'a4'], ['folder', null]];
 const USO = `uso: node scripts/prova-kit/export-pdf.mjs --out DIR [--dry-run] [--help]
 Exporta fixtures A5, A4 e folder A5 multipagina em PDF e grava a evidencia
 em DIR/${EVIDENCIA}/, com pdfinfo, pdffonts, pdftotext, pdfimages, pdftocairo
@@ -38,8 +38,9 @@ function planejar(out) {
   for (const [base, preset] of PECAS) {
     const entry = `fixtures/${base}.html`;
     sidecars.push(path.relative(out, path.join(fix, `${base}.html.artifact.json`)));
-    cmds.push({ argv: [...KIT, 'export', entry, '--format', 'pdf', '--preset', preset,
-      '--bleed', '0', '--workspace', ws], cwd: ws,
+    const impressao = preset ? ['--preset', preset, '--bleed', '0'] : [];
+    cmds.push({ argv: [...KIT, 'export', entry, '--format', 'pdf', ...impressao,
+      '--workspace', ws], cwd: ws,
       env: { OPEN_DESIGN_BROWSER_PATH: '/usr/local/bin/google-chrome-prova' },
       log: path.join(ev, `${base}.kit.log`), kit: base,
       origem: path.join(fix, 'exports', `${base}.pdf`), destino: path.join(ev, `${base}.pdf`) });
@@ -82,8 +83,10 @@ function folder() {
 }
 
 function sidecar(entry, formato) {
-  return JSON.stringify({ version: 1, kind: 'html', entry, renderer: 'html',
-    exports: ['pdf'], status: 'complete', metadata: { format: formato } }, null, 2) + '\n';
+  const base = { version: 1, kind: 'html', entry, renderer: 'html',
+    exports: ['pdf'], status: 'complete' };
+  if (formato) base.metadata = { format: formato };
+  return JSON.stringify(base, null, 2) + '\n';
 }
 
 function escreverFixtures(fix) {
