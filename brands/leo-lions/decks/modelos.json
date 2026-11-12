@@ -81,7 +81,7 @@
     },
     "numeros": {
       "slide": 84, "layout": "L26", "shapes": ["TextBox 6", "TextBox 3", "TextBox 8", "TextBox 9", "TextBox 10"],
-      "limits": {"numero": {"chars": 3}, "legenda": {"chars": 30}, "numero2": {"chars": 3}, "legenda2": {"chars": 30}},
+      "limits": {"numero": {"chars": 3}, "legenda": {"chars": 12}, "numero2": {"chars": 3}, "legenda2": {"chars": 30}},
       "remover": ["TextBox 10"],
       "campos": {
         "numero": {"shape": "TextBox 6", "tipo": "texto"},
