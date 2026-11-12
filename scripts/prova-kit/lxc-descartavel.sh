@@ -232,7 +232,7 @@ montar_exports() {
   EXPORTS+='export OPEN_DESIGN_PREVIEW=off; '
   EXPORTS+='export OPEN_DESIGN_FFMPEG_PATH=/usr/bin/ffmpeg; '
   EXPORTS+='unset OPEN_DESIGN_FIGMA_TOKEN; '
-  EXPORTS+='test ! -e /root/.config/open-design/integrations.json; '
+  EXPORTS+='test ! -e /root/.config/open-design/integrations.json && '
 }
 
 rodar_inside() {
