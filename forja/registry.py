@@ -5,7 +5,7 @@ import os
 
 from .errors import ForjaError
 
-KINDS = ("tts", "stt", "render", "clip")
+KINDS = ("tts", "stt", "render", "clip", "image", "music")
 
 _FACTORIES: dict[str, dict[str, object]] = {}
 _META: dict[tuple[str, str], dict] = {}
