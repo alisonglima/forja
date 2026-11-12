@@ -1,0 +1,83 @@
+{
+  "schema": "forja-brand-variants/v1",
+  "variants": {
+    "lions": {
+      "accent": "#00338D",
+      "paleta": {
+        "azul": "#00338D",
+        "amarelo": "#EBB700",
+        "roxo": "#7A2582",
+        "azul_claro": "#407CCA",
+        "azul_marinho": "#0D2240",
+        "cinza": "#55565A",
+        "cinza_claro": "#B3B2B1",
+        "verde": "#00AB68",
+        "laranja": "#FF5B35"
+      },
+      "emblema": {
+        "permitido": "emblema oficial de Lions International e assinatura de 2 componentes (emblema + marca nominativa) de logos/Emblemas_do_Lions/ e logos/Assinaturas_de_Lions_Clubs_International/",
+        "proibido": "reconstruir, recortar, inclinar, recolorir, sobrepor ou usar o emblema em item vendido para arrecadar fundos; fora do clube/distrito e mídia digital, exige permissão escrita (trademarkuse@lionsclubs.org)"
+      },
+      "elemento": "nenhum obrigatório; grid, foto e tipografia conduzem. Não inventar seta nem fita",
+      "tipografia": "Helvetica Neue 35–96 (inclui Helvetica 77 Condensed Bold); fallback Helvetica/Arial/Times; Roboto é a substituta digital declarada, não a fonte oficial",
+      "tom": "voz Lions: breve e direta, ativa, 3ª pessoa por padrão; confiável, empática, informativa; títulos emocionais e subtítulos explicativos; slogan \"Nós Servimos\"",
+      "fundo": "contraste ≥4.5:1; emblema em positivo/negativo conforme a arte oficial; não sobrepor texto a emblema; fundo claro ou escuro, desde que a arte oficial seja a correta",
+      "fonte": {
+        "arquivo": "tokens-oficiais.json",
+        "paginas": "p.26-31 (Diretrizes da marca V4.0 FULL 5/23 PT; conferido visualmente na p.26)"
+      }
+    },
+    "leo": {
+      "accent": "#00AB68",
+      "paleta": {
+        "cinza": "#55565A",
+        "amarelo": "#EBB700",
+        "azul_claro": "#407CCA",
+        "verde": "#00AB68"
+      },
+      "emblema": {
+        "permitido": "emblema Leo refinado em Cool Gray 11, só as interpretações do guia: logos/Emblemas_de_Leos/ (texto cinza e texto branco)",
+        "proibido": "emblema de Lions International; azul 287 como primária; reconstruir, recolorir ou alterar; designação Alpha/Omega só quando o conteúdo for exclusivo daquele grupo"
+      },
+      "elemento": "seta (arrow shape) como elemento primário",
+      "tipografia": "Helvetica Neue 35–96; fallback Helvetica/Arial/Times; Roboto é a substituta digital declarada, não a fonte oficial",
+      "tom": "espírito brincalhão como o do Lions, mas energético, comprometido e apaixonado; títulos diretos e vivos, sem coloquialismo excessivo",
+      "exemplos": [
+        "Leos get things done.",
+        "Leo like you mean it.",
+        "Where there's a need, there's a Leo."
+      ],
+      "fundo": "cores claras sobre escuras (amarelo, branco, cinza sobre tons mais ricos); garantir contraste e legibilidade; não usar azul 287 como fundo dominante",
+      "fonte": {
+        "arquivo": "tokens-submarcas.json",
+        "paginas": "p.4-10 (Leo Brand Guidelines V1.0 09/24 EN; PDF site-extra/webdam/YGiue5cCGhE7.pdf)"
+      }
+    },
+    "leo-lion": {
+      "accent": "#00338D",
+      "paleta": {
+        "azul": "#00338D",
+        "cinza": "#55565A",
+        "azul_claro": "#407CCA",
+        "amarelo": "#EBB700"
+      },
+      "emblema": {
+        "permitido": "assinatura primária de 3 componentes (emblema Lions International + plaqueta \"Leo-Lion\" + setas), 2 configurações primárias (plaqueta azul / branca) e secundárias de cor única (preto, azul, branco): logos/Logotipos_de_Leo_a_Leão/",
+        "proibido": "redesenhar, reconstruir, trocar componentes de lugar ou usar a primária sobre fundo azul"
+      },
+      "elemento": "fita azul (blue ribbon) ancora todas as composições",
+      "tipografia": "Helvetica Neue 35–96; fallback Helvetica/Arial/Times; Roboto é a substituta digital declarada, não a fonte oficial",
+      "tom": "voz do Lions com inclinação mais inovadora; títulos, subtítulos e slogans mais informativos e explicativos",
+      "exemplos": [
+        "A new breed of Lion.",
+        "Lion, your way.",
+        "There's a different way to Lion."
+      ],
+      "fundo": "grandes áreas de espaço em branco e fotografia significativa; a assinatura primária não vai sobre fundo azul",
+      "fonte": {
+        "arquivo": "tokens-submarcas.json",
+        "paginas": "p.4-10 (Leo-Lion Brand Guidelines V1.0 09/24 EN; PDF site-extra/webdam/EmeAP2MW6qH2.pdf)"
+      }
+    }
+  }
+}
