@@ -3,7 +3,8 @@ from __future__ import annotations
 import copy
 
 
-def build_props(clip_name, total, subs, lower_thirds, cfg) -> dict:
+def build_props(clip_name, total, subs, lower_thirds, cfg, brand=None) -> dict:
+    """Props do template Remotion; `brand` injetado vence o da config."""
     render_cfg = cfg.get("render", {}) if isinstance(cfg, dict) else {}
     width = render_cfg.get("width", 1280)
     height = render_cfg.get("height", 720)
@@ -18,7 +19,7 @@ def build_props(clip_name, total, subs, lower_thirds, cfg) -> dict:
         "fontSize": font_size,
         "subs": copy.deepcopy(subs),
         "lowerThirds": copy.deepcopy(lower_thirds),
-        "brand": copy.deepcopy(cfg.get("brand") or {}) if isinstance(cfg, dict) else {},
+        "brand": copy.deepcopy(brand if brand is not None else (cfg.get("brand") or {} if isinstance(cfg, dict) else {})),
     }
 
 
