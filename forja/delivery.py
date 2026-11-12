@@ -178,6 +178,33 @@ def build_package(root, *, brief, brand_root, formats, approvals, now=None) -> d
     if len(hashtags) > hashtag_max:
         _fail("BRIEF_INCOMPLETE", "hashtags com %d itens (limite %d)"
               % (len(hashtags), hashtag_max), campo="hashtags")
+    if "min_hashtags" in row:
+        hashtag_min = _limit(row, "min_hashtags", 0)
+        if len(hashtags) < hashtag_min:
+            _fail("BRIEF_INCOMPLETE", "hashtags com %d itens (minimo %d)"
+                  % (len(hashtags), hashtag_min), campo="hashtags")
+    if "max_chars" in row:
+        max_chars = _limit(row, "max_chars", 0)
+        if len(legenda) > max_chars:
+            _fail("BRIEF_INCOMPLETE", "legenda com %d caracteres (limite %d)"
+                  % (len(legenda), max_chars), campo="legenda")
+    if row.get("alt_obrigatorio") is True and not alt.strip():
+        _fail("BRIEF_INCOMPLETE", "brief.alt nao pode ser vazio", campo="alt")
+
+    cta = brief.get("cta")
+    cta_obrigatorio = row.get("cta_obrigatorio") is True
+    cta_ok = (isinstance(cta, dict)
+              and isinstance(cta.get("texto"), str) and bool(cta["texto"].strip())
+              and isinstance(cta.get("destino"), str) and bool(cta["destino"].strip()))
+    if cta_obrigatorio and not cta_ok:
+        _fail("BRIEF_INCOMPLETE", "brief.cta exige texto e destino nao vazios",
+              campo="cta")
+    if cta is not None:
+        destino = cta.get("destino") if isinstance(cta, dict) else None
+        if not (isinstance(destino, str) and destino.startswith("https://")
+                and len(destino) > len("https://")):
+            _fail("CONFIG_INVALID", "brief.cta.destino deve ser URL https",
+                  campo="cta.destino")
 
     brand = _json(Path(brand_root) / "manifest.json", "manifest da marca")
     source = _safe_file(root, arte)
@@ -200,6 +227,16 @@ def build_package(root, *, brief, brand_root, formats, approvals, now=None) -> d
                        "bytes": source.stat().st_size}],
         "marca": brand,
     }
+    manifest["avisos"] = []
+    if brief.get("pessoas") is True:
+        if brief.get("consent") is not True:
+            manifest["avisos"] = ["BRIEF_CONSENT_PENDING"]
+        else:
+            responsavel = brief.get("responsavel")
+            if isinstance(responsavel, str) and responsavel.strip():
+                manifest["consentimento"] = {"responsavel": responsavel}
+    if cta_ok:
+        manifest["cta"] = {"texto": cta["texto"], "destino": cta["destino"]}
 
     ent = root / "entrega"
     art_dir = ent / "arte"

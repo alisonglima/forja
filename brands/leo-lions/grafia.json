@@ -1,13 +1,35 @@
 {
   "schema": "forja-brand-grafia/v1",
-  "fonte": "regra do dono, 2026-11-12 (diverge do guia PT oficial, que escreve 'Leos'; a regra do dono manda)",
+  "fonte": "regra do dono, 2026-11-12 (diverge do guia PT oficial, que escreve 'Leos'); derivadas, plural e nomes pela pesquisa docs/estudio/grafia-derivadas-leo-pesquisa-2026-11-12.md (dono mandou aplicar boas praticas e pesquisa)",
   "marcas": {
     "leo": {
       "pt-BR": {
         "sigla": "LEO",
         "plural": "LEOs",
-        "proibido": ["Leo", "Leos"],
-        "quando": "toda arte, video ou texto em portugues divulgado no Brasil"
+        "proibido": [
+          "Leo",
+          "Leos",
+          "Léo",
+          "Léos",
+          "LEO's",
+          "LEOS",
+          "Leoísmo",
+          "Leoísta",
+          "Leoístico"
+        ],
+        "quando": "toda arte, video ou texto em portugues divulgado no Brasil",
+        "derivados": {
+          "substantivo": "LEOísmo",
+          "adjetivo": "LEOísta",
+          "nota": "excecao de marca: a norma geral daria leoísmo (como petista), mas o movimento escreve a sigla em maiusculas e o dono rejeita 'leo' minusculo"
+        },
+        "nomes": {
+          "clube": "LEO Clube de Taquaritinga",
+          "plural_clubes": "LEO Clubes",
+          "distrito": "Distrito LEO LC-6",
+          "distrito_multiplo": "Distrito Múltiplo LEO LC",
+          "dia_nacional": "Dia Nacional do LEOísmo"
+        }
       },
       "outros-idiomas": {
         "sigla": "Leo",
@@ -18,12 +40,76 @@
   },
   "verificacao": {
     "onde": "no TEXTO-FONTE (copy.json, legenda, roteiro), nunca no render: text-transform:uppercase esconderia um 'Leo' errado",
-    "padrao_pt_BR": "\\bLeos?\\b",
-    "mensagem": "em pt-BR a sigla e LEO (plural LEOs)"
+    "normalizar": "trocar apostrofo curvo por reto antes de testar; regex case-sensitive, com lookarounds Unicode, nunca re.I",
+    "reprova": [
+      {
+        "codigo": "GRAFIA_LEO",
+        "padrao": "(?<!\\w)Leos?(?!\\w)",
+        "mensagem": "em pt-BR a sigla e LEO (plural LEOs)"
+      },
+      {
+        "codigo": "GRAFIA_LEO",
+        "padrao": "(?<!\\w)Léos?(?!\\w)",
+        "mensagem": "em pt-BR a sigla e LEO (plural LEOs), sem acento"
+      },
+      {
+        "codigo": "GRAFIA_LEO_PLURAL",
+        "padrao": "(?<!\\w)LEO['’]s(?!\\w)",
+        "mensagem": "plural sem apostrofo: LEOs"
+      },
+      {
+        "codigo": "GRAFIA_LEO_PLURAL",
+        "padrao": "(?<!\\w)LEOS(?!\\w)",
+        "mensagem": "plural com s minusculo: LEOs"
+      },
+      {
+        "codigo": "GRAFIA_LEO_DERIVADO",
+        "padrao": "(?<!\\w)(?:Leoísmo|Leoísta|Leoístico)(?!\\w)",
+        "mensagem": "derivados mantem LEO maiusculo: LEOísmo, LEOísta"
+      }
+    ],
+    "avisa": [
+      {
+        "codigo": "GRAFIA_LEO_DERIVADO",
+        "padrao": "(?<!\\w)(?:leoísmo|leoísta|leoístico)(?!\\w)",
+        "mensagem": "norma geral, fora do padrao de marca (LEOísmo, LEOísta)"
+      },
+      {
+        "codigo": "GRAFIA_LEO_NOME",
+        "padrao": "(?<!\\w)LEOs\\s+Clubes?(?!\\w)",
+        "mensagem": "plural recai no nucleo: LEO Clubes"
+      },
+      {
+        "codigo": "GRAFIA_LEO_NOME",
+        "padrao": "(?<!\\w)Clubes?\\s+de\\s+LEOs(?!\\w)",
+        "mensagem": "nome oficial: LEO Clube de <cidade>"
+      },
+      {
+        "codigo": "GRAFIA_LEO_NOME",
+        "padrao": "(?<!\\w)Multidistritos?\\s+LEO(?!\\w)",
+        "mensagem": "termo usado: Distrito Múltiplo LEO"
+      },
+      {
+        "codigo": "GRAFIA_LEO_NOME",
+        "padrao": "(?<!\\w)Distritos\\s+LEOs(?!\\w)",
+        "mensagem": "modificador invariavel: Distritos LEO"
+      },
+      {
+        "codigo": "GRAFIA_LEO_NOME",
+        "padrao": "(?<!\\w)LEO\\s*-\\s*(?:Clube|Clubes|Distrito)(?!\\w)",
+        "mensagem": "sem hifen: LEO Clube"
+      },
+      {
+        "codigo": "GRAFIA_LEO_NOME",
+        "padrao": "(?<!\\w)Dia\\s+Nacional\\s+do\\s+LEO(?!ísmo)(?!\\w)",
+        "mensagem": "nome consagrado da data: Dia Nacional do LEOísmo (28/8)"
+      }
+    ],
+    "falso_positivo": "pessoa chamada Leo cai na regra dura: manter allowlist por contexto ou revisao humana; nao aplicar a conteudo em outro idioma"
   },
   "decisoes_pendentes_do_dono": [
-    "palavras derivadas em pt-BR (Leoismo/LEOismo, LEOísmo...): o exemplo de clube visto no Instagram mistura 'LEOs' e 'Leoísmo'; o checador NAO as bloqueia",
-    "plural 'LEOs' e provisorio (decorre da regra; nao foi dito pelo dono)",
+    "derivados LEOísmo/LEOísta e plural LEOs: adotados por pesquisa e boa pratica (12/11/2026), a confirmar com o dono ao ver as pecas",
+    "'Dia Nacional do LEO' (usado em post do proprio clube) x 'Dia Nacional do LEOísmo' (consagrado nas paginas LEO): so avisa",
     "grafia de Leo-Lion em portugues (Leo-Leao?): nao definida; nao usar nesta fase"
   ]
 }
