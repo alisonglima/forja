@@ -870,6 +870,8 @@ def main(argv=None, env=None, out=sys.stdout, err=sys.stderr):
     try:
         # Importar os workflows registra os comandos/passos disponiveis.
         from .workflows import dub as _dub  # noqa: F401
+        from .workflows import lote_digital as _lote_digital  # noqa: F401
+        from .workflows import post as _post  # noqa: F401
         from .workflows import storyboard as _storyboard  # noqa: F401
 
         rest, json_mode, project_dir = _split_globals(raw_argv)
