@@ -156,6 +156,7 @@ cleanup() {
     puxar_erro
     if destruir >/dev/null; then DESTRUIDO=1; fi
   fi
+  ssh_pve "rm -f /tmp/prova-kit-$CTID.tar.gz /tmp/evidencias-$CTID.tar.gz /tmp/erro-$CTID.json" >/dev/null 2>&1 || true
   exit "$rc"
 }
 
@@ -192,7 +193,7 @@ echo "nodesource sha256: $NODE_SHA"
 bash /tmp/nodesource_setup.sh
 apt-get install -y nodejs
 node --version
-npx --yes @feimacode/open-design-agent-kit@0.4.0 --version
+npx --yes @feimacode/open-design-agent-kit@0.4.0 --help > /srv/prova/evidencias/kit-help.txt
 npm view @feimacode/open-design-agent-kit@0.4.0 dist.integrity
 printf '%s\n' '#!/bin/sh' \
   'exec /usr/bin/google-chrome-stable \' \
@@ -205,7 +206,7 @@ chmod 0755 /usr/local/bin/google-chrome-prova
 if [ -x /usr/bin/google-chrome-stable ]; then /usr/local/bin/google-chrome-prova --version; fi
 CHROME_VER=$(google-chrome --version 2>/dev/null || echo desconhecido)
 NODE_VER=$(node --version 2>/dev/null || echo desconhecido)
-KIT_VER=$(npx --yes @feimacode/open-design-agent-kit@0.4.0 --version 2>/dev/null | tail -n1 || echo desconhecido)
+KIT_VER=$(npm view @feimacode/open-design-agent-kit@0.4.0 version 2>/dev/null | tail -n1 || echo desconhecido)
 KIT_INTEG=$(npm view @feimacode/open-design-agent-kit@0.4.0 dist.integrity 2>/dev/null | tail -n1 || echo desconhecido)
 {
   printf '{\n'
