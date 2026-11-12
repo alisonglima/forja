@@ -81,12 +81,13 @@
     },
     "numeros": {
       "slide": 84, "layout": "L26", "shapes": ["TextBox 6", "TextBox 3", "TextBox 8", "TextBox 9", "TextBox 10"],
-      "limits": {"numero": {"chars": 3}, "legenda": {"chars": 90}, "apoios": {"chars": 40}},
-      "remover": ["TextBox 6", "TextBox 3", "Straight Connector 11"],
+      "limits": {"numero": {"chars": 3}, "legenda": {"chars": 30}, "numero2": {"chars": 3}, "legenda2": {"chars": 30}},
+      "remover": ["TextBox 10"],
       "campos": {
-        "numero": {"shape": "TextBox 8", "tipo": "texto"},
-        "legenda": {"shape": "TextBox 9", "tipo": "texto"},
-        "apoios": {"shape": "TextBox 10", "tipo": "texto"}
+        "numero": {"shape": "TextBox 6", "tipo": "texto"},
+        "legenda": {"shape": "TextBox 3", "tipo": "texto"},
+        "numero2": {"shape": "TextBox 8", "tipo": "texto"},
+        "legenda2": {"shape": "TextBox 9", "tipo": "texto"}
       },
       "suportado": true
     },
