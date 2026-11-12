@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 from datetime import date, timedelta
-from importlib import resources
+from importlib import resources  # nosemgrep: python.lang.compatibility.python37.python37-compatibility-importlib2 (requires-python >= 3.9)
 from pathlib import Path
 
 from forja.errors import ForjaError
