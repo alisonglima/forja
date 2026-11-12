@@ -9,10 +9,14 @@ Interface comum de cada script:
   node scripts/prova-kit/<nome>.mjs --out DIR [--dry-run] [--help]
   --help       uso (cita --out), exit 0
   sem --out    exit 2 e mensagem no stderr
-  --dry-run    imprime no stdout um JSON {"script", "evidencia", "comandos": [...]}
-               ("evidencia" = nome da pasta p5-0N-..., "comandos" = lista nao vazia
-               de strings), NAO inicia nenhum processo externo e NAO cria arquivos
-               fora de DIR.
+  --dry-run    imprime no stdout um JSON {"script", "evidencia", "workspace", "sidecars",
+               "comandos": [...]} ("evidencia" = nome da pasta p5-0N-..., "comandos" =
+               lista nao vazia de strings), NAO inicia nenhum processo externo e NAO
+               cria arquivos fora de DIR.
+Contrato do kit (docs/prova-kit/cli-0.4.0.md, lido da FONTE): todo artefato exportado/
+checado precisa de sidecar `<entry>.artifact.json` e ficar DENTRO do workspace; por isso
+"workspace" = caminho relativo a DIR, "sidecars" = lista de `*.artifact.json` previstos
+(vazia so em video-compare, que usa render-video) e todo comando do kit leva --workspace.
 """
 from __future__ import annotations
 
@@ -36,6 +40,9 @@ SCRIPTS = {
     "medir-rede.mjs": "p5-06-rede",
 }
 PROIBIDO = re.compile(r"\b(ssh|scp|rsync|sshpass|pct|qm|pvesh)\b|shell\s*:\s*true|\beval\s*\(|new\s+Function\s*\(")
+# o kit 0.4.0 NAO le estas variaveis nem tem --version (cli-0.4.0.md secoes 1, 2 e 7)
+INEXISTENTE = re.compile(r"OPEN_DESIGN_(OUTPUT_DIR|WORKSPACE_ROOT|DEFAULT_WORKSPACE|PREVIEW)\b|[\"'`\s]--version\b")
+USAM_SIDECAR = {"export-exato.mjs", "export-pdf.mjs", "preflight-provocado.mjs", "lote-csv.mjs", "medir-rede.mjs"}
 FERRAMENTAS = ("npx", "npm", "node-gyp", "identify", "convert", "magick", "pdftoppm", "pdftotext",
                "pdfinfo", "qpdf", "ffmpeg", "ffprobe", "google-chrome", "google-chrome-prova",
                "tcpdump", "ss", "curl", "wget", "apt-get")
@@ -106,3 +113,28 @@ def test_dry_run_plano_sem_processos(nome, pasta, tmp_path):
     assert all(isinstance(c, str) and c.strip() for c in plano["comandos"])
     fora = [p for p in tmp_path.iterdir() if p.name not in ("bin", "saida", "chamadas.log")]
     assert not fora, f"dry-run criou arquivos fora de --out: {fora}"
+
+
+@pytest.mark.parametrize("nome", SCRIPTS)
+def test_sem_suposicoes_refutadas_pela_fonte(nome):
+    txt = _caminho(nome).read_text(encoding="utf-8")
+    achados = sorted({m.group(0).strip() for m in INEXISTENTE.finditer(txt)})
+    assert not achados, f"{nome}: o kit 0.4.0 nao tem/le isto (cli-0.4.0.md): {achados}"
+
+
+@pytest.mark.parametrize("nome,pasta", SCRIPTS.items())
+def test_dry_run_declara_workspace_e_sidecars(nome, pasta, tmp_path):
+    proc, marca = _node(tmp_path, nome, "--out", str(tmp_path / "saida"), "--dry-run")
+    assert proc.returncode == 0, proc.stderr
+    plano = json.loads(proc.stdout)
+    assert isinstance(plano.get("workspace"), str) and plano["workspace"].strip()
+    assert not os.path.isabs(plano["workspace"]), "workspace deve ser relativo a --out"
+    side = plano.get("sidecars")
+    assert isinstance(side, list)
+    if nome in USAM_SIDECAR:
+        assert side and all(isinstance(x, str) and x.endswith(".artifact.json") for x in side)
+        kit = [c for c in plano["comandos"] if "open-design-agent-kit" in c]
+        assert kit, "nenhum comando do kit no plano"
+        assert all("--workspace" in c for c in kit), f"comando do kit sem --workspace: {kit}"
+    else:
+        assert side == []
