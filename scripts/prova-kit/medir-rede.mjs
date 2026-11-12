@@ -49,7 +49,7 @@ function plano(cfg) {
     'cat /sys/class/net/eth0/statistics/tx_bytes', 'cat /sys/class/net/eth0/statistics/rx_bytes',
     `tcpdump -ni eth0 -w ${pcap}`, 'ss -tunp', `npx --yes ${KIT} check ${entry} --workspace ${workspace} --fail-on error --json`,
     'ss -tunp', `tcpdump -nr ${pcap} -q ip and not host 127.0.0.1`,
-    `tcpdump -nr ${pcap} -q ip6 and not host ::1`, `tcpdump -nrt ${pcap} -q ip or ip6`,
+    `tcpdump -nr ${pcap} -q ip6 and not host ::1`, `tcpdump -n -t -r ${pcap} -q ip or ip6`,
     `tcpdump -nr ${pcap} -q port 53 -vv`] };
 }
 function executar(cfg) {
@@ -113,7 +113,7 @@ function executar(cfg) {
     }
     gravar(`fora-loopback${suf}.txt`, fora.length ? `${fora.join('\n')}\n` : '');
     const dst = new Set();
-    if (okPcap) for (const linha of rodar(['tcpdump', '-nrt', pcap, '-q', 'ip or ip6']).stdout.split('\n')) {
+    if (okPcap) for (const linha of rodar(['tcpdump', '-n', '-t', '-r', pcap, '-q', 'ip or ip6']).stdout.split('\n')) {
       const i = linha.indexOf(' > '); if (i < 0) continue;
       const token = (linha.slice(i + 3).trim().split(/\s+/)[0] || '').replace(/:$/, ''); if (token) dst.add(token);
     }

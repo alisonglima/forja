@@ -183,7 +183,7 @@ fase_base() {
 set -e
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y --no-install-recommends ca-certificates curl xz-utils gnupg jq poppler-utils imagemagick qpdf tcpdump ffmpeg fonts-dejavu-core fonts-liberation
+apt-get install -y --no-install-recommends ca-certificates curl xz-utils gnupg jq poppler-utils imagemagick qpdf tcpdump time ffmpeg fonts-dejavu-core fonts-liberation
 curl -fsSL -o /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 apt-get install -y /tmp/chrome.deb
 google-chrome --version
@@ -200,10 +200,22 @@ printf '%s\n' '#!/bin/sh' \
   '  --disable-background-networking --disable-component-update --disable-default-apps \' \
   '  --disable-sync --no-first-run --no-default-browser-check --metrics-recording-only \' \
   '  --disable-dev-shm-usage --disable-features=Translate,OptimizationHints,MediaRouter \' \
-  '  __NS__--host-resolver-rules="MAP * ~NOTFOUND , EXCLUDE localhost" "$@"' \
+  '  __NS__--host-resolver-rules="MAP * ~NOTFOUND , EXCLUDE localhost , EXCLUDE 127.0.0.1" "$@"' \
   > /usr/local/bin/google-chrome-prova
 chmod 0755 /usr/local/bin/google-chrome-prova
 if [ -x /usr/bin/google-chrome-stable ]; then /usr/local/bin/google-chrome-prova --version; fi
+# Sanidade (2a execucao real: o wrapper bloqueava 127.0.0.1 e toda prova renderizou "This site can't be reached"):
+# o Chrome da prova TEM de alcancar o loopback (o kit serve o artefato por 127.0.0.1) e NAO a internet.
+if [ -x /usr/bin/google-chrome-stable ]; then
+  node -e "require('http').createServer((q,r)=>r.end('<p id=\"ok\">loopback</p>')).listen(38765,'127.0.0.1')" &
+  SRV_LOOP=$!
+  sleep 2
+  /usr/local/bin/google-chrome-prova --headless --dump-dom http://127.0.0.1:38765/ > /srv/prova/evidencias/chrome-loopback.txt 2>/dev/null || true
+  /usr/local/bin/google-chrome-prova --headless --dump-dom http://example.com/ > /srv/prova/evidencias/chrome-externo.txt 2>/dev/null || true
+  kill "$SRV_LOOP" 2>/dev/null || true
+  grep -q 'id="ok"' /srv/prova/evidencias/chrome-loopback.txt || { echo "ERRO: o Chrome da prova nao alcanca 127.0.0.1" >&2; exit 1; }
+  if grep -qi 'example domain' /srv/prova/evidencias/chrome-externo.txt; then echo "ERRO: o Chrome da prova alcanca a internet" >&2; exit 1; fi
+fi
 CHROME_VER=$(google-chrome --version 2>/dev/null || echo desconhecido)
 NODE_VER=$(node --version 2>/dev/null || echo desconhecido)
 KIT_VER=$(npm view @feimacode/open-design-agent-kit@0.4.0 version 2>/dev/null | tail -n1 || echo desconhecido)

@@ -282,7 +282,8 @@ def test_wrapper_chrome_offline_como_no_plano(tmp_path):
     proc, out, st, log = _rodar(tmp_path, "ok")
     assert proc.returncode == 0, proc.stderr
     for trecho in ("google-chrome-prova", "--host-resolver-rules", "MAP * ~NOTFOUND",
-                   "EXCLUDE localhost", "--disable-background-networking", "google-chrome-stable"):
+                   "EXCLUDE localhost", "EXCLUDE 127.0.0.1", "--disable-background-networking", "google-chrome-stable",
+                   "chrome-loopback.txt", "chrome-externo.txt"):
         assert trecho in log, f"wrapper sem {trecho!r}"
 
 
