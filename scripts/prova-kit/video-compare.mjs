@@ -47,7 +47,6 @@ const p = {
   public: join(out, "fixtures", "public"),
   fundo: join(out, "fixtures", "public", "fundo.png"),
   props: join(out, "fixtures", "remotion-props.json"),
-  kitOut: join(out, "kit-out"),
   hfMp4: join(out, EV, "hf.mp4"),
   remMp4: join(out, EV, "remotion.mp4"),
   hfTime: join(out, EV, "hf.time"),
@@ -96,7 +95,6 @@ const cmdTime = (time, cmd) => ["/usr/bin/time", "-v", "-o", time, ...cmd];
 
 function previstos() {
   const lista = [
-    `OPEN_DESIGN_OUTPUT_DIR=${p.kitOut} ${cmdKit().join(" ")}`,
     cmdTime(p.hfTime, cmdKit()).join(" "),
     cmdTime(p.remTime, cmdRem()).join(" "),
     cmdProbe(p.hfMp4).join(" "),
@@ -117,7 +115,13 @@ function previstos() {
 }
 
 if (dryRun) {
-  console.log(JSON.stringify({ script: SCRIPT, evidencia: EV, comandos: previstos() }, null, 2));
+  console.log(JSON.stringify({
+    script: SCRIPT,
+    evidencia: EV,
+    workspace: "workspace",
+    sidecars: [],
+    comandos: previstos(),
+  }, null, 2));
   process.exit(0);
 }
 
@@ -185,7 +189,7 @@ const props = {
     accent: "#c24b2a", font: "Liberation Sans", safe_margin: 48 },
 };
 
-for (const d of [p.video, p.fixtures, p.hf, p.public, p.kitOut]) mkdirSync(d, { recursive: true });
+for (const d of [p.video, p.fixtures, p.hf, p.public]) mkdirSync(d, { recursive: true });
 writeFileSync(join(p.hf, "index.html"), HTML, "utf-8");
 writeFileSync(join(p.hf, "abertura.css"), CSS, "utf-8");
 writeFileSync(join(p.hf, "abertura.js"), JS, "utf-8");
@@ -218,7 +222,7 @@ rodar(cmdFundo());
 copyFileSync(p.fundo, join(p.hf, "fundo.png"));
 copyFileSync(p.fundo, join(p.public, "fundo.png"));
 
-const envKit = { ...process.env, OPEN_DESIGN_OUTPUT_DIR: p.kitOut, npm_config_offline: "false" };
+const envKit = { ...process.env, npm_config_offline: "false" };
 const saiuHf = rodar(cmdTime(p.hfTime, cmdKit()), { env: envKit });
 writeFileSync(p.hfLog, `${saiuHf.stdout || ""}${saiuHf.stderr || ""}`, "utf-8");
 const saiuRem = rodar(cmdTime(p.remTime, cmdRem()), { cwd: p.remDir });
