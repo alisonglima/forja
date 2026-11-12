@@ -6,6 +6,7 @@ import { createHash } from "node:crypto";
 import {
   appendFileSync,
   copyFileSync,
+  existsSync,
   mkdirSync,
   readFileSync,
   readdirSync,
@@ -53,6 +54,7 @@ const p = {
   remTime: join(out, EV, "remotion.time"),
   hfLog: join(out, EV, "hf.log"),
   remLog: join(out, EV, "remotion.log"),
+  remInstallLog: join(out, EV, "remotion-install.log"),
   hfProbe: join(out, EV, "hf.ffprobe.json"),
   remProbe: join(out, EV, "remotion.ffprobe.json"),
   ssim: join(out, EV, "ssim.txt"),
@@ -69,9 +71,15 @@ const cmdKit = () => [
   "npx", "--yes", "@feimacode/open-design-agent-kit@0.4.0", "render-video",
   p.hf, "--output", p.hfMp4, "--quality", "high",
 ];
+const cmdNpm = () => ["npm", "install", "--no-audit", "--no-fund"];
 const cmdRem = () => [
   "./node_modules/.bin/remotion", "render", "src/index.jsx", "Storyboard",
   p.remMp4, "--props", p.props, "--public-dir", p.public,
+  "--browser-executable=/usr/bin/google-chrome-stable",
+  "--chrome-mode=chrome-for-testing",
+  "--concurrency=1",
+  "--gl=swangle",
+  "--image-format=png",
 ];
 const cmdProbe = (mp4) => [
   "ffprobe", "-v", "error", "-print_format", "json", "-show_format", "-show_streams", mp4,
@@ -96,6 +104,7 @@ const cmdTime = (time, cmd) => ["/usr/bin/time", "-v", "-o", time, ...cmd];
 function previstos() {
   const lista = [
     cmdTime(p.hfTime, cmdKit()).join(" "),
+    cmdNpm().join(" "),
     cmdTime(p.remTime, cmdRem()).join(" "),
     cmdProbe(p.hfMp4).join(" "),
     cmdProbe(p.remMp4).join(" "),
@@ -129,39 +138,42 @@ const HTML = `<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>abertura 5s</title>
-<link rel="stylesheet" href="./abertura.css">
+<title>abertura 5 s</title>
+<style>
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #0b1020; }
+  #palco { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+           font-family: "Liberation Sans", Arial, sans-serif; color: #f6f1e8; }
+  #fundo { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; }
+  .cena { position: absolute; left: 96px; margin: 0; opacity: 0;
+          transform: translateY(90px); animation: entra .9s ease-out both; }
+  #kicker { top: 560px; font-size: 34px; letter-spacing: 6px;
+            color: #c24b2a; font-weight: 700; animation-delay: .1s; }
+  #titulo { top: 680px; font-size: 132px; line-height: 1.02;
+            font-weight: 700; animation-duration: 1.2s; animation-delay: .3s; }
+  #linha  { top: 900px; font-size: 52px; line-height: 1.2;
+            color: #d8d2c6; animation-delay: .8s; }
+  @keyframes entra {
+    from { opacity: 0; transform: translateY(90px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
 </head>
 <body>
-<main id="palco">
+<div id="palco"
+     data-composition-id="abertura"
+     data-start="0"
+     data-duration="5"
+     data-width="1080"
+     data-height="1920"
+     data-fps="30"
+     data-no-timeline>
   <img id="fundo" src="./fundo.png" alt="">
-  <p id="kicker">PROVA K.2(e)</p>
-  <h1 id="titulo">ABERTURA 5s</h1>
-  <p id="linha">HyperFrames vs Remotion</p>
-</main>
-<script src="./abertura.js"></script>
+  <p id="kicker" class="cena">PROVA K.2(e)</p>
+  <h1 id="titulo" class="cena">ABERTURA 5s</h1>
+  <p id="linha" class="cena">HyperFrames vs Remotion</p>
+</div>
 </body>
 </html>
-`;
-const CSS = `html,body{margin:0;padding:0;background:#0b1020;overflow:hidden}
-#palco{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:"Liberation Sans",Arial,sans-serif;color:#f6f1e8}
-#fundo{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover}
-#kicker{position:absolute;left:96px;top:560px;margin:0;font-size:34px;letter-spacing:6px;color:#c24b2a;font-weight:700}
-#titulo{position:absolute;left:96px;top:680px;margin:0;font-size:132px;line-height:1.02;font-weight:700}
-#linha{position:absolute;left:96px;top:900px;margin:0;font-size:52px;line-height:1.2;color:#d8d2c6}
-#kicker{animation:entra 0.8s ease-out both}
-#titulo{animation:entra 1.2s ease-out 0.2s both}
-#linha{animation:entra 1s ease-out 0.5s both}
-@keyframes entra{from{opacity:0;transform:translateY(90px)}to{opacity:1;transform:translateY(0)}}
-`;
-const JS = `(() => {
-  const alvo = document.querySelector("#titulo");
-  if (window.gsap) {
-    window.gsap.from("#kicker", { opacity: 0, duration: 0.8, delay: 0.2 });
-    window.gsap.from(alvo, { y: 90, opacity: 0, duration: 1.2, ease: "power3.out" });
-    window.gsap.from("#linha", { opacity: 0, duration: 1, delay: 0.6 });
-  }
-})();
 `;
 const props = {
   durationS: 5,
@@ -191,8 +203,6 @@ const props = {
 
 for (const d of [p.video, p.fixtures, p.hf, p.public]) mkdirSync(d, { recursive: true });
 writeFileSync(join(p.hf, "index.html"), HTML, "utf-8");
-writeFileSync(join(p.hf, "abertura.css"), CSS, "utf-8");
-writeFileSync(join(p.hf, "abertura.js"), JS, "utf-8");
 writeFileSync(p.props, JSON.stringify(props, null, 2) + "\n", "utf-8");
 
 const falhas = [];
@@ -222,9 +232,17 @@ rodar(cmdFundo());
 copyFileSync(p.fundo, join(p.hf, "fundo.png"));
 copyFileSync(p.fundo, join(p.public, "fundo.png"));
 
-const envKit = { ...process.env, npm_config_offline: "false" };
+const envKit = {
+  ...process.env,
+  npm_config_offline: "false",
+  HYPERFRAMES_BROWSER_PATH: "/usr/bin/google-chrome-stable",
+};
 const saiuHf = rodar(cmdTime(p.hfTime, cmdKit()), { env: envKit });
 writeFileSync(p.hfLog, `${saiuHf.stdout || ""}${saiuHf.stderr || ""}`, "utf-8");
+if (!existsSync(join(p.remDir, "node_modules", ".bin", "remotion"))) {
+  const saiuInstall = rodar(cmdNpm(), { cwd: p.remDir });
+  writeFileSync(p.remInstallLog, `${saiuInstall.stdout || ""}${saiuInstall.stderr || ""}`, "utf-8");
+}
 const saiuRem = rodar(cmdTime(p.remTime, cmdRem()), { cwd: p.remDir });
 writeFileSync(p.remLog, `${saiuRem.stdout || ""}${saiuRem.stderr || ""}`, "utf-8");
 
