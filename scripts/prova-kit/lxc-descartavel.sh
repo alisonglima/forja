@@ -176,7 +176,8 @@ PY
 
 # Provisao da base no CT (K.1 passos 2 e 3). Versoes vao para ambiente.json.
 fase_base() {
-  local script
+  local script ns='' sb=false
+  if [ "${CHROME_NO_SANDBOX:-0}" = 1 ]; then ns='--no-sandbox '; sb=true; fi
   script=$(cat <<'BASE'
 set -e
 export DEBIAN_FRONTEND=noninteractive
@@ -193,9 +194,15 @@ apt-get install -y nodejs
 node --version
 npx --yes @feimacode/open-design-agent-kit@0.4.0 --version
 npm view @feimacode/open-design-agent-kit@0.4.0 dist.integrity
-printf '%s\n' '#!/bin/sh' 'exec google-chrome --headless --no-sandbox --disable-gpu "$@"' > /usr/local/bin/google-chrome-prova
+printf '%s\n' '#!/bin/sh' \
+  'exec /usr/bin/google-chrome-stable \' \
+  '  --disable-background-networking --disable-component-update --disable-default-apps \' \
+  '  --disable-sync --no-first-run --no-default-browser-check --metrics-recording-only \' \
+  '  --disable-dev-shm-usage --disable-features=Translate,OptimizationHints,MediaRouter \' \
+  '  __NS__--host-resolver-rules="MAP * ~NOTFOUND , EXCLUDE localhost" "$@"' \
+  > /usr/local/bin/google-chrome-prova
 chmod 0755 /usr/local/bin/google-chrome-prova
-/usr/local/bin/google-chrome-prova --version
+if [ -x /usr/bin/google-chrome-stable ]; then /usr/local/bin/google-chrome-prova --version; fi
 CHROME_VER=$(google-chrome --version 2>/dev/null || echo desconhecido)
 NODE_VER=$(node --version 2>/dev/null || echo desconhecido)
 KIT_VER=$(npx --yes @feimacode/open-design-agent-kit@0.4.0 --version 2>/dev/null | tail -n1 || echo desconhecido)
@@ -206,20 +213,26 @@ KIT_INTEG=$(npm view @feimacode/open-design-agent-kit@0.4.0 dist.integrity 2>/de
   printf '  "node": "%s",\n' "$NODE_VER"
   printf '  "kit": "%s",\n' "$KIT_VER"
   printf '  "kit_integrity": "%s",\n' "$KIT_INTEG"
-  printf '  "sha256_nodesource": "%s"\n' "$NODE_SHA"
+  printf '  "sha256_nodesource": "%s",\n' "$NODE_SHA"
+  printf '  "no_sandbox": __SB__\n'
   printf '}\n'
 } > /srv/prova/evidencias/ambiente.json
 BASE
 )
+  script=${script//__NS__/$ns}
+  script=${script//__SB__/$sb}
   ssh_pve "pct exec $CTID -- bash -lc $(printf '%q' "$script")"
 }
 
 montar_exports() {
-  local nome
-  EXPORTS=''
-  for nome in $(env | awk -F= '/^OPEN_DESIGN_[A-Za-z0-9_]+=/ {print $1}'); do
-    EXPORTS+="export $nome=$(printf '%q' "${!nome}"); "
-  done
+  EXPORTS='export OPEN_DESIGN_BROWSER_PATH=/usr/local/bin/google-chrome-prova; '
+  EXPORTS+='export OPEN_DESIGN_WORKSPACE_ROOT=/srv/prova/workspace; '
+  EXPORTS+='export OPEN_DESIGN_DEFAULT_WORKSPACE=/srv/prova/workspace; '
+  EXPORTS+='export OPEN_DESIGN_OUTPUT_DIR=/srv/prova/out; '
+  EXPORTS+='export OPEN_DESIGN_PREVIEW=off; '
+  EXPORTS+='export OPEN_DESIGN_FFMPEG_PATH=/usr/bin/ffmpeg; '
+  EXPORTS+='unset OPEN_DESIGN_FIGMA_TOKEN; '
+  EXPORTS+='test ! -e /root/.config/open-design/integrations.json; '
 }
 
 rodar_inside() {
@@ -280,7 +293,7 @@ while [ "$i" -lt 30 ]; do
 done
 empacotar_kit || { erro "empacotar kit falhou"; exit 1; }
 ssh_pve "cat > $KIT_TAR" < "$OUT/prova-kit.tar.gz" || { erro "envio do kit falhou"; exit 1; }
-ssh_pve "pct exec $CTID -- mkdir -p /srv/prova/evidencias /usr/local/bin" >/dev/null || { erro "mkdir no CT falhou"; exit 1; }
+ssh_pve "pct exec $CTID -- mkdir -p /srv/prova/evidencias /srv/prova/workspace /srv/prova/out /usr/local/bin" >/dev/null || { erro "mkdir no CT falhou"; exit 1; }
 ssh_pve "$CMD_PUSH" >/dev/null || { erro "pct push falhou"; exit 1; }
 fase_base || { erro "provisao da base falhou"; exit 1; }
 montar_exports
