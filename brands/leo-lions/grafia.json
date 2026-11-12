@@ -20,8 +20,11 @@
         "quando": "toda arte, video ou texto em portugues divulgado no Brasil",
         "derivados": {
           "substantivo": "LEOísmo",
-          "adjetivo": "LEOísta",
-          "nota": "excecao de marca: a norma geral daria leoísmo (como petista), mas o movimento escreve a sigla em maiusculas e o dono rejeita 'leo' minusculo"
+          "adjetivo": [
+            "LEOísta",
+            "LEOístico"
+          ],
+          "nota": "excecao de marca: a norma geral daria leoísmo (como petista), mas o movimento escreve a sigla em maiusculas e o dono rejeita 'leo' minusculo; LEOístico confirmado como de uso comum pelo dono em 2026-11-12"
         },
         "nomes": {
           "clube": "LEO Clube de Taquaritinga",

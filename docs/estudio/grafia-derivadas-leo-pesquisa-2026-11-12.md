@@ -29,7 +29,7 @@ Regra do dono (12/11/2026): em português do Brasil a sigla é **`LEO`**, nunca 
 
 | Fonte (URL) | Acesso | Formas encontradas | Observação |
 |---|---|---|---|
-| https://www.lionsclubs.org/pt/about-us/our-membership/what-is-a-leo | 12/11/2026 | `Leo`, `Leos`, `Leo clubes`, `Leo Clube` | Página oficial em português. "Os Leos estão comprometidos em servir"; "Ao afiliar-se a um Leo Clube". |
+| https://www.lionsclubs.org/pt/about-us/our-membership/what-is-a-leo (**NÃO VERIFICADO**: lido por proxy de terceiros, fora da regra) | 12/11/2026 | `Leo`, `Leos`, `Leo clubes`, `Leo Clube` | Página oficial em português. "Os Leos estão comprometidos em servir"; "Ao afiliar-se a um Leo Clube". |
 | https://leoclubebrasil.com.br/ | 12/11/2026 | `LEO Clube Brasil`, `LEO Clubes`, `clubes LEO`, `Distritos LEOs` | Rede nacional. "404 LEO Clubes"; "28 Distritos LEOs do Brasil". |
 | https://leoclubebrasil.com.br/clubes | 12/11/2026 | `LEO Clubes`, `Distritos LEOs`, `LEO Clube` | Diretório. O plural do clube recai em "Clubes", não em "LEOs". |
 | https://www.leold4.org/post/a-hist%C3%B3ria-por-tr%C3%A1s-do-dia-nacional-do-leo%C3%ADsmo | 12/11/2026 | `LEOs`, `LEOísmo`, `LEO Clube` | "LEOs brasileiros"; "Dia Nacional do LEOísmo". Título em caixa alta: `LEOÍSMO`. |
@@ -118,10 +118,10 @@ Também devem ser barradas, como aviso ou reescrita: "Clube de LEOs", "Multidist
 
 ## 6. Não verificado / lacunas
 
-- **Ferramenta de busca:** `web_search` estava indisponível (sem `DEEPSEEK_API_KEY`). A busca foi feita pela página HTML do DuckDuckGo via `web_fetch`; houve dois bloqueios anti-bot (HTTP 202), registrados e contornados com nova tentativa ou fonte direta. `lionsclubs.org` direto devolveu 403 (Cloudflare); a página foi lida via `r.jina.ai`.
+- **Ferramenta de busca:** `web_search` estava indisponível; a busca foi feita pela página HTML do DuckDuckGo via `web_fetch`, com dois bloqueios anti-bot (HTTP 202). **Correção de conformidade (12/11/2026):** `lionsclubs.org` devolveu 403 (Cloudflare) e a lane leu a página por um leitor de terceiros (`r.jina.ai`), o que a regra do projeto (sem contornar Cloudflare) proíbe. A linha da tabela da seção 2 que depende dessa leitura fica **marcada como não verificada**; a conclusão não depende dela, pois o guia PT local já grafa "Leos". Specs de pesquisa passam a proibir proxies e leitores de terceiros.
 - **Sem manual oficial do LEO Brasil:** não encontrei um guia de estilo do LEO Clube Brasil ou dos distritos LEO; a evidência é de páginas institucionais e posts, não de norma interna.
 - **VOLP:** a busca pública é dinâmica e não devolveu resultados por leitura simples; não consegui confirmar entrada para `LEO`, `LEOísmo` ou `LEOísta`. O VOLP, de todo modo, não fixa plural.
-- **`LEOístico`:** não atestado. A forma é proposta por analogia com `LEOísmo`/`LEOísta`; baixa confiança.
+- **`LEOístico`:** não atestado nas páginas que li, mas **confirmado pelo dono (12/11/2026) como de uso comum**; entra como derivado aceito, ao lado de `LEOísmo` e `LEOísta`.
 - **`leoísta` minúsculo:** não encontrei ocorrência; a única forma atestada é `LEOísta` (Portal C3, "serviço LEOísta").
 - **`Multidistrito LEO`:** não encontrei a expressão; encontrei `Distrito Múltiplo LEO` (LEO LD-4, LEO LD-8, DM LEO LB).
 - **`Clube de LEOs`:** não encontrei a expressão; o nome usado é `LEO Clube de <cidade>`.
