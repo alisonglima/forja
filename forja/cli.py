@@ -20,6 +20,7 @@ from . import (
     brief,
     config,
     describe as describe_module,
+    events as events_module,
     media,
     probe,
     project as project_module,
@@ -94,6 +95,11 @@ def _build_parser():
     approve.add_argument("--post", action="store_true")
     approve.add_argument("--hash", action="append", default=None)
     approve.add_argument("--by", default=None)
+
+    deliver = command("deliver")
+    deliver.add_argument("--post", action="store_true")
+    deliver.add_argument("--by", default=None)
+    deliver.add_argument("--confirm", action="store_true")
 
     init = command("init")
     init.add_argument("dir")
@@ -525,6 +531,114 @@ def _cmd_approve(project_dir, args, json_mode, out):
     return 0
 
 
+_DELIVER_FILES = ("manifest.json", "legenda.txt", "hashtags.txt", "alt.txt", "horario.json", "manifesto-ia.json")
+
+
+def _load_estado(root):
+    path = Path(root) / "work" / "estado.json"
+    if not path.is_file(): return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ForjaError("GATE_FAILED", "estado ilegivel: %s" % exc) from exc
+    if not isinstance(data, dict) or not isinstance(data.get("estado"), str):
+        raise ForjaError("GATE_FAILED", "estado invalido; a entrega falha fechada")
+    return data
+
+
+def _save_estado(root, data):
+    path = Path(root) / "work" / "estado.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    tmp.replace(path)
+
+
+def _stale_details(piece, path=None, expected=None, current=None):
+    return {"expected": expected, "current": current, "piece": piece, "path": path}
+
+
+def _deliver_approval(root, approvals, piece):
+    record = approvals.get("hash")
+    label = record.get("arquivo") if isinstance(record, dict) else None
+    if not isinstance(label, str) or not label.strip():
+        raise ForjaError("APPROVAL_STALE", "aprovacao sem hash/arquivo final", details=_stale_details(piece))
+    root = Path(root)
+    target = (root / label).resolve()
+    try:
+        relative = target.relative_to(root.resolve()).as_posix()
+    except ValueError:
+        raise ForjaError("APPROVAL_STALE", "artefato aprovado fora do projeto: %s" % label,
+                         details=_stale_details(piece, label, record.get("valor"))) from None
+    expected = record.get("valor")
+    current = _file_sha256(target) if target.is_file() else None
+    if not isinstance(expected, str) or not expected or current != expected:
+        raise _approval_stale(expected, current, piece, relative)
+    return target, relative, current, record
+
+
+def _deliver_package(root, piece):
+    package = Path(root) / "out" / piece
+    manifest_path = package / "manifest.json"
+    if not manifest_path.is_file(): raise ForjaError("ASSET_MISSING", "pacote sem manifest.json: %s" % package.as_posix())
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ForjaError("ASSET_MISSING", "manifest.json do pacote ilegivel: %s" % exc) from exc
+    if not isinstance(manifest, dict): raise ForjaError("ASSET_MISSING", "manifest.json do pacote deve ser um objeto")
+    names = list(_DELIVER_FILES)
+    names.extend(item for item in manifest.get("arquivos") or () if isinstance(item, str))
+    for name in names:
+        if Path(name).name != name or not (package / name).is_file():
+            raise ForjaError("ASSET_MISSING", "pacote incompleto: falta %s" % name, details={"path": name})
+    return package
+
+
+def _deliver_out(data, text, json_mode, out, **extra):
+    if json_mode: _write_json(out, _envelope(data, **extra))
+    else: _stream_write(out, text)
+
+
+def _cmd_deliver(args, project_dir, json_mode, out):
+    by = "" if args.by is None else args.by.strip()
+    if not by:
+        raise ForjaError("USAGE", "informe quem entregou em --by", hint="ex.: forja deliver --post --by Ana --confirm")
+    project = _require_project(project_dir)
+    root = project.root
+    approvals = brief.load_approvals(root)
+    estado = _load_estado(root)
+    if estado is None or estado["estado"] not in ("aprovado", "entregue"):
+        raise ForjaError("GATE_FAILED", "estado ausente ou invalido para entrega", hint="a peca precisa estar aprovada")
+    piece = (brief.load_brief(root) or {}).get("piece") or approvals.get("piece") or estado.get("piece")
+    if not isinstance(piece, str) or not piece.strip() or Path(piece).name != piece:
+        raise ForjaError("MISSING_INPUT", "brief sem piece para entregar")
+    pacote = (Path(root) / "out" / piece).relative_to(root).as_posix()
+    if estado["estado"] == "entregue":
+        data = {"estado": "entregue", "de": "aprovado", "para": "entregue", "pacote": pacote, "aprovacao": estado.get("aprovacao"), "artefato": estado.get("artefato")}
+        _deliver_out(data, "peca ja entregue: %s" % pacote, json_mode, out)
+        return 0
+    target, relative, digest, record = _deliver_approval(root, approvals, piece)
+    _deliver_package(root, piece)
+    aprovacao = dict(estado.get("aprovacao") or {}, by=by, sha256=digest)
+    aprovacao["at"] = aprovacao.get("at") or record.get("at") or ""
+    artefato = estado.get("artefato")
+    if not isinstance(artefato, dict):
+        artefato = {"path": relative, "sha256": digest, "bytes": target.stat().st_size}
+    if not args.confirm:
+        data = {"estado": "aprovado", "de": None, "para": "entregue", "pacote": pacote, "aprovacao": aprovacao, "artefato": artefato}
+        command = "forja deliver --project %s --post --by %s --confirm%s" % (shlex.quote(str(root)), shlex.quote(by), " --json" if json_mode else "")
+        next_actions = [{"command": command, "why": "confirme a entrega do pacote aprovado"}]
+        _deliver_out(data, "pronto para entregar: %s (rode de novo com --confirm)" % pacote, json_mode, out, next_actions=next_actions, artifacts=[artefato])
+        return 0
+    momento = events_module.emit(project.work, "deliver", "ok", by=by, de="aprovado", para="entregue", sha256=digest).get("t") or ""
+    estado.setdefault("historico", []).append({"de": "aprovado", "para": "entregue", "por": by, "em": momento, "sha256": digest})
+    estado.update({"estado": "entregue", "aprovacao": aprovacao})
+    _save_estado(root, estado)
+    data = {"estado": "entregue", "de": "aprovado", "para": "entregue", "pacote": pacote, "aprovacao": aprovacao, "artefato": artefato}
+    _deliver_out(data, "entregue: %s por %s" % (pacote, by), json_mode, out, artifacts=[artefato])
+    return 0
+
+
 def _cmd_providers(json_mode, env, out):
     items = describe_module.builtin_providers(env) + registry.available(env=env)
     if json_mode:
@@ -724,6 +838,8 @@ def _dispatch(args, project_dir, json_mode, env, out, err):
         return _cmd_doctor(project_dir, json_mode, env, out, err)
     if command == "approve":
         return _cmd_approve(project_dir, args, json_mode, out)
+    if command == "deliver":
+        return _cmd_deliver(args, project_dir, json_mode, out)
     if command == "providers":
         return _cmd_providers(json_mode, env, out)
     if command == "status":
@@ -758,7 +874,9 @@ def main(argv=None, env=None, out=sys.stdout, err=sys.stderr):
 
         rest, json_mode, project_dir = _split_globals(raw_argv)
         if any(arg in ("-h", "--help") for arg in rest):
-            help_text = _build_parser().format_help()
+            parser = _build_parser()
+            subs = next((a.choices for a in parser._actions if isinstance(a, argparse._SubParsersAction)), {})
+            help_text = subs.get(rest[0], parser).format_help() if rest else parser.format_help()
             if json_mode:
                 _write_json(out, _envelope({"help": help_text}))
             else:
