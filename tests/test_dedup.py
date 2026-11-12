@@ -27,7 +27,7 @@ def _image(path, pattern):
     img.save(path, quality=95, subsampling=0) if path.suffix == ".jpg" else img.save(path)
     return path
 def _at(day):
-    return datetime.datetime(2026, 1, day, 12, tzinfo=datetime.timezone.utc)
+    return datetime.datetime(2026, 1, 1, 12, tzinfo=datetime.timezone.utc) + datetime.timedelta(days=day - 1)
 
 def test_content_hash_is_sha256_streamed_and_rejects_missing(tmp_path):
     from forja import dedup
