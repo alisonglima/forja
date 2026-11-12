@@ -64,14 +64,8 @@ def main(pasta, saida):
         r["dom"] = dom
         caixas = [dict(b, id=b["id"]) for b in dom["fields"] + dom["emblema"]]
         sz = (1080, altura)
-        if nome == "feed":
-            r["safe_area_54"] = qa_geometry.check_safe_area(caixas, sz, safe_margin=54)
-        else:
-            # o gate só aceita margem simétrica; a zona segura do story é 10% laterais / 15% vertical
-            r["safe_area_gate_simetrico_108"] = qa_geometry.check_safe_area(caixas, sz, safe_margin=108)
-            lim = (108, 288, 1080 - 108, 1920 - 288)
-            r["safe_area_story_assimetrica"] = [c["id"] for c in caixas
-                                                if not (c["x"] >= lim[0] and c["y"] >= lim[1] and c["x"] + c["w"] <= lim[2] and c["y"] + c["h"] <= lim[3])]
+        # zona segura LIDA do formats.json (check_safe_zone, corrigido na onda L-GATEFIX-GEOM-01)
+        r["safe_zone"] = {"zona": linha["safe_zone"], "issues": qa_geometry.check_safe_zone(caixas, sz, linha["safe_zone"])}
         r["overflow"] = qa_geometry.check_overflow(caixas, sz)
         # contraste: precisa de imagem de FUNDO sem texto (o gate mede todos os pixels da caixa)
         sem_texto = pasta / f"fundo-sem-texto-{nome}.png"
@@ -82,11 +76,11 @@ def main(pasta, saida):
         r["contraste_sob_texto"] = {}
         for b in dom["fields"]:
             box = (b["x"], b["y"], b["x"] + b["w"], b["y"] + b["h"])
-            r["contraste_sob_texto"][b["id"]] = contrast_photo.photo_contrast(fundo, box, variants["variants"]["leo"]["paleta"]["cinza"])
+            r["contraste_sob_texto"][b["id"]] = contrast_photo.photo_contrast(fundo, box, "#FFFFFF", min_ratio=3.0)  # texto branco; todos os campos >= 24 px = texto grande (plano 469/563: 3:1)
         full = np.array(Image.open(png).convert("RGB"))
         b0 = dom["fields"][0]
         r["contraste_no_png_final_com_texto(uso_errado)"] = contrast_photo.photo_contrast(
-            full, (b0["x"], b0["y"], b0["x"] + b0["w"], b0["y"] + b0["h"]), variants["variants"]["leo"]["paleta"]["cinza"])
+            full, (b0["x"], b0["y"], b0["x"] + b0["w"], b0["y"] + b0["h"]), "#FFFFFF", min_ratio=3.0)
     # proveniência da foto
     foto_src = REPO / ".work/fontes/lions/box-extra/G-fotos-biblioteca/_Environment/2015_03_16_California_Seal Beach_Clean up_Service Project_Leos_Lions - 02.jpg"
     sha = lambda p: hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()

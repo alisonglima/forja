@@ -10,7 +10,7 @@
 @font-face { font-family: "Roboto"; font-weight: 900; src: url("fonts/roboto-900.woff2") format("woff2"); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { background: var(--white); }
+html, body { background: var(--sky); }
 
 [data-od-card] {
   position: relative;
@@ -19,49 +19,72 @@ html, body { background: var(--white); }
   width: var(--w);
   height: var(--h);
   overflow: hidden;
-  background: var(--white);
-  color: var(--gray);
+  background: var(--sky);
+  color: var(--white);
   font-family: "Roboto", sans-serif;
 }
+/* hierarquia a 1080 px (plano 180): titulo 48-64, corpo 24-28; o texto fica na zona segura */
 [data-format="feed"] {
   --w: 1080px; --h: 1350px;
-  --photo-h: 900px;
-  --pad-x: 72px; --pad-top: 60px; --pad-bottom: 56px;
-  --h1: 64px; --body: 28px; --cta: 30px; --emb: 177px;
+  --photo-h: 880px;
+  --pad-x: 72px; --pad-top: 60px; --pad-bottom: 72px;
+  --h1: 64px; --body: 28px; --cta: 28px; --emb: 177px;
 }
 [data-format="story"] {
   --w: 1080px; --h: 1920px;
-  --photo-h: 1040px;
-  --pad-x: 108px; --pad-top: 64px; --pad-bottom: 288px;
-  --h1: 76px; --body: 34px; --cta: 36px; --emb: 240px;
+  --photo-h: 1112px;
+  --pad-x: 108px; --pad-top: 72px; --pad-bottom: 288px;
+  --h1: 64px; --body: 28px; --cta: 28px; --emb: 220px;
 }
 
 .foto { flex: none; height: var(--photo-h); width: 100%; overflow: hidden; }
 .foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 .painel {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+  overflow: hidden;
 }
-.barra { width: 120px; height: 12px; background: var(--yellow); }
+/* faixa diagonal translucida (vocabulario do kit oficial Leo) */
+.painel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--white);
+  opacity: 0.08;
+  clip-path: polygon(52% 0, 78% 0, 48% 100%, 22% 100%);
+}
+/* seta amarela: forma primaria do Leo (guia-leo p.10) */
+.seta {
+  position: absolute;
+  left: 0;
+  top: var(--pad-top);
+  width: 40px;
+  height: 120px;
+  background: var(--yellow);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+.painel > * { position: relative; }
+.painel > .seta { position: absolute; }
 
 [data-od-field="titulo"] {
-  margin-top: 28px;
   font-weight: 900;
   font-size: var(--h1);
   line-height: 1.08;
   letter-spacing: -0.01em;
   text-wrap: balance;
-  color: var(--gray);
+  color: var(--white);
 }
+.fio { margin-top: 24px; width: 360px; height: 4px; background: var(--yellow); }
 [data-od-field="corpo"] {
-  margin-top: 20px;
+  margin-top: 24px;
   font-weight: 400;
   font-size: var(--body);
   line-height: 1.4;
-  color: var(--gray);
+  color: var(--white);
 }
 .rodape {
   margin-top: auto;
@@ -74,9 +97,9 @@ html, body { background: var(--white); }
   font-size: var(--cta);
   line-height: 1.2;
   letter-spacing: 0.02em;
-  color: var(--gray);
+  color: var(--white);
   padding-bottom: 6px;
-  border-bottom: 6px solid var(--yellow);
+  border-bottom: 4px solid var(--yellow);
 }
 /* o PNG oficial vai inteiro (sem recorte nem recolor); a caixa recorta so a margem transparente,
    de modo que a caixa medida = o desenho visivel (0,699 x 0,650 da imagem) */
@@ -88,8 +111,9 @@ html, body { background: var(--white); }
 <div data-od-card data-variant="leo" data-format="{{formato}}">
   <div class="foto"><img src="{{foto}}" alt="{{alt}}"></div>
   <div class="painel">
-    <div class="barra"></div>
+    <div class="seta"></div>
     <h1 data-od-field="titulo">{{titulo}}</h1>
+    <div class="fio"></div>
     <p data-od-field="corpo">{{corpo}}</p>
     <div class="rodape">
       <span data-od-field="cta">{{cta}}</span>

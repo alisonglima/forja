@@ -13,7 +13,7 @@ import sys
 AQUI = pathlib.Path(__file__).resolve().parent
 REPO = AQUI.parents[1]
 FOTO = {"feed": "assets/foto-feed.jpg", "story": "assets/foto-story.jpg"}
-EMB_W = {"feed": 177, "story": 240}  # largura do PNG oficial inteiro; desenho visivel = 0,699 x isto
+EMB_W = {"feed": 177, "story": 220}  # largura do PNG oficial inteiro; desenho visivel = 0,699 x isto
 
 
 def main(formato, saida):

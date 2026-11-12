@@ -4,15 +4,15 @@
   "measure": {
    "width": 1080,
    "height": 1350,
-   "bytes": 1794413,
-   "sha256": "fc23b7fe1038701b2be71db055f790ba4e9ca5804fbd35391785f6688bf2ccb1"
+   "bytes": 1777311,
+   "sha256": "ad22ba87104f6bbf3d0e24158785f59913d89dd218e8f729226388a053ff703b"
   },
   "inspect_artifact": {
    "ok": true,
    "issues": [],
    "width": 1080,
    "height": 1350,
-   "sha256": "fc23b7fe1038701b2be71db055f790ba4e9ca5804fbd35391785f6688bf2ccb1"
+   "sha256": "ad22ba87104f6bbf3d0e24158785f59913d89dd218e8f729226388a053ff703b"
   },
   "formato_linha": {
    "id": "ig-feed-4x5",
@@ -52,30 +52,30 @@
     {
      "id": "titulo",
      "x": 72,
-     "y": 1000,
+     "y": 940,
      "w": 936,
      "h": 69
     },
     {
      "id": "corpo",
      "x": 72,
-     "y": 1089,
+     "y": 1061,
      "w": 936,
      "h": 39
     },
     {
      "id": "cta",
      "x": 72,
-     "y": 1246,
-     "w": 230,
-     "h": 48
+     "y": 1234,
+     "w": 214,
+     "h": 44
     }
    ],
    "emblema": [
     {
      "id": "emblema-box",
      "x": 884,
-     "y": 1179,
+     "y": 1163,
      "w": 124,
      "h": 115
     }
@@ -86,50 +86,52 @@
      "x": 0,
      "y": 0,
      "w": 1080,
-     "h": 900
+     "h": 880
     }
    ],
-   "barra": [
-    {
-     "id": "barra",
-     "x": 72,
-     "y": 960,
-     "w": 120,
-     "h": 12
-    }
-   ],
+   "barra": [],
    "fonts": [
     "Roboto 400 loaded",
     "Roboto 700 loaded",
     "Roboto 900 loaded"
    ]
   },
-  "safe_area_54": [],
+  "safe_zone": {
+   "zona": {
+    "top": 0.05,
+    "bottom": 0.05,
+    "left": 0.05,
+    "right": 0.05,
+    "fonte": "casa: 5% + 40 px; sem % oficial (F1)",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
   "overflow": [],
   "contraste_sob_texto": {
    "titulo": {
-    "min": 7.329813707112641,
-    "p5": 7.329813707112641,
-    "mean": 7.329813707112639,
+    "min": 3.7275428261897705,
+    "p5": 3.7275428261897705,
+    "mean": 4.08563336061166,
     "pass": true
    },
    "corpo": {
-    "min": 7.329813707112641,
-    "p5": 7.329813707112641,
-    "mean": 7.329813707112639,
+    "min": 3.7275428261897705,
+    "p5": 3.7275428261897705,
+    "mean": 4.0856789069623725,
     "pass": true
    },
    "cta": {
-    "min": 7.329813707112641,
-    "p5": 7.329813707112641,
-    "mean": 7.329813707112639,
+    "min": 4.239074091405974,
+    "p5": 4.239074091405974,
+    "mean": 4.239074091405974,
     "pass": true
    }
   },
   "contraste_no_png_final_com_texto(uso_errado)": {
    "min": 1.0,
    "p5": 1.0,
-   "mean": 5.388343779770356,
+   "mean": 3.1298217035490343,
    "pass": false
   }
  },
@@ -138,15 +140,15 @@
   "measure": {
    "width": 1080,
    "height": 1920,
-   "bytes": 2013027,
-   "sha256": "9ae42cd3658e0366b8bb4c8660e0ebe5b659ab64f92c338eebec4582d5f5d4f8"
+   "bytes": 2102155,
+   "sha256": "3b3cfdde291bd0a9de0cf239a75fd6976a6ee32a76692b7abb95a4cab8672033"
   },
   "inspect_artifact": {
    "ok": true,
    "issues": [],
    "width": 1080,
    "height": 1920,
-   "sha256": "9ae42cd3658e0366b8bb4c8660e0ebe5b659ab64f92c338eebec4582d5f5d4f8"
+   "sha256": "3b3cfdde291bd0a9de0cf239a75fd6976a6ee32a76692b7abb95a4cab8672033"
   },
   "formato_linha": {
    "id": "ig-story",
@@ -186,32 +188,32 @@
     {
      "id": "titulo",
      "x": 108,
-     "y": 1144,
+     "y": 1184,
      "w": 864,
-     "h": 164
+     "h": 138
     },
     {
      "id": "corpo",
      "x": 108,
-     "y": 1328,
+     "y": 1374,
      "w": 864,
-     "h": 48
+     "h": 39
     },
     {
      "id": "cta",
      "x": 108,
-     "y": 1577,
-     "w": 276,
-     "h": 55
+     "y": 1588,
+     "w": 214,
+     "h": 44
     }
    ],
    "emblema": [
     {
      "id": "emblema-box",
-     "x": 804,
-     "y": 1476,
-     "w": 168,
-     "h": 156
+     "x": 818,
+     "y": 1489,
+     "w": 154,
+     "h": 143
     }
    ],
    "foto": [
@@ -220,51 +222,52 @@
      "x": 0,
      "y": 0,
      "w": 1080,
-     "h": 1040
+     "h": 1112
     }
    ],
-   "barra": [
-    {
-     "id": "barra",
-     "x": 108,
-     "y": 1104,
-     "w": 120,
-     "h": 12
-    }
-   ],
+   "barra": [],
    "fonts": [
     "Roboto 400 loaded",
     "Roboto 700 loaded",
     "Roboto 900 loaded"
    ]
   },
-  "safe_area_gate_simetrico_108": [],
-  "safe_area_story_assimetrica": [],
+  "safe_zone": {
+   "zona": {
+    "top": 0.15,
+    "bottom": 0.15,
+    "left": 0.1,
+    "right": 0.1,
+    "fonte": "convenção 15/15/10/10 a validar; Meta só pede bordas livres",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
   "overflow": [],
   "contraste_sob_texto": {
    "titulo": {
-    "min": 7.329813707112641,
-    "p5": 7.329813707112641,
-    "mean": 7.329813707112638,
+    "min": 3.7275428261897705,
+    "p5": 3.7275428261897705,
+    "mean": 4.07289255488122,
     "pass": true
    },
    "corpo": {
-    "min": 7.329813707112641,
-    "p5": 7.329813707112641,
-    "mean": 7.329813707112639,
+    "min": 3.7275428261897705,
+    "p5": 3.7275428261897705,
+    "mean": 4.072911063805764,
     "pass": true
    },
    "cta": {
-    "min": 7.329813707112641,
-    "p5": 7.329813707112641,
-    "mean": 7.329813707112639,
+    "min": 4.239074091405974,
+    "p5": 4.239074091405974,
+    "mean": 4.239074091405974,
     "pass": true
    }
   },
   "contraste_no_png_final_com_texto(uso_errado)": {
    "min": 1.0,
    "p5": 1.0,
-   "mean": 6.072518805013069,
+   "mean": 3.5386944919816137,
    "pass": false
   }
  },
