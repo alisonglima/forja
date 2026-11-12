@@ -50,7 +50,8 @@ def _linear(channels) -> np.ndarray:
 
 def _luminance(rgb) -> np.ndarray:
     """Luminancia relativa sRGB; aceita (..., 3) e devolve (...)."""
-    return _linear(rgb) @ _LUMA
+    # einsum: o matmul do numpy 2.0 no macOS (Accelerate) emite avisos espurios de divide/overflow
+    return np.einsum("...c,c->...", _linear(rgb), _LUMA)
 
 
 def _as_image(image) -> np.ndarray:

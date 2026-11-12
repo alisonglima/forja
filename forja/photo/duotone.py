@@ -28,10 +28,15 @@ def duotone(img: Image.Image, dark: str, light: str) -> Image.Image:
                 round(d + (l - d) * value / 255)
                 for d, l in zip(dark_rgb, light_rgb)
             )
-            for value in lum.getdata()
+            for value in _pixels(lum)
         ]
     )
     return out
+
+
+def _pixels(img):
+    """Pixels achatados; `getdata` esta deprecado no Pillow 12+ (remocao no 14)."""
+    return getattr(img, "get_flattened_data", img.getdata)()
 
 
 def blend(img: Image.Image, overlay: Image.Image, alpha: float = 0.5) -> Image.Image:
@@ -42,7 +47,7 @@ def blend(img: Image.Image, overlay: Image.Image, alpha: float = 0.5) -> Image.I
     out.putdata(
         [
             tuple(round(b + (o - b) * alpha) for b, o in zip(base_px, top_px))
-            for base_px, top_px in zip(base.getdata(), top.getdata())
+            for base_px, top_px in zip(_pixels(base), _pixels(top))
         ]
     )
     return out
