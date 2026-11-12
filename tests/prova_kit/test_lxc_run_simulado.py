@@ -12,13 +12,16 @@ start_falha | config_adulterada.
 """
 from __future__ import annotations
 
+import atexit
 import importlib.util
 import json
 import os
 import re
+import shutil
 import stat
 import subprocess
 import sys
+import tempfile
 import textwrap
 from pathlib import Path
 
@@ -165,6 +168,11 @@ def _contrato():
 
 
 def _montar(tmp_path, cenario):
+    # o ssh/pct falsos reescrevem "/tmp/" (caminho DENTRO do CT): no Linux o tmp do pytest comeca
+    # por /tmp/ e seria reescrito junto; o macOS usa /private/var/..., que nunca casa. Raiz sem "/tmp/":
+    if "/tmp/" in f"{tmp_path}/":
+        tmp_path = Path(tempfile.mkdtemp(prefix="forja-sim-", dir=str(Path.home())))
+        atexit.register(shutil.rmtree, str(tmp_path), True)
     st = tmp_path / "pve"
     macbin, pvebin, ctbin = tmp_path / "macbin", st / "pvebin", st / "ctbin"
     for d in (st, macbin, pvebin, ctbin):
