@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forja.local/schemas/approvals.schema.json",
+  "title": "Aprovacoes v2",
+  "description": "Aprovacoes humanas de uma peca: booleanos por etapa, aprovador, peca/marca/formato, hash do brief e hash dos artefatos aprovados. O formato v1, sem schema_version, continua legivel pelo loader; este schema descreve o v2.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 2,
+      "type": "integer",
+      "description": "Versao do formato; 2 identifica o formato com hashes."
+    },
+    "script": {
+      "type": "boolean",
+      "description": "Roteiro aprovado."
+    },
+    "voice": {
+      "type": "boolean",
+      "description": "Voz/narracao aprovada."
+    },
+    "overlays": {
+      "type": "boolean",
+      "description": "Overlays aprovados."
+    },
+    "publish": {
+      "type": "boolean",
+      "description": "Publicacao aprovada."
+    },
+    "by": {
+      "type": "string",
+      "description": "Quem aprovou por ultimo."
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Quando a aprovacao foi registrada (UTC, ISO 8601)."
+    },
+    "piece": {
+      "type": "string",
+      "description": "Identificador da peca no brief."
+    },
+    "brand_id": {
+      "type": "string",
+      "description": "Marca da peca, como em brands/."
+    },
+    "format": {
+      "type": "string",
+      "description": "Formato de entrega da peca."
+    },
+    "brief": {
+      "type": "object",
+      "description": "Hash do brief no momento da aprovacao.",
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 do hash composto do brief."
+        },
+        "by": {
+          "type": "string",
+          "description": "Quem aprovou o brief."
+        },
+        "at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Quando o brief foi aprovado."
+        }
+      },
+      "required": [
+        "sha256",
+        "by",
+        "at"
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Artefatos cobertos pela aprovacao do pacote.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Caminho relativo ao projeto."
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "description": "SHA-256 do arquivo."
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Tamanho do arquivo em bytes."
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "bytes"
+        ]
+      }
+    },
+    "hash": {
+      "type": "object",
+      "description": "Hash do pacote aprovado. Em lote/carrossel, `arquivo` e omitido e `valor` cobre a lista de artefatos.",
+      "properties": {
+        "algoritmo": {
+          "type": "string",
+          "description": "Algoritmo do hash (sha256)."
+        },
+        "valor": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Hash do brief somado aos artefatos."
+        },
+        "arquivo": {
+          "type": "string",
+          "description": "Artefato unico aprovado; omitido em lote/carrossel."
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tamanho coberto pelo hash em bytes."
+        }
+      },
+      "required": [
+        "algoritmo",
+        "valor",
+        "bytes"
+      ]
+    }
+  }
+}
