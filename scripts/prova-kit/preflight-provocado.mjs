@@ -1,6 +1,8 @@
 #!/usr/bin/env node
-// L-PROVA-KIT-03: preflight provocado. So executa e grava; nao decide.
+// L-PROVA-KIT-03R: preflight provocado. So executa e grava; nao decide.
 // Interface: --out DIR [--dry-run] [--help]. Sem --dry-run nada externo roda.
+// Fixtures dentro de <out>/workspace (com .open-design/) e sidecar
+// <entry>.artifact.json ao lado; --workspace absoluto e entry relativo.
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
@@ -94,13 +96,29 @@ function fixtures() {
   };
 }
 
+function formato(nome) {
+  // card de tela (ig-portrait 1080x1350) ou impressao A5; sem kind: card.
+  return nome === "preflight-ppi.html" ? "a5" : "ig-portrait";
+}
+
+function sidecar(nome) {
+  return JSON.stringify({
+    version: 1,
+    kind: "html",
+    renderer: "html",
+    exports: ["png"],
+    metadata: { format: formato(nome) },
+  }, null, 2) + "\n";
+}
+
 function plano(out) {
-  const fix = path.join(out, "fixtures");
+  const ws = path.join(out, "workspace");
   const ev = path.join(out, EVID);
   const base = (arq, viewport, shots) => {
     const argv = [
-      "npx", "--yes", KIT, "check", path.join(fix, arq),
+      "npx", "--yes", KIT, "check", "fixtures/" + arq,
       "--viewport", viewport, "--json", "--fail-on", "error",
+      "--workspace", ws,
     ];
     if (shots) argv.push("--screenshots", path.join(ev, "screenshots", shots));
     return { argv, caso: shots || "controle" };
@@ -143,20 +161,22 @@ function gravarErro(ev, erro) {
 
 function executar(out, comandos) {
   const ev = path.join(out, EVID);
-  const fix = path.join(out, "fixtures");
+  const ws = path.join(out, "workspace");
+  const fix = path.join(ws, "fixtures");
   fs.mkdirSync(ev, { recursive: true });
+  fs.mkdirSync(path.join(ws, ".open-design"), { recursive: true });
   fs.mkdirSync(fix, { recursive: true });
   for (const [nome, html] of Object.entries(fixtures())) {
     fs.writeFileSync(path.join(fix, nome), html, "utf8");
+    fs.writeFileSync(path.join(fix, nome + ".artifact.json"), sidecar(nome), "utf8");
   }
   fs.writeFileSync(path.join(fix, "ppi-80x80.png"), Buffer.from(PNG80, "base64"));
   const log = [];
   for (const cmd of comandos) {
     const t0 = Date.now();
     const r = spawnSync(cmd.argv[0], cmd.argv.slice(1), {
-      cwd: out,
+      cwd: ws,
       encoding: "utf8",
-      env: { ...process.env, OPEN_DESIGN_OUTPUT_DIR: out },
       maxBuffer: 64 * 1024 * 1024,
       timeout: 600000,
     });
@@ -178,9 +198,13 @@ if (opts.help) {
 } else {
   const comandos = plano(opts.out);
   if (opts.dry) {
+    const wsRel = path.relative(opts.out, path.join(opts.out, "workspace"))
+      .split(path.sep).join("/");
     process.stdout.write(JSON.stringify({
       script: path.resolve(process.argv[1] || "preflight-provocado.mjs"),
       evidencia: EVID,
+      workspace: wsRel,
+      sidecars: Object.keys(fixtures()).map((nome) => wsRel + "/fixtures/" + nome + ".artifact.json"),
       comandos: comandos.map((c) => c.argv.join(" ")),
     }) + "\n");
   } else {
