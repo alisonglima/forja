@@ -222,3 +222,44 @@ def summarize(issues) -> dict:
         "warnings": warnings,
         "issues": issues,
     }
+
+
+# Formatos que exigem legenda embutida e alvos editoriais de duracao.
+_EMBEDDED_CAPTIONS_FORMATS = ("ig-reels", "ig-story")
+_REELS_MAX_DURATION_S = 60.0
+_STORY_SCREEN_MAX_S = 15.0
+
+
+def check_embedded_captions(subs, formato) -> list:
+    """Exige legenda embutida nos formatos que a plataforma cobra."""
+    if formato in _EMBEDDED_CAPTIONS_FORMATS and not subs:
+        return [_issue(
+            "error", None, "CAPTIONS_MISSING",
+            "legenda embutida obrigatoria em %s" % formato,
+        )]
+    return []
+
+
+def check_editorial_duration(formato, duracao_s, telas_s=None) -> list:
+    """Confere alvo de duracao de reels e limite por tela de story."""
+    duracao = _as_float(duracao_s)
+    if duracao is None or duracao < 0:
+        return []
+    if formato == "ig-reels" and duracao > _REELS_MAX_DURATION_S + 1e-9:
+        return [_issue(
+            "warn", None, "DURATION_TARGET",
+            "duracao %.1fs acima do alvo %.0fs"
+            % (duracao, _REELS_MAX_DURATION_S),
+        )]
+    if formato == "ig-story":
+        issues = []
+        for index, tela in enumerate(telas_s or []):
+            segundos = _as_float(tela)
+            if segundos is not None and segundos > _STORY_SCREEN_MAX_S + 1e-9:
+                issues.append(_issue(
+                    "warn", index, "STORY_SCREEN_LONG",
+                    "tela %d com %.1fs (maximo %.0fs)"
+                    % (index, segundos, _STORY_SCREEN_MAX_S),
+                ))
+        return issues
+    return []
