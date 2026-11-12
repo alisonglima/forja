@@ -138,3 +138,13 @@ def test_dry_run_declara_workspace_e_sidecars(nome, pasta, tmp_path):
         assert all("--workspace" in c for c in kit), f"comando do kit sem --workspace: {kit}"
     else:
         assert side == []
+
+
+def test_preflight_usa_fail_on_warning_em_todos_os_casos(tmp_path):
+    """Run real: contraste e safe-area sao WARNING no kit (cli-0.4.0.md secao 5); com --fail-on error o exit fica 0
+    e o plano espera 1. Todos os cinco casos usam --fail-on warning (o controle limpo continua 0)."""
+    proc, marca = _node(tmp_path, "preflight-provocado.mjs", "--out", str(tmp_path / "saida"), "--dry-run")
+    assert proc.returncode == 0, proc.stderr
+    kit = [c for c in json.loads(proc.stdout)["comandos"] if "open-design-agent-kit" in c and " check " in c]
+    assert len(kit) == 5, kit
+    assert all("--fail-on warning" in c and "--fail-on error" not in c for c in kit), kit
