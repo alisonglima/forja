@@ -42,6 +42,20 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _tag_key(value) -> str:
+    """Normaliza hashtag para comparacao: sem #, sem caixa."""
+    if not isinstance(value, str):
+        return ""
+    return value.strip().lstrip("#").casefold()
+
+
+def _tag_keys(rows) -> set:
+    if not isinstance(rows, list):
+        return set()
+    return {_tag_key(row.get("tag")) for row in rows
+            if isinstance(row, dict) and _tag_key(row.get("tag"))}
+
+
 def _json(path: Path, label: str) -> dict:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -256,6 +270,24 @@ def build_package(root, *, brief, brand_root, formats, approvals, now=None) -> d
                           trecho=issue.get("trecho"))
                 if issue["code"] not in manifest["avisos"]:
                     manifest["avisos"].append(issue["code"])
+
+    hashtags_path = Path(brand_root) / "hashtags.json"
+    if hashtags_path.is_file():
+        lista = _json(hashtags_path, "hashtags da marca")
+        regras = lista.get("regras")
+        permitidas = _tag_keys(lista.get("tags"))
+        genericas = _tag_keys(regras.get("genericas_evitar")
+                              if isinstance(regras, dict) else None)
+        for tag in hashtags:
+            chave = _tag_key(tag)
+            if chave in genericas:
+                aviso = "HASHTAG_GENERICA"
+            elif chave not in permitidas:
+                aviso = "HASHTAG_FORA_DA_LISTA"
+            else:
+                continue
+            if aviso not in manifest["avisos"]:
+                manifest["avisos"].append(aviso)
 
     ent = root / "entrega"
     art_dir = ent / "arte"
