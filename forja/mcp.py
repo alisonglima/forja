@@ -32,6 +32,28 @@ def _bool(description):
     return {"type": "boolean", "description": description}
 
 
+# tool -> (passos do --only, --dry-run?, descricao)
+RUN_TOOLS = {
+    "forja_post_plan": (
+        "brief,research,copy,template,compose", True,
+        "Planeja o post (brief, research, copy, template, compose) sem renderizar.",
+    ),
+    "forja_post_render": ("render", False, "Renderiza as artes do post."),
+    "forja_post_inspect": ("lint,inspect", False, "Roda lint e inspect do post."),
+    "forja_lote_validate": ("validate-data", False, "Valida CSV/JSON do lote."),
+    "forja_lote_render": ("render-lote", False, "Renderiza uma arte por linha do lote."),
+    "forja_package": ("deliver", False, "Monta o pacote de entrega do post."),
+}
+FORCEABLE = {"forja_post_plan", "forja_post_render", "forja_lote_render"}
+
+
+def _run_schema(name):
+    properties = {"project": _string("Diretorio do projeto")}
+    if name in FORCEABLE:
+        properties["force"] = _bool("Ignora o cache")
+    return _schema(properties, ["project"])
+
+
 TOOLS = [
     {
         "name": "forja_describe",
@@ -104,6 +126,13 @@ TOOLS = [
             ["project"],
         ),
     },
+] + [
+    {
+        "name": name,
+        "description": description,
+        "inputSchema": _run_schema(name),
+    }
+    for name, (_, _, description) in RUN_TOOLS.items()
 ]
 
 
@@ -196,6 +225,15 @@ def _tool_text(name: str, args: dict, env) -> tuple[str, bool]:
             if not isinstance(by, str):
                 return "by deve ser string", True
             argv += ["--by", by]
+    elif name in RUN_TOOLS:
+        if not project:
+            return "project e obrigatorio", True
+        only, dry_run, _ = RUN_TOOLS[name]
+        argv = ["--json", "--project", project, "run", "--only", only]
+        if dry_run:
+            argv.append("--dry-run")
+        if name in FORCEABLE and args.get("force"):
+            argv.append("--force")
     else:
         return "tool desconhecida: %s" % name, True
 
