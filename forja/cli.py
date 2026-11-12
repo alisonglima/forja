@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import importlib.util
 import json
 import os
@@ -15,6 +16,7 @@ import yaml
 
 from . import (
     __version__,
+    approvals as approvals_module,
     brief,
     config,
     describe as describe_module,
@@ -88,7 +90,10 @@ def _build_parser():
     approve.add_argument("--voice", action="store_true")
     approve.add_argument("--overlays", action="store_true")
     approve.add_argument("--publish", action="store_true")
-    approve.add_argument("--by", default="humano")
+    approve.add_argument("--brief", action="store_true")
+    approve.add_argument("--post", action="store_true")
+    approve.add_argument("--hash", action="append", default=None)
+    approve.add_argument("--by", default=None)
 
     init = command("init")
     init.add_argument("dir")
@@ -396,6 +401,60 @@ def _cmd_status(project_dir, json_mode, out):
     return 0
 
 
+_APPROVAL_CHUNK = 1024 * 1024
+
+
+def _canonical(value):
+    return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":"), default=str)
+
+
+def _file_sha256(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        while block := handle.read(_APPROVAL_CHUNK):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _project_artifact(root, value):
+    root = Path(root)
+    path = Path(value).expanduser()
+    if not path.is_absolute():
+        path = root / path
+    try:
+        relative = path.resolve().relative_to(root.resolve()).as_posix()
+    except (OSError, ValueError):
+        raise ForjaError("USAGE", "arquivo fora do projeto: %s" % value) from None
+    if not path.is_file():
+        raise ForjaError("MISSING_INPUT", "arquivo nao encontrado: %s" % relative, details={"path": relative})
+    return path, relative
+
+
+def _brief_sha256(root, data):
+    try:
+        return approvals_module.hash_brief(root)
+    except ForjaError as exc:
+        if exc.code != "MISSING_INPUT":
+            raise
+    return hashlib.sha256(_canonical(data).encode("utf-8")).hexdigest()
+
+
+def _approval_stale(expected, current, piece, path):
+    return ForjaError(
+        "APPROVAL_STALE",
+        "aprovacao por hash invalida ou desatualizada",
+        details={"expected": expected, "current": current, "piece": piece, "path": path},
+    )
+
+
+def _save_approvals(root, data):
+    path = brief.approvals_path(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    tmp.replace(path)
+
+
 def _cmd_approve(project_dir, args, json_mode, out):
     project = _require_project(project_dir)
     updates = {
@@ -403,17 +462,66 @@ def _cmd_approve(project_dir, args, json_mode, out):
         for key in ("script", "voice", "overlays", "publish")
         if getattr(args, key, False)
     }
-    if not updates:
+    if not (updates or args.post or args.brief or args.hash):
         raise ForjaError(
             "USAGE",
-            "informe ao menos uma aprovacao (--script, --voice, --overlays ou --publish)",
+            "informe ao menos uma aprovacao (--script, --voice, --overlays, --publish, --brief, --post ou --hash)",
             hint="ex.: forja approve --script --voice --by Ana",
         )
-    data = brief.write_approvals(project.root, updates, by=args.by)
+    by = "humano" if args.by is None else args.by.strip()
+    if not by or (args.post and args.by is None):
+        raise ForjaError(
+            "USAGE",
+            "informe quem aprovou em --by",
+            hint="ex.: forja approve --post --hash out/peca.png --by Ana",
+        )
+    data = brief.load_approvals(project.root)
+    brief_data = None
+    if args.brief or args.post or args.hash:
+        brief_data = brief.load_brief(project.root)
+        if brief_data is None:
+            raise ForjaError("MISSING_INPUT", "brief.yaml ausente: sem brief nao ha o que aprovar")
+        if args.brief:
+            issues = [item for item in brief.brief_issues(project.root) if item.get("code") == "BRIEF_INCOMPLETE"]
+            if issues:
+                raise ForjaError("BRIEF_INCOMPLETE", issues[0].get("msg") or "brief incompleto")
+    records, block = [], None
+    if args.hash:
+        for value in args.hash:
+            path, relative = _project_artifact(project.root, value)
+            records.append({"path": relative, "sha256": _file_sha256(path), "bytes": path.stat().st_size})
+        records.sort(key=lambda item: item["path"])
+        current = records[0]["sha256"] if len(records) == 1 else hashlib.sha256(_canonical(records).encode("utf-8")).hexdigest()
+        piece = brief_data.get("piece")
+        path = records[0]["path"]
+        stored = data.get("hash")
+        expected = stored.get("valor") if isinstance(stored, dict) else None
+        if expected is not None and expected != current:
+            raise _approval_stale(expected, current, piece or data.get("piece"), path)
+        block = {"algoritmo": "sha256", "valor": current}
+        if len(records) == 1:
+            block["arquivo"] = path
+            block["bytes"] = records[0]["bytes"]
+    if not updates:
+        updates = {key: bool(data.get(key)) for key in brief.APPROVAL_KEYS}
+    saved = brief.write_approvals(project.root, updates, by=by)
+    if brief_data is not None:
+        for key in ("piece", "brand_id", "format"):
+            value = brief_data.get(key)
+            if isinstance(value, str) and value.strip():
+                saved[key] = value
+        saved["schema_version"] = 2
+    if args.brief:
+        saved["brief"] = {"sha256": _brief_sha256(project.root, brief_data), "by": saved["by"], "at": saved["at"]}
+    if block is not None:
+        saved["artifacts"] = records
+        saved["hash"] = block
+    if brief_data is not None or block is not None:
+        _save_approvals(project.root, saved)
     if json_mode:
-        _write_json(out, _envelope({"approvals": data, "path": brief.APPROVALS_FILE}))
+        _write_json(out, _envelope({"approvals": saved, "path": brief.APPROVALS_FILE, "brief": saved.get("brief"), "hash": saved.get("hash")}))
         return 0
-    _stream_write(out, "aprovacoes registradas: " + ", ".join(sorted(updates)) + " por " + data["by"])
+    _stream_write(out, "aprovacoes registradas: " + ", ".join(sorted(updates)) + " por " + saved["by"])
     return 0
 
 
