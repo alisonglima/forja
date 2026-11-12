@@ -181,9 +181,10 @@ def _montar(tmp_path, cenario):
     return st, out, env
 
 
-def _rodar(tmp_path, cenario, ctid="920"):
+def _rodar(tmp_path, cenario, ctid="920", extra_env=None):
     assert SCRIPT.is_file(), f"falta {SCRIPT}"
     st, out, env = _montar(tmp_path, cenario)
+    env.update(extra_env or {})
     proc = subprocess.run(["bash", str(SCRIPT), "--run", "--ctid", ctid, "--out", str(out)],
                           capture_output=True, text=True, env=env, cwd=ROOT, timeout=120)
     log = (st / "log.txt").read_text(encoding="utf-8") if (st / "log.txt").exists() else ""
@@ -272,3 +273,26 @@ def test_modo_inside_roda_fases_na_ordem(tmp_path):
     assert proc.returncode != 0, "fase com exit 3 deve falhar o --inside no fim"
     fases = json.loads((raiz / "evidencias" / "fases.json").read_text(encoding="utf-8"))
     assert {f["fase"]: f["exit"] for f in fases}["lote-csv"] == 3
+
+
+def test_wrapper_chrome_offline_como_no_plano(tmp_path):
+    """K.1: o wrapper corta rede de fundo e resolve so loopback; sem isso a prova de rede nao vale."""
+    proc, out, st, log = _rodar(tmp_path, "ok")
+    assert proc.returncode == 0, proc.stderr
+    for trecho in ("google-chrome-prova", "--host-resolver-rules", "MAP * ~NOTFOUND",
+                   "EXCLUDE localhost", "--disable-background-networking", "google-chrome-stable"):
+        assert trecho in log, f"wrapper sem {trecho!r}"
+
+
+def test_ambiente_do_kit_e_fixo_e_nao_herda_do_mac(tmp_path):
+    """Exports OPEN_DESIGN_* sao os do plano; nada do ambiente do Mac (token!) vai ao CT ou ao PVE."""
+    segredo = "segredo-do-mac-123"
+    proc, out, st, log = _rodar(tmp_path, "ok", extra_env={
+        "OPEN_DESIGN_FIGMA_TOKEN": segredo, "OPEN_DESIGN_OUTPUT_DIR": "/etc/saida-do-mac"})
+    assert proc.returncode == 0, proc.stderr
+    assert segredo not in log and segredo not in proc.stdout + proc.stderr
+    assert "/etc/saida-do-mac" not in log
+    for trecho in ("OPEN_DESIGN_BROWSER_PATH", "OPEN_DESIGN_WORKSPACE_ROOT", "OPEN_DESIGN_OUTPUT_DIR",
+                   "OPEN_DESIGN_PREVIEW", "OPEN_DESIGN_FFMPEG_PATH", "unset OPEN_DESIGN_FIGMA_TOKEN"):
+        assert trecho in log, f"faltou no ambiente do kit: {trecho}"
+    assert "/usr/local/bin/google-chrome-prova" in log and "/srv/prova/out" in log
