@@ -40,8 +40,12 @@ Changelog = "https://github.com/alisonglima/forja/blob/main/CHANGELOG.md"
 [project.scripts]
 forja = "forja.cli:main"
 
-[tool.setuptools]
-packages = ["forja", "forja.workflows"]
+[tool.setuptools.packages.find]
+include = ["forja*"]
+
+[tool.setuptools.package-data]
+"forja.data" = ["*.json"]
+"forja.schemas" = ["*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

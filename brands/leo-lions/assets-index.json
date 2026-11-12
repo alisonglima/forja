@@ -1,0 +1,125 @@
+{
+  "schema": "forja-brand-assets/v1",
+  "brand": "leo-lions",
+  "root_env": "FORJA_BRAND_SOURCES",
+  "root_default": ".work/fontes/lions",
+  "generated_from": "SHA256SUMS.txt",
+  "checked_at": "2026-11-11",
+  "assets": [
+    {
+      "id": "leo-emblema-2c",
+      "kind": "logo",
+      "path": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+      "sha256": "d1d9e7ca35e2c5567e366c66412dbc9629293b6cc36e15c2c04b7eff48d11f78",
+      "bytes": 92542,
+      "license": "Lions International; arquivo oficial, não reconstruir",
+      "variant": "leo"
+    },
+    {
+      "id": "leo-emblema-alpha-gray",
+      "kind": "logo",
+      "path": "logos/Emblemas_de_Leos/109141431__Logo_rgb_Leo_2C_Alpha_GrayText.png",
+      "sha256": "12a97412a9bfae73b1abb8e9b10b29a7bc29d861bde7744cf8bf00e55eed3356",
+      "bytes": 95079,
+      "license": "Lions International; arquivo oficial, não reconstruir",
+      "variant": "leo"
+    },
+    {
+      "id": "leo-emblema-omega-white",
+      "kind": "logo",
+      "path": "logos/Emblemas_de_Leos/109141435__Logo_rgb_Leo_2C_Omega_WhiteText.png",
+      "sha256": "49142af6c8daf738c7b03a01257060702b98ee1f622a9cfbb97aa489c4b15c7e",
+      "bytes": 96848,
+      "license": "Lions International; arquivo oficial, não reconstruir",
+      "variant": "leo"
+    },
+    {
+      "id": "leo-lion-assinatura-3c-blue",
+      "kind": "logo",
+      "path": "logos/Logotipos_de_Leo_a_Leão/109141436__Logo_rgb_Leo-Lion_3C_BlueText.png",
+      "sha256": "f642518f7f20d2f07f3e46e6574850e5cacfb3c36e7846ff881dc194970aec24",
+      "bytes": 90536,
+      "license": "Lions International; arquivo oficial, não reconstruir",
+      "variant": "leo-lion"
+    },
+    {
+      "id": "leo-lion-assinatura-1c-white",
+      "kind": "logo",
+      "path": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
+      "sha256": "75ced8013a51cf9b830d0fd9440b83e5e686912184529f533a0aef238f41a55f",
+      "bytes": 74835,
+      "license": "Lions International; arquivo oficial, não reconstruir",
+      "variant": "leo-lion"
+    },
+    {
+      "id": "lions-emblema-2c",
+      "kind": "logo",
+      "path": "logos/Emblemas_do_Lions/76039637__lionlogo_2c.jpg",
+      "sha256": "dbb950cafb6c8716638501217c76ee4a4889f619a243a3d275cc8b593f4b6449",
+      "bytes": 269002,
+      "license": "Lions International; arquivo oficial, não reconstruir",
+      "variant": "lions"
+    },
+    {
+      "id": "lions-assinatura-2c",
+      "kind": "logo",
+      "path": "logos/Assinaturas_de_Lions_Clubs_International/90875984__LCI_primary_sig_2color.png",
+      "sha256": "c665068f91ccea99ff1efda4c1e58dc21ba270e4286c6f1f6c075ad43e306539",
+      "bytes": 49780,
+      "license": "Lions International; arquivo oficial, não reconstruir",
+      "variant": "lions"
+    },
+    {
+      "id": "lions-oficial-2022",
+      "kind": "pptx",
+      "path": "box/C-apresentacoes/LI_BrandResources_Template_PPT_13.3x7.5_Presentation_00a.pptx",
+      "sha256": "4a5b521de577453a7e50065a2a1fc5d658879ccde37267a1e8a56ad84f6f9d24",
+      "bytes": 18518334,
+      "license": "© Lions International; fora do git; uso conforme o guia",
+      "template_id": "lions-oficial-2022",
+      "variants": [
+        "lions",
+        "leo-lion"
+      ]
+    },
+    {
+      "id": "mission-brief-2026",
+      "kind": "pptx",
+      "path": "site-extra/resources/152441463__Mission Brief Presentation_en.pptx",
+      "sha256": "07e0302a650c2c0028c2e31f370ef1a9a4248424219c0c83d00314fc42b3e9fc",
+      "bytes": 66852075,
+      "license": "© Lions International; fora do git; uso conforme o guia",
+      "template_id": "mission-brief-2026",
+      "variants": [
+        "lions"
+      ],
+      "optional": true
+    },
+    {
+      "id": "service-journey-2026",
+      "kind": "pptx",
+      "path": "site-extra/resources/122465944__ContinuingtheServiceJourney_en.pptx",
+      "sha256": "155a5452e0533d5113cf4594576df65436f4196bf7c6d472328ff18a73b3960f",
+      "bytes": 22297824,
+      "license": "© Lions International; fora do git; uso conforme o guia",
+      "template_id": "service-journey-2026",
+      "variants": [
+        "lions"
+      ],
+      "optional": true
+    },
+    {
+      "id": "new-club-development-2026",
+      "kind": "pptx",
+      "path": "site-extra/resources/97013210__New Club Development WorkshopTraining_en.pptx",
+      "sha256": "62ce24a3240c274d8a3275a3912bcee6953c5d1908e0cda67508da644677d313",
+      "bytes": 138849830,
+      "license": "© Lions International; fora do git; uso conforme o guia",
+      "template_id": "new-club-development-2026",
+      "variants": [
+        "lions"
+      ],
+      "optional": true
+    }
+  ]
+}
