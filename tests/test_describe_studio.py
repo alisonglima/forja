@@ -6,6 +6,7 @@ derivam `steps{name,doc,needs}` + `files` sem lista fixa (plano:559,404);
 LACUNA: texto CLI/deliver/google/slides fora desta lane; sem leitura de arquivo.
 """
 import inspect
+import re
 
 
 def test_top_level_ganha_mcp_tools():
@@ -40,7 +41,9 @@ def test_describe_importa_tools_dentro_da_funcao():
 
     assert "TOOLS" in inspect.getsource(describe.describe)
     top = inspect.getsource(describe).partition("def describe(")[0]
-    assert "mcp" not in top and "TOOLS" not in top
+    # a intencao e o import tardio: o catalogo de comandos ja cita a palavra "mcp"
+    assert not re.search(r"^\s*(from\s+\S*\s*import\s+mcp|from\s+\S*mcp\s+import|import\s+\S*mcp)", top, re.M)
+    assert "TOOLS" not in top
 
 
 def test_approve_tem_brief_post_hash():
