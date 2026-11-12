@@ -120,7 +120,7 @@ for proibido in os.environ["FAKE_MAC_PATHS"].split("|"):
 tmp = S / "pve_tmp"; tmp.mkdir(exist_ok=True); (S / "pve_home").mkdir(exist_ok=True)
 cmd = cmd.replace("/tmp/", str(tmp) + "/")
 env = dict(os.environ, PATH=os.environ["FAKE_PVEBIN"] + ":" + os.environ["PATH"])
-sys.exit(subprocess.run(["sh", "-c", cmd], env=env, cwd=str(S / "pve_home")).returncode)
+sys.exit(subprocess.run(["bash", "-c", cmd], env=env, cwd=str(S / "pve_home")).returncode)  # o root do PVE real roda bash; sh=dash no Debian nao entende $'..' do printf %q
 '''
 
 FAKE_PVEAM = r'''#!/bin/sh
