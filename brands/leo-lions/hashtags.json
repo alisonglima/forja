@@ -1,0 +1,159 @@
+{
+  "schema": "forja-brand-hashtags/v1",
+  "brand": "leo-lions",
+  "atualizado_em": "2026-11-12",
+  "tags": [
+    {
+      "tag": "#WeServe",
+      "tipo": "marca",
+      "marcas": ["lions", "leo"],
+      "fonte": "videos-vimeo-social-media/analise/408602835/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#LionsClub",
+      "tipo": "marca",
+      "marcas": ["lions", "leo"],
+      "fonte": "videos-vimeo-social-media/analise/408602835/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#LionsGoGreen",
+      "tipo": "campanha",
+      "marcas": ["lions"],
+      "fonte": "https://distritolc6.org.br/acontece-no-distrito/noticias-de-lions-internacional-para-os-clubes/",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#LionsFightHunger",
+      "tipo": "campanha",
+      "marcas": ["lions"],
+      "fonte": "videos-vimeo-social-media/analise/564738364/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "a-confirmar"
+    },
+    {
+      "tag": "#LionsFightDiabetes",
+      "tipo": "campanha",
+      "marcas": ["lions"],
+      "fonte": "videos-vimeo-social-media/analise/564738364/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "a-confirmar"
+    },
+    {
+      "tag": "#LDUN",
+      "tipo": "campanha",
+      "marcas": ["lions"],
+      "fonte": "videos-vimeo-social-media/analise/564738364/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#ThankYouLions",
+      "tipo": "campanha",
+      "marcas": ["lions"],
+      "fonte": "videos-vimeo-social-media/analise/564738364/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "a-confirmar"
+    },
+    {
+      "tag": "#PeacePoster",
+      "tipo": "campanha",
+      "marcas": ["lions"],
+      "fonte": "videos-vimeo-social-media/analise/564738364/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#LCICon2021",
+      "tipo": "campanha",
+      "marcas": ["lions"],
+      "fonte": "videos-vimeo-social-media/analise/564738364/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#LCICon2023",
+      "tipo": "campanha",
+      "marcas": ["lions"],
+      "fonte": "videos-vimeo-social-media/analise/909166997/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "a-confirmar"
+    },
+    {
+      "tag": "#LionsCon24",
+      "tipo": "campanha",
+      "marcas": ["lions"],
+      "fonte": "videos-vimeo-social-media/analise/909166997/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#leoclub",
+      "tipo": "identidade",
+      "marcas": ["leo"],
+      "fonte": "videos-vimeo-social-media/analise/565616352/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#socialservice",
+      "tipo": "identidade",
+      "marcas": ["leo"],
+      "fonte": "videos-vimeo-social-media/analise/565616352/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#altruism",
+      "tipo": "identidade",
+      "marcas": ["leo"],
+      "fonte": "videos-vimeo-social-media/analise/565616352/notas.md",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#LCIF",
+      "tipo": "marca",
+      "marcas": ["lions"],
+      "fonte": "https://distritolc6.org.br/acontece-no-distrito/lcsjriopretosullcif-projeto-fome-casa-apoio-amor-e-fe/",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#DistritoLC6",
+      "tipo": "local",
+      "marcas": ["lions"],
+      "fonte": "https://distritolc6.org.br/acontece-no-distrito/lcsjriopretosullcif-projeto-fome-casa-apoio-amor-e-fe/",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    },
+    {
+      "tag": "#WeServer",
+      "tipo": "local",
+      "marcas": ["lions"],
+      "fonte": "https://distritolc6.org.br/acontece-no-distrito/lcsjriopretosullcif-projeto-fome-casa-apoio-amor-e-fe/",
+      "acessado_em": "2026-11-12",
+      "status": "verificado"
+    }
+  ],
+  "regras": {
+    "minimo": 3,
+    "maximo": 5,
+    "genericas_evitar": [
+      {
+        "tag": "#FYP",
+        "fonte": "909166997 [05:20]; 565616352 [12:40]",
+        "motivo": "tag ampla de descoberta; o vídeo manda evitar genéricas/amplas e a nota só a registra como tática datada"
+      },
+      {
+        "tag": "#ForYouPage",
+        "fonte": "909166997 [05:20]; 565616352 [12:40]",
+        "motivo": "mesma tag de descoberta ampla, grafia por extenso; não é hashtag de marca"
+      }
+    ]
+  }
+}
