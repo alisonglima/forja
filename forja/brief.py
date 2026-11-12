@@ -12,6 +12,7 @@ from .errors import ForjaError
 BRIEF_FILE = "brief.yaml"
 APPROVALS_FILE = "approvals.json"
 APPROVAL_KEYS = ("script", "voice", "overlays", "publish")
+_V2_KEYS = ("schema_version", "piece", "brand_id", "format", "brief", "artifacts", "hash")
 _REQUIRED_TEXT = ("objective", "audience", "tone")
 
 
@@ -118,6 +119,9 @@ def load_approvals(root) -> dict:
             if not isinstance(data[key], str):
                 raise ForjaError("GATE_FAILED", "approvals.%s deve ser string" % key)
             result[key] = data[key]
+    for key in _V2_KEYS:
+        if key in data:
+            result[key] = data[key]
     return result
 
 
@@ -163,11 +167,66 @@ def approval_issues(root, required=("script", "voice")) -> list[dict]:
     return issues
 
 
-def require_approvals(root, cfg: dict, required=("script", "voice")) -> None:
+def _artifact_path(root, value):
+    if not isinstance(value, str) or not value or Path(value).is_absolute():
+        return None
+    if ".." in Path(value).parts:
+        return None
+    root = Path(root)
+    path = root / value
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, ValueError):
+        return None
+    return path
+
+
+def _approval_hash_stale(expected, current, piece=None, path=None) -> ForjaError:
+    return ForjaError(
+        "APPROVAL_STALE",
+        "aprovacao por hash invalida ou desatualizada",
+        details={"expected": expected, "current": current, "piece": piece, "path": path},
+    )
+
+
+def _check_piece_hash(root, data: dict, piece_hash: str) -> None:
+    hashed = data.get("hash")
+    if data.get("schema_version") != 2 or not isinstance(hashed, dict):
+        raise _approval_hash_stale(None, piece_hash, data.get("piece"))
+    expected = hashed.get("valor")
+    path = hashed.get("arquivo")
+    if not isinstance(expected, str) or expected != piece_hash:
+        raise _approval_hash_stale(expected, piece_hash, data.get("piece"), path)
+    artifacts = data.get("artifacts")
+    if not isinstance(artifacts, list) or not artifacts:
+        raise _approval_hash_stale(expected, piece_hash, data.get("piece"), path)
+    covered = False
+    for artifact in artifacts:
+        if not isinstance(artifact, dict):
+            continue
+        if _artifact_path(root, artifact.get("path")) is None:
+            raise _approval_hash_stale(expected, piece_hash, data.get("piece"), path)
+        if artifact.get("path") == path and artifact.get("sha256") == expected:
+            covered = True
+    safe = _artifact_path(root, path)
+    if not covered or safe is None or not safe.is_file():
+        raise _approval_hash_stale(expected, piece_hash, data.get("piece"), path)
+
+
+def require_approvals(
+    root, cfg: dict, required=("script", "voice"), piece_hash=None
+) -> None:
     project = cfg.get("project") if isinstance(cfg, dict) else {}
     if not isinstance(project, dict) or not project.get("require_approvals"):
         return
-    data = load_approvals(root)
+    if piece_hash is None:
+        data = load_approvals(root)
+    else:
+        try:
+            data = load_approvals(root)
+        except ForjaError:
+            raise _approval_hash_stale(None, piece_hash) from None
+        _check_piece_hash(root, data, piece_hash)
     missing = [key for key in required if not data.get(key)]
     if missing:
         raise ForjaError(
