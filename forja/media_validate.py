@@ -26,6 +26,8 @@ _IMAGE_PREFIXES = (
     b"\xff\xd8\xff",
     b"GIF87a",
     b"GIF89a",
+    b"II*\x00",
+    b"MM\x00*",
 )
 _VIDEO_PREFIXES = (b"\x1aE\xdf\xa3", b"\x00\x00\x01", b"FLV")
 

@@ -326,3 +326,21 @@ def test_fase_que_falha_ainda_traz_as_evidencias_antes_de_destruir(tmp_path):
     assert _linhas(log, "pct destroy ") == ["pct destroy 920 --purge"], "CT proprio tem de ser destruido"
     sobras = sorted(p.name for p in (st / "pve_tmp").glob("*920*"))
     assert not sobras, f"sobrou lixo meu no /tmp do PVE: {sobras}"
+
+
+def test_extra_itens_entram_no_tar_do_kit(tmp_path):
+    """Peca real: EXTRA_ITENS leva caminhos do repo ao CT junto do kit."""
+    import tarfile
+    proc, out, st, log = _rodar(tmp_path, "ok", extra_env={"EXTRA_ITENS": "docs/prova-kit/video-0.9.38.md"})
+    assert proc.returncode == 0, proc.stderr
+    with tarfile.open(out / "prova-kit.tar.gz") as tar:
+        nomes = tar.getnames()
+    assert "docs/prova-kit/video-0.9.38.md" in nomes and any(n.startswith("scripts/prova-kit") for n in nomes)
+
+
+@pytest.mark.parametrize("item", ["/etc/passwd", "../fora", "docs/../../fora"])
+def test_extra_itens_absoluto_ou_com_pontos_e_recusado_antes_de_criar(tmp_path, item):
+    proc, out, st, log = _rodar(tmp_path, "ok", extra_env={"EXTRA_ITENS": item})
+    assert proc.returncode == 2 and "EXTRA_ITENS" in proc.stderr
+    assert not _linhas(log, "pct create "), "nao pode criar CT com EXTRA_ITENS invalido"
+

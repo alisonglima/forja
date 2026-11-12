@@ -67,6 +67,12 @@ if [ "$MODO" = inside ]; then
 fi
 
 validar_ctid "$CTID"
+# EXTRA_ITENS: caminhos relativos a raiz do repo; nada absoluto nem com `..` (so entra no tar o que e do repo)
+for item in ${EXTRA_ITENS:-}; do
+  case "$item" in
+    /*|*..*) erro "EXTRA_ITENS invalido: '$item' (caminho relativo, sem '..')"; exit 2 ;;
+  esac
+done
 KIT_TAR="/tmp/prova-kit-$CTID.tar.gz"
 EVID_TAR="/tmp/evidencias-$CTID.tar.gz"
 HOSTNAME="prova-kit-$CTID"
