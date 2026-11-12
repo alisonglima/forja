@@ -116,6 +116,69 @@ def _color_issues(html, allowed):
                               color=color))
     return out
 
+_VAR_DECL = re.compile(r"(--[A-Za-z0-9_-]+)\s*:\s*(#[0-9A-Fa-f]{6})\b")
+_POS = r"-?\d*\.?\d+(?:%|[a-z]+)?"
+_NON_COLOR = re.compile(
+    r"(?:from\s+)?-?\d*\.?\d+(?:deg|grad|rad|turn)(?:\s+at\s+.+)?"
+    r"|at\s+.+|to\s+(?:left|right|top|bottom|center)"
+    r"(?:\s+(?:left|right|top|bottom|center))?"
+    rf"|(?:{_POS}\s*)+", re.I)
+
+def _split_args(text):
+    """Separa argumentos de topo por virgula, respeitando parenteses."""
+    parts, depth, start = [], 0, 0
+    for idx, char in enumerate(text):
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+        elif char == "," and depth == 0:
+            parts.append(text[start:idx])
+            start = idx + 1
+    parts.append(text[start:])
+    return parts
+
+def _gradient_args(html):
+    """Extrai os argumentos de cada *-gradient(...) do html."""
+    out = []
+    for match in _GRADIENT.finditer(html):
+        depth, end = 0, len(html)
+        for idx in range(match.end() - 1, len(html)):
+            if html[idx] == "(":
+                depth += 1
+            elif html[idx] == ")":
+                depth -= 1
+                if depth == 0:
+                    end = idx
+                    break
+        out.append(_split_args(html[match.end():end]))
+    return out
+
+def _gradient_authorized(html, allowed):
+    """Todo stop de cor e hex da paleta ou var declarado com hex dela."""
+    declared = {name: value.lower() for name, value in _VAR_DECL.findall(html)}
+    strip = re.compile(rf"^(?:\s*{_POS})+|(?:\s+{_POS})+$", re.I)
+    for args in _gradient_args(html):
+        colors = 0
+        for raw in args:
+            stop = raw.strip()
+            if not stop or _NON_COLOR.fullmatch(stop):
+                continue
+            stop = strip.sub("", stop).strip()
+            if not stop:
+                continue
+            colors += 1
+            if _HEX_FULL.fullmatch(stop):
+                if stop.lower() not in allowed:
+                    return False
+                continue
+            var = re.fullmatch(r"var\(\s*(--[A-Za-z0-9_-]+)\s*\)", stop)
+            if not var or declared.get(var.group(1)) not in allowed:
+                return False
+        if not colors:
+            return False
+    return True
+
 def _accent_issues(html, accents, maximum):
     used = sorted({raw.lower() for raw in _HEX.findall(html)} & accents)
     if len(used) <= maximum:
@@ -211,7 +274,9 @@ def lint_brand(html, tokens, variant, fonts=None, logos=None,
         issues.append(_issue("error", "BRAND_EMOJI_ICON",
                              f"emoji como icone: {emoji.group(0)}",
                              char=emoji.group(0)))
-    if _GRADIENT.search(html):
+    if _GRADIENT.search(html) and (
+            rules.get("allow_brand_gradient") is not True
+            or not _gradient_authorized(html, allowed)):
         issues.append(_issue("error", "BRAND_GENERIC_GRADIENT",
                              "gradiente generico nao autorizado"))
     issues.extend(_accent_issues(html, accents, maximum))
