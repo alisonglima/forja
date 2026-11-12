@@ -123,8 +123,10 @@ def test_new_tools_never_approve_deliver_confirm_nor_slides(tmp_path, monkeypatc
     seen = _cap(monkeypatch)
     for name in NEW:
         _call(name, {"project": str(tmp_path)})
+        # o passo `deliver` de forja_package so monta entrega/ (o humano aprova e publica): o valor de --only e permitido
+        args = [a for a in seen["argv"] if a != ONLY[name]]
         for banned in ("--confirm", "--by", "--hash", "approve", "deliver"):
-            assert banned not in seen["argv"]
+            assert banned not in args
     # LACUNA: contrato nao fixa campos de `data`; so o --only e o envelope/isError.
     from forja import mcp
 
