@@ -180,3 +180,9 @@ As três são **adaptações em PT** de tom/posicionamento, não traduções ofi
 | **Canva editável** | OAuth do dono pendente (`README.md:62`) | decidir se a produção fica no código (HTML/CSS + logos) ou no Canva |
 
 **Não verificado:** não reexecutei `shasum -a 256 -c SHA256SUMS.txt` sobre os 1.285 arquivos; não abri os PDFs, usei os textos extraídos; não há EULA de fonte no acervo; não há regra de posição nem mínimo digital para Leo; não há guia Leo em PT (o README:79 diz que não foi verificado em todos os idiomas); não testei renderização no LXC (rede/kit proibidos nesta lane).
+
+## Errata (12/11/2026, após abrir o kit oficial `graficos-prontos`)
+
+- §2 e §7: o emblema Leo geral `109141433` **funciona sobre o azul claro `#407CCA`**. O "branco" do PNG é o contorno do desenho (visível no kit oficial Leo, `121994757`/`121994761`). A conclusão "só serve em fundo claro / cinza dá 1,54:1 sobre azul escuro" vale para o azul 287 e o azul marinho, não para o azul claro do Leo.
+- §5: o guia Leo (p.10) pede títulos em verde/azul pesados e a **seta** como elemento gráfico primário; no kit oficial isso aparece como fundo azul claro, título branco pesado, fio amarelo, triângulo amarelo e faixas diagonais translúcidas. Não há arquivo de seta no acervo.
+- Ver `peca-real-leo-2026-11-12.md`.
