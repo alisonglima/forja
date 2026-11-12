@@ -26,7 +26,8 @@ _DEFAULT_FONTS = frozenset({
     "ui-monospace", "system-ui", "-apple-system", "blinkmacsystemfont"})
 _FONT_KEYWORDS = frozenset({"inherit", "initial", "unset", "revert", "revert-layer"})
 _EMBLEMS = {
-    "lions": ("logos/Emblemas_do_Lions/", "logos/Assinaturas_de_Lions_Clubs_International/"),
+    "lions": ("logos/Emblemas_do_Lions/", "logos/Assinaturas_de_Lions_Clubs_International/",
+ "logos/Assinaturas_de_Lions_International/"),
     "leo": ("logos/Emblemas_de_Leos/",),
     "leo-lion": ("logos/Logotipos_de_Leo_a_Leao/", "logos/Logotipos_de_Leo_a_Leão/"),
 }

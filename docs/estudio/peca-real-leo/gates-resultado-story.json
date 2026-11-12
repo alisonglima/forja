@@ -1,0 +1,881 @@
+{
+ "lions-capa-campanha-story": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1920,
+   "bytes": 1339578,
+   "sha256": "8ecbd0ed51ba6f282c14af1e5932884212f32e66d43601017c1cb2dd869d8f14"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1920,
+   "sha256": "8ecbd0ed51ba6f282c14af1e5932884212f32e66d43601017c1cb2dd869d8f14"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "eyebrow",
+     "x": 108,
+     "y": 995,
+     "w": 204,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
+    },
+    {
+     "id": "titulo",
+     "x": 108,
+     "y": 1039,
+     "w": 587,
+     "h": 385,
+     "cor": "#ffffff",
+     "px": 120
+    },
+    {
+     "id": "subtitulo",
+     "x": 108,
+     "y": 1483,
+     "w": 667,
+     "h": 42,
+     "cor": "#ffffff",
+     "px": 36
+    },
+    {
+     "id": "clube",
+     "x": 108,
+     "y": 1601,
+     "w": 149,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    },
+    {
+     "id": "periodo",
+     "x": 273,
+     "y": 1601,
+     "w": 177,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 108,
+     "y": 288,
+     "w": 620,
+     "h": 129,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.15,
+    "bottom": 0.15,
+    "left": 0.1,
+    "right": 0.1,
+    "fonte": "convenção 15/15/10/10 a validar; Meta só pede bordas livres",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "eyebrow": {
+    "min": 8.13177932334655,
+    "p5": 8.15842657240651,
+    "mean": 9.191165545235284,
+    "pass": true
+   },
+   "titulo": {
+    "min": 7.550532731621432,
+    "p5": 7.70358247634144,
+    "mean": 8.906698350509375,
+    "pass": true
+   },
+   "subtitulo": {
+    "min": 7.941522699662205,
+    "p5": 8.004791492160901,
+    "mean": 8.273304160614998,
+    "pass": true
+   },
+   "clube": {
+    "min": 8.312404867831594,
+    "p5": 8.321231917783784,
+    "mean": 8.358655161157143,
+    "pass": true
+   },
+   "periodo": {
+    "min": 8.096063887424346,
+    "p5": 8.192846059639695,
+    "mean": 8.355681621034979,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "leo-capa-campanha-story": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1920,
+   "bytes": 1225657,
+   "sha256": "32b87b1c358cbca6ee05ff4cbcda3997096f53d7e1e9e69503cbddf9b8e63597"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1920,
+   "sha256": "32b87b1c358cbca6ee05ff4cbcda3997096f53d7e1e9e69503cbddf9b8e63597"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "eyebrow",
+     "x": 226,
+     "y": 1071,
+     "w": 204,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
+    },
+    {
+     "id": "titulo",
+     "x": 226,
+     "y": 1115,
+     "w": 523,
+     "h": 262,
+     "cor": "#ffffff",
+     "px": 120
+    },
+    {
+     "id": "subtitulo",
+     "x": 226,
+     "y": 1436,
+     "w": 664,
+     "h": 89,
+     "cor": "#ffffff",
+     "px": 36
+    },
+    {
+     "id": "clube",
+     "x": 226,
+     "y": 1601,
+     "w": 130,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    },
+    {
+     "id": "periodo",
+     "x": 372,
+     "y": 1601,
+     "w": 177,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 226,
+     "y": 288,
+     "w": 190,
+     "h": 177,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.15,
+    "bottom": 0.15,
+    "left": 0.1,
+    "right": 0.1,
+    "fonte": "convenção 15/15/10/10 a validar; Meta só pede bordas livres",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "eyebrow": {
+    "min": 3.494418225533384,
+    "p5": 3.5455011116662694,
+    "mean": 3.702910123109655,
+    "pass": true
+   },
+   "titulo": {
+    "min": 3.4161292207737506,
+    "p5": 3.477125192333261,
+    "mean": 3.720165280084711,
+    "pass": true
+   },
+   "subtitulo": {
+    "min": 3.4214541627872057,
+    "p5": 3.505761860035359,
+    "mean": 4.018779396495241,
+    "pass": true
+   },
+   "clube": {
+    "min": 3.4214541627872057,
+    "p5": 3.477125192333261,
+    "mean": 4.108956477434025,
+    "pass": true
+   },
+   "periodo": {
+    "min": 3.432569230570198,
+    "p5": 3.499178469507948,
+    "mean": 3.8040553250076536,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "lions-data-comemorativa-story": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1920,
+   "bytes": 1500339,
+   "sha256": "04e71334004f0974e56929bb09042f0612e681c953c9098579301b583d19954c"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1920,
+   "sha256": "04e71334004f0974e56929bb09042f0612e681c953c9098579301b583d19954c"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "data",
+     "x": 315,
+     "y": 777,
+     "w": 450,
+     "h": 42,
+     "cor": "#ffffff",
+     "px": 36
+    },
+    {
+     "id": "rotulo",
+     "x": 330,
+     "y": 850,
+     "w": 419,
+     "h": 75,
+     "cor": "#00338d",
+     "px": 64
+    },
+    {
+     "id": "titulo",
+     "x": 150,
+     "y": 936,
+     "w": 780,
+     "h": 200,
+     "cor": "#ffffff",
+     "px": 170
+    },
+    {
+     "id": "assinatura",
+     "x": 414,
+     "y": 1540,
+     "w": 251,
+     "h": 47,
+     "cor": "#ffffff",
+     "px": 40
+    },
+    {
+     "id": "clube",
+     "x": 346,
+     "y": 1598,
+     "w": 388,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 260,
+     "y": 288,
+     "w": 560,
+     "h": 116,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.15,
+    "bottom": 0.15,
+    "left": 0.1,
+    "right": 0.1,
+    "fonte": "convenção 15/15/10/10 a validar; Meta só pede bordas livres",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "data": {
+    "min": 7.296643213504436,
+    "p5": 7.742788844448869,
+    "mean": 9.852302000095678,
+    "pass": true
+   },
+   "rotulo": {
+    "min": 11.301575094962985,
+    "p5": 11.301575094962985,
+    "mean": 11.301575094962983,
+    "pass": true
+   },
+   "titulo": {
+    "min": 6.416049855422833,
+    "p5": 7.720811873697396,
+    "mean": 8.831274319959896,
+    "pass": true
+   },
+   "assinatura": {
+    "min": 9.037947826054564,
+    "p5": 9.282295276533839,
+    "mean": 9.429257437223958,
+    "pass": true
+   },
+   "clube": {
+    "min": 9.054300545979935,
+    "p5": 9.281493925819555,
+    "mean": 9.401392933629976,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "leo-data-comemorativa-story": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1920,
+   "bytes": 935622,
+   "sha256": "0f3e62f3654f222ca27454990d35ac0c296ddace0298461105914884099dc9c6"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1920,
+   "sha256": "0f3e62f3654f222ca27454990d35ac0c296ddace0298461105914884099dc9c6"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "data",
+     "x": 335,
+     "y": 867,
+     "w": 411,
+     "h": 42,
+     "cor": "#ffffff",
+     "px": 36
+    },
+    {
+     "id": "rotulo",
+     "x": 260,
+     "y": 940,
+     "w": 559,
+     "h": 75,
+     "cor": "#55565a",
+     "px": 64
+    },
+    {
+     "id": "titulo",
+     "x": 130,
+     "y": 1030,
+     "w": 819,
+     "h": 159,
+     "cor": "#ffffff",
+     "px": 136
+    },
+    {
+     "id": "clube",
+     "x": 356,
+     "y": 1598,
+     "w": 367,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 430,
+     "y": 288,
+     "w": 220,
+     "h": 204,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.15,
+    "bottom": 0.15,
+    "left": 0.1,
+    "right": 0.1,
+    "fonte": "convenção 15/15/10/10 a validar; Meta só pede bordas livres",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "data": {
+    "min": 3.4214541627872057,
+    "p5": 3.543988573720262,
+    "mean": 3.8832222009395467,
+    "pass": true
+   },
+   "rotulo": {
+    "min": 7.329813707112641,
+    "p5": 7.329813707112641,
+    "mean": 7.329813707112638,
+    "pass": true
+   },
+   "titulo": {
+    "min": 3.4161292207737506,
+    "p5": 3.4706781173473265,
+    "mean": 4.129842204954653,
+    "pass": true
+   },
+   "clube": {
+    "min": 3.505415618928303,
+    "p5": 3.6034565893573203,
+    "mean": 3.8131732130125604,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "leo-editorial-capa-story": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1920,
+   "bytes": 2044695,
+   "sha256": "41b07039c1df455eefa30a3f1bf63fc324760b86f60255477235798754b353e6"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1920,
+   "sha256": "41b07039c1df455eefa30a3f1bf63fc324760b86f60255477235798754b353e6"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "data",
+     "x": 108,
+     "y": 294,
+     "w": 358,
+     "h": 35,
+     "cor": "#ffffff",
+     "px": 30
+    },
+    {
+     "id": "titulo",
+     "x": 108,
+     "y": 1215,
+     "w": 874,
+     "h": 311,
+     "cor": "#ffffff",
+     "px": 150
+    },
+    {
+     "id": "clube",
+     "x": 108,
+     "y": 1602,
+     "w": 130,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    },
+    {
+     "id": "periodo",
+     "x": 254,
+     "y": 1602,
+     "w": 177,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 802,
+     "y": 288,
+     "w": 170,
+     "h": 158,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.15,
+    "bottom": 0.15,
+    "left": 0.1,
+    "right": 0.1,
+    "fonte": "convenção 15/15/10/10 a validar; Meta só pede bordas livres",
+    "status": "provisorio"
+   },
+   "issues": [
+    {
+     "level": "error",
+     "id": "titulo",
+     "code": "GATE_FAILED",
+     "msg": "caixa fora da zona segura (top=288 bottom=288 left=108 right=108)"
+    }
+   ]
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "data": {
+    "min": 3.5345634009559572,
+    "p5": 4.505369233463668,
+    "mean": 4.710775410126771,
+    "pass": true
+   },
+   "titulo": {
+    "min": 3.5345634009559572,
+    "p5": 4.171643037885364,
+    "mean": 7.06288193551846,
+    "pass": true
+   },
+   "clube": {
+    "min": 3.5345634009559572,
+    "p5": 3.5345634009559572,
+    "mean": 4.48684577806611,
+    "pass": true
+   },
+   "periodo": {
+    "min": 3.5345634009559572,
+    "p5": 3.5879725012207655,
+    "mean": 6.07563415884127,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "lions-editorial-capa-story": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1920,
+   "bytes": 1708254,
+   "sha256": "88fd1ecb685e1b6537f0fb5313dbc07ea4f0d602d266931ad381b8781606e561"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1920,
+   "sha256": "88fd1ecb685e1b6537f0fb5313dbc07ea4f0d602d266931ad381b8781606e561"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "data",
+     "x": 108,
+     "y": 294,
+     "w": 392,
+     "h": 35,
+     "cor": "#ffffff",
+     "px": 30
+    },
+    {
+     "id": "titulo",
+     "x": 108,
+     "y": 1080,
+     "w": 856,
+     "h": 446,
+     "cor": "#ffffff",
+     "px": 150
+    },
+    {
+     "id": "clube",
+     "x": 108,
+     "y": 1602,
+     "w": 149,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    },
+    {
+     "id": "periodo",
+     "x": 273,
+     "y": 1602,
+     "w": 177,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 802,
+     "y": 288,
+     "w": 170,
+     "h": 161,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.15,
+    "bottom": 0.15,
+    "left": 0.1,
+    "right": 0.1,
+    "fonte": "convenção 15/15/10/10 a validar; Meta só pede bordas livres",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "data": {
+    "min": 4.612086794085452,
+    "p5": 4.612086794085452,
+    "mean": 4.624242610140874,
+    "pass": true
+   },
+   "titulo": {
+    "min": 4.612086794085452,
+    "p5": 4.624314990843303,
+    "mean": 7.152304952777525,
+    "pass": true
+   },
+   "clube": {
+    "min": 6.779571065688288,
+    "p5": 7.001639506066518,
+    "mean": 7.738511017533084,
+    "pass": true
+   },
+   "periodo": {
+    "min": 7.150199651081565,
+    "p5": 7.50308004481539,
+    "mean": 8.068979373966172,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "leo-editorial-numero-story": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1920,
+   "bytes": 1377293,
+   "sha256": "fde5772b09f01b675490bd606561f17950034f2f362ebfbba170ce6b6002c818"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1920,
+   "sha256": "fde5772b09f01b675490bd606561f17950034f2f362ebfbba170ce6b6002c818"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "chamada",
+     "x": 136,
+     "y": 874,
+     "w": 633,
+     "h": 54,
+     "cor": "#55565a",
+     "px": 46
+    },
+    {
+     "id": "numero",
+     "x": 108,
+     "y": 954,
+     "w": 763,
+     "h": 251,
+     "cor": "#ebb700",
+     "px": 214
+    },
+    {
+     "id": "legenda",
+     "x": 108,
+     "y": 1189,
+     "w": 834,
+     "h": 47,
+     "cor": "#ffffff",
+     "px": 40
+    },
+    {
+     "id": "clube",
+     "x": 108,
+     "y": 1602,
+     "w": 130,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    },
+    {
+     "id": "periodo",
+     "x": 254,
+     "y": 1602,
+     "w": 177,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 802,
+     "y": 288,
+     "w": 170,
+     "h": 158,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.15,
+    "bottom": 0.15,
+    "left": 0.1,
+    "right": 0.1,
+    "fonte": "convenção 15/15/10/10 a validar; Meta só pede bordas livres",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "chamada": {
+    "min": 7.329813707112641,
+    "p5": 7.329813707112641,
+    "mean": 7.329813707112639,
+    "pass": true
+   },
+   "numero": {
+    "min": 3.2797017464216696,
+    "p5": 3.293903645965138,
+    "mean": 3.622678994528058,
+    "pass": true
+   },
+   "legenda": {
+    "min": 6.091879024674587,
+    "p5": 6.238887238966093,
+    "mean": 6.802456979404626,
+    "pass": true
+   },
+   "clube": {
+    "min": 6.5906269033790075,
+    "p5": 6.678021797384732,
+    "mean": 7.415794694553643,
+    "pass": true
+   },
+   "periodo": {
+    "min": 6.091879024674587,
+    "p5": 6.308895633615813,
+    "mean": 7.383730167246336,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ }
+}

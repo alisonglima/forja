@@ -25,9 +25,10 @@ def grafia_erros(copy, idioma):
     if idioma != "pt-BR":
         return []
     cfg = json.loads((BRANDS / "grafia.json").read_text(encoding="utf-8"))
-    rx = re.compile(cfg["verificacao"]["padrao_pt_BR"])
-    return [f"{campo}: '{m.group(0)}' ({cfg['verificacao']['mensagem']})"
-            for campo, valor in copy.items() if isinstance(valor, str) for m in rx.finditer(valor)]
+    regras = [(re.compile(r["padrao"]), r["mensagem"]) for r in cfg["verificacao"]["reprova"]]
+    return [f"{campo}: '{m.group(0)}' ({msg})"
+            for campo, valor in copy.items() if isinstance(valor, str)
+            for rx, msg in regras for m in rx.finditer(valor.replace("\u2019", "'"))]
 
 
 def geometria_logo(arquivo, largura_visivel):
@@ -68,6 +69,12 @@ def main(id_, saida):
     if ov:
         linhas.append(f"  --ov-a: {ov['opacidade']};")
         linhas.append(f"  --base-a: {ov.get('base_opacidade', 0)};")
+    fmt = next(f for f in json.loads((REPO / "forja/data/formats.json").read_text(encoding="utf-8"))["formatos"] if f["id"] == p["preset"])
+    zona = fmt["safe_zone"]
+    linhas += [f"  --h: {p['altura']}px;",
+               f"  --mx: {max(72, round(zona['left'] * 1080))}px;",
+               f"  --mt: {max(72, round(zona['top'] * p['altura']))}px;",
+               f"  --mb: {max(72, round(zona['bottom'] * p['altura']))}px;"]
     tokens = ":root {\n" + "\n".join(linhas) + "\n}"
     foto = p["foto"].get("src") or f"assets/{p['id']}.jpg"
     campos = dict(copy, formato=p["formato"], foto=foto, emb_w=p.get("emb_w", 0), marca=p["marca"], lang=p["idioma"])

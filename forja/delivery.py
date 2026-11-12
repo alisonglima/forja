@@ -12,6 +12,7 @@ import json
 import shutil
 from pathlib import Path
 
+from . import grafia
 from .errors import ForjaError
 
 _CHUNK = 1024 * 1024
@@ -237,6 +238,24 @@ def build_package(root, *, brief, brand_root, formats, approvals, now=None) -> d
                 manifest["consentimento"] = {"responsavel": responsavel}
     if cta_ok:
         manifest["cta"] = {"texto": cta["texto"], "destino": cta["destino"]}
+
+    idioma = brief.get("idioma", "pt-BR")
+    grafia_path = Path(brand_root) / "grafia.json"
+    if idioma == "pt-BR" and grafia_path.is_file():
+        try:
+            json.loads(grafia_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            _fail("CONFIG_INVALID", "grafia da marca ilegivel: %s" % exc)
+        textos = [legenda, alt] + [
+            tag[1:] if tag.startswith("#") else tag for tag in hashtags]
+        for texto in textos:
+            for issue in grafia.check_text(texto, idioma, brand_root):
+                if issue["level"] == "error":
+                    _fail("GATE_FAILED", issue.get("msg") or issue["code"],
+                          campo="grafia", codigo=issue["code"],
+                          trecho=issue.get("trecho"))
+                if issue["code"] not in manifest["avisos"]:
+                    manifest["avisos"].append(issue["code"])
 
     ent = root / "entrega"
     art_dir = ent / "arte"
