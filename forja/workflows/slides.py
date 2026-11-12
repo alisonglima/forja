@@ -22,7 +22,8 @@ from . import WORKFLOWS, register_workflow
 _DECK_KEYS = {"template", "template_sha256", "brand", "variant", "size", "locale",
               "notas", "modelo_catalogo"}
 _SLIDE_KEYS = {"modelo", "titulo", "subtitulo", "corpo", "numero", "legenda",
-               "rodape", "citacao", "atribuicao", "imagem", "imagem_sha256", "notas"}
+               "rodape", "citacao", "atribuicao", "imagem", "imagem_sha256", "notas",
+               "apoios", "itens", "linha"}
 _HEX = re.compile(r"[0-9a-fA-F]{64}\Z")
 
 def _fail(code, msg, **details):

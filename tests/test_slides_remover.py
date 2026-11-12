@@ -78,3 +78,13 @@ def test_texto_de_modelo_que_sobra_reprova_o_deck(tmp_path):
         _run(tmp_path, "deck", "template", "compose", "pptx")
     assert exc.value.code == "DECK_PLACEHOLDER_LEFT"
     assert exc.value.details["slide"] == 3 and exc.value.details["campo"] == "Extra"
+
+
+def test_chaves_do_deck_cobrem_todos_os_campos_do_catalogo():
+    """Todo campo mapeado no catalogo oficial tem de ser aceito pelo passo `deck`."""
+    from pathlib import Path
+
+    from forja.workflows import slides
+    cat = json.loads((Path(__file__).resolve().parents[1] / "brands/leo-lions/decks/modelos.json").read_text(encoding="utf-8"))
+    campos = {c for m in cat["models"].values() for c in (m.get("campos") or {})}
+    assert campos - slides._SLIDE_KEYS == set()
