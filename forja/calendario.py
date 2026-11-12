@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, timedelta
 from importlib import resources
 from pathlib import Path
 
@@ -97,3 +97,71 @@ def stale_rows(data, on=None, days=90) -> list:
                            "msg": f"{row.get('data')} desatualizado ha {idade} dias "
                                   f"(checked_at {row['checked_at']}, limite {days})"})
     return issues
+
+
+def _as_date(value):
+    """Converte data ISO; entrada invalida vira CONFIG_INVALID."""
+    if not isinstance(value, str):
+        raise _fail("CONFIG_INVALID", f"data invalida: {value!r}")
+    try:
+        return date.fromisoformat(value)
+    except ValueError as exc:
+        raise _fail("CONFIG_INVALID", f"data invalida: {value}") from exc
+
+
+def _week(day):
+    ano, semana, _ = day.isocalendar()
+    return f"{ano}-W{semana:02d}"
+
+
+def check_cadence(datas, minimo=1, ideal=(2, 3)) -> list:
+    """Avisa semanas abaixo do minimo ou do ideal, entre a primeira e a ultima."""
+    if not isinstance(minimo, int) or isinstance(minimo, bool) or minimo < 0:
+        raise _fail("CONFIG_INVALID", "minimo deve ser inteiro nao negativo")
+    if (not isinstance(ideal, (list, tuple)) or len(ideal) != 2
+            or any(not isinstance(v, int) or isinstance(v, bool) or v < 0 for v in ideal)):
+        raise _fail("CONFIG_INVALID", "ideal deve ser par de inteiros nao negativos")
+    if datas is None:
+        return []
+    if isinstance(datas, (str, bytes)):
+        raise _fail("CONFIG_INVALID", "datas deve ser lista de datas ISO")
+    try:
+        dias = [_as_date(item) for item in datas]
+    except TypeError as exc:
+        raise _fail("CONFIG_INVALID", "datas deve ser lista de datas ISO") from exc
+    if not dias:
+        return []
+    semanas = {}
+    for dia in dias:
+        segunda = dia - timedelta(days=dia.weekday())
+        semanas[segunda] = semanas.get(segunda, 0) + 1
+    issues = []
+    segunda, fim = min(semanas), max(semanas)
+    while segunda <= fim:
+        total, wid = semanas.get(segunda, 0), _week(segunda)
+        if total < minimo:
+            issues.append({"id": wid, "level": "warn", "code": "CADENCE_GAP", "count": total,
+                           "msg": f"{wid} abaixo do minimo ({total}/{minimo})"})
+        elif total < ideal[0]:
+            issues.append({"id": wid, "level": "info", "code": "CADENCE_BELOW_IDEAL",
+                           "count": total, "msg": f"{wid} abaixo do ideal ({total}/{ideal[0]})"})
+        segunda += timedelta(days=7)
+    return issues
+
+
+def weekly_grid(causas, semanas, inicio) -> list:
+    """Grade semanal a partir da segunda da semana de `inicio`, em rodizio."""
+    if not isinstance(causas, (list, tuple)) or not causas:
+        raise _fail("CONFIG_INVALID", "causas deve ser lista nao vazia")
+    if any(not isinstance(c, str) or not c.strip() for c in causas):
+        raise _fail("CONFIG_INVALID", "causa deve ser texto nao vazio")
+    if not isinstance(semanas, int) or isinstance(semanas, bool) or semanas < 1:
+        raise _fail("CONFIG_INVALID", "semanas deve ser inteiro positivo")
+    segunda = _as_date(inicio)
+    segunda -= timedelta(days=segunda.weekday())
+    grid = []
+    for i in range(semanas):
+        dia = segunda + timedelta(weeks=i)
+        grid.append({"semana": _week(dia), "segunda": dia.isoformat(),
+                     "causa": causas[i % len(causas)]})
+    return grid
