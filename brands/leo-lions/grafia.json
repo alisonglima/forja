@@ -1,0 +1,29 @@
+{
+  "schema": "forja-brand-grafia/v1",
+  "fonte": "regra do dono, 2026-11-12 (diverge do guia PT oficial, que escreve 'Leos'; a regra do dono manda)",
+  "marcas": {
+    "leo": {
+      "pt-BR": {
+        "sigla": "LEO",
+        "plural": "LEOs",
+        "proibido": ["Leo", "Leos"],
+        "quando": "toda arte, video ou texto em portugues divulgado no Brasil"
+      },
+      "outros-idiomas": {
+        "sigla": "Leo",
+        "plural": "Leos",
+        "quando": "arte ou video em outro idioma, divulgado fora do Brasil (ex.: en)"
+      }
+    }
+  },
+  "verificacao": {
+    "onde": "no TEXTO-FONTE (copy.json, legenda, roteiro), nunca no render: text-transform:uppercase esconderia um 'Leo' errado",
+    "padrao_pt_BR": "\\bLeos?\\b",
+    "mensagem": "em pt-BR a sigla e LEO (plural LEOs)"
+  },
+  "decisoes_pendentes_do_dono": [
+    "palavras derivadas em pt-BR (Leoismo/LEOismo, LEOísmo...): o exemplo de clube visto no Instagram mistura 'LEOs' e 'Leoísmo'; o checador NAO as bloqueia",
+    "plural 'LEOs' e provisorio (decorre da regra; nao foi dito pelo dono)",
+    "grafia de Leo-Lion em portugues (Leo-Leao?): nao definida; nao usar nesta fase"
+  ]
+}
