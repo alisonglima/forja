@@ -88,3 +88,49 @@ def test_chaves_do_deck_cobrem_todos_os_campos_do_catalogo():
     cat = json.loads((Path(__file__).resolve().parents[1] / "brands/leo-lions/decks/modelos.json").read_text(encoding="utf-8"))
     campos = {c for m in cat["models"].values() for c in (m.get("campos") or {})}
     assert campos - slides._SLIDE_KEYS == set()
+
+
+def test_lista_herda_formato_do_paragrafo_numeracao_e_espacamento():
+    """Itens 2..n herdam o `a:pPr` do primeiro (a agenda oficial e numerada, com entrelinha 150%)."""
+    from copy import deepcopy
+
+    from lxml import etree
+    from pptx import Presentation
+    from pptx.oxml.ns import qn
+    from pptx.util import Inches
+
+    from forja.workflows.slides import _fill_list
+
+    prs = Presentation()
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    box = slide.shapes.add_textbox(Inches(1), Inches(1), Inches(4), Inches(2))
+    box.name = "Itens"
+    box.text_frame.text = "Topic here"
+    para = box.text_frame.paragraphs[0]._p
+    ppr = etree.fromstring(
+        '<a:pPr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" marL="457200" indent="-457200">'
+        '<a:lnSpc><a:spcPct val="150000"/></a:lnSpc><a:buAutoNum type="arabicPeriod"/></a:pPr>')
+    para.insert(0, deepcopy(ppr))
+    _fill_list(slide, {"shape": "Itens", "tipo": "lista"}, ["Abertura", "Relatorio", "Plano"])
+    paras = box.text_frame._txBody.findall(qn("a:p"))
+    assert [p.findtext(".//" + qn("a:t")) for p in paras] == ["Abertura", "Relatorio", "Plano"]
+    for p in paras:
+        assert p.find(qn("a:pPr")) is not None
+        assert p.find(qn("a:pPr")).find(qn("a:buAutoNum")).get("type") == "arabicPeriod"
+        assert p.find(qn("a:pPr")).get("marL") == "457200"
+
+
+def test_campo_de_texto_omitido_nao_deixa_texto_de_modelo(tmp_path):
+    """Campo de texto do catalogo ausente do slide do deck: erro (senao fica o texto em ingles do template)."""
+    import yaml
+
+    from forja.errors import ForjaError
+    _base(tmp_path)
+    deck_path = tmp_path / "deck.yaml"
+    deck = yaml.safe_load(deck_path.read_text(encoding="utf-8"))
+    deck["slides"][0].pop("subtitulo", None)
+    deck_path.write_text(yaml.safe_dump(deck, allow_unicode=True), encoding="utf-8")
+    with pytest.raises(ForjaError) as exc:
+        _run(tmp_path, "deck", "template", "compose")
+    assert exc.value.code == "CONFIG_INVALID"
+    assert exc.value.details["campo"] == "subtitulo"

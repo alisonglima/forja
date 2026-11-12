@@ -120,8 +120,9 @@
     },
     "contato": {
       "slide": 57, "layout": "L26", "shapes": ["Headline"],
-      "limits": {"linha": {"chars": 60}},
+      "limits": {"titulo": {"palavras": 4, "chars": 30}, "linha": {"chars": 60}},
       "campos": {
+        "titulo": {"shape": "Headline", "contains": "Contact Us", "tipo": "texto"},
         "linha": {"shape": "Headline", "contains": "Name - Department", "tipo": "texto"}
       },
       "suportado": true

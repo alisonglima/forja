@@ -13,6 +13,7 @@ from copy import deepcopy
 from pathlib import Path
 
 import yaml
+from pptx.oxml.ns import qn
 
 from .. import pptx_deck
 from ..errors import ForjaError
@@ -173,6 +174,10 @@ def _run_compose(ctx):
             if field not in fields:
                 raise _fail("CONFIG_INVALID", "campo sem mapeamento: %r" % (field,),
                             campo=field)
+        for field, spec in fields.items():
+            if field not in valores and isinstance(spec, dict) and spec.get("tipo") != "imagem":
+                raise _fail("CONFIG_INVALID", "campo de texto ausente no slide: %r" % (field,),
+                            campo=field)
         slides.append({"modelo": modelo, "origem": origem, "valores": valores,
                        "notas": item.get("notas")})
     _write_json(_p(ctx, "compose.json"), {"slides": slides})
@@ -194,8 +199,15 @@ def _fill_list(slide, spec, value):
                     name=spec["shape"])
     text_frame = matches[0].text_frame
     source = text_frame.paragraphs[0].runs[0]._r
+    first_ppr = text_frame.paragraphs[0]._p.find(qn("a:pPr"))
     for text in items[1:]:
-        run = text_frame.add_paragraph().add_run()
+        paragraph = text_frame.add_paragraph()
+        if first_ppr is not None:
+            old_ppr = paragraph._p.find(qn("a:pPr"))
+            if old_ppr is not None:
+                paragraph._p.remove(old_ppr)
+            paragraph._p.insert(0, deepcopy(first_ppr))
+        run = paragraph.add_run()
         run.text = text
         if source.rPr is not None:
             run._r.insert(0, deepcopy(source.rPr))
