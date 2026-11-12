@@ -54,6 +54,7 @@
     "texto": {
       "slide": 16, "layout": "L26", "shapes": ["Large #", "Body Copy"],
       "limits": {"titulo": {"palavras": 8, "chars": 48}, "corpo": {"chars": 180}},
+      "remover": ["Picture 17"],
       "campos": {
         "titulo": {"shape": "Large #", "tipo": "texto"},
         "corpo": {"shape": "Body Copy", "tipo": "lista"}
@@ -80,7 +81,8 @@
     },
     "numeros": {
       "slide": 84, "layout": "L26", "shapes": ["TextBox 6", "TextBox 3", "TextBox 8", "TextBox 9", "TextBox 10"],
-      "limits": {"numero": {"chars": 6}, "legenda": {"chars": 90}, "apoios": {"chars": 40}},
+      "limits": {"numero": {"chars": 3}, "legenda": {"chars": 90}, "apoios": {"chars": 40}},
+      "remover": ["TextBox 6", "TextBox 3", "Straight Connector 11"],
       "campos": {
         "numero": {"shape": "TextBox 8", "tipo": "texto"},
         "legenda": {"shape": "TextBox 9", "tipo": "texto"},

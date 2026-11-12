@@ -199,6 +199,24 @@ def _fill_list(slide, spec, value):
         if source.rPr is not None:
             run._r.insert(0, deepcopy(source.rPr))
 
+def _remove(slide, nome):
+    """Tira do slide clonado as formas do modelo sem campo (icone de imagem, coluna sobrando)."""
+    achadas = [shape for shape in slide.shapes if shape.name == nome]
+    if not achadas: raise _fail("DECK_SHAPE_MISSING", "forma a remover ausente: %r" % (nome,), campo=nome)
+    for shape in achadas: shape._element.getparent().remove(shape._element)
+
+_FILLER = re.compile(r"lorem ipsum|^\s*insert\b", re.I)
+
+
+def _no_filler(prs, indices):
+    """Reprova o deck se sobrou texto de modelo (Lorem ipsum, 'Insert ...') em slide gerado."""
+    for pos, index in enumerate(indices, 1):
+        for shape in prs.slides[index].shapes:
+            if shape.has_text_frame and _FILLER.search(shape.text_frame.text):
+                raise _fail("DECK_PLACEHOLDER_LEFT", "texto de modelo sobrou no slide %d: %r" % (pos, shape.name),
+                            slide=pos, campo=shape.name)
+
+
 def _run_pptx(ctx, *, run=subprocess.run):
     from pptx import Presentation
     compose = _read_json(_p(ctx, "compose.json"))
@@ -211,7 +229,7 @@ def _run_pptx(ctx, *, run=subprocess.run):
         if not isinstance(origem, int) or isinstance(origem, bool) or not 1 <= origem <= count:
             raise _fail("CONFIG_INVALID", "slide de origem invalido: %r" % (origem,))
         slide = pptx_deck.clone(prs, prs.slides[origem - 1])
-        _, fields = _model(catalog, item.get("modelo"))
+        model, fields = _model(catalog, item.get("modelo"))
         for field, value in (item.get("valores") or {}).items():
             spec = fields.get(field) or {}
             if not isinstance(spec, dict) or not spec.get("shape"):
@@ -225,8 +243,11 @@ def _run_pptx(ctx, *, run=subprocess.run):
             else:
                 pptx_deck.put(slide, spec["shape"], "" if value is None else str(value),
                               spec.get("contains"))
+        for nome in model.get("remover") or []:
+            _remove(slide, nome)
         if item.get("notas") is not None:
             slide.notes_slide.notes_text_frame.text = str(item["notas"])
+    _no_filler(prs, range(count, count + len(items)))
     pptx_deck.drop_slides(prs, range(count, count + len(items)))
     pptx_deck.slim(prs, [])
     target = _out(ctx, ".pptx"); prs.save(str(target))

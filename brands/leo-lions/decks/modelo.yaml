@@ -33,8 +33,9 @@ slides:
       - "Cada projeto, uma vida."
 
   - modelo: numeros
-    numero: "40%"
-    legenda: "dos associados participam de ações locais"
+    numero: "40"
+    legenda: "por cento dos associados participam de ações locais"
+    apoios: "Exemplo: troque pelo dado do clube"
 
   - modelo: fechamento
     titulo: "Obrigado"

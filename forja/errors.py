@@ -28,6 +28,7 @@ ERROR_CODES: dict[str, dict] = {
     "DECK_SCHEMA": {"exit": 2, "retryable": False, "hint": "corrija as chaves e os tipos do deck e rode de novo"},
     "DECK_TEMPLATE_MISSING": {"exit": 4, "retryable": False, "hint": "o template base do deck não está no kit; instale o template e repita"},
     "DECK_SHAPE_MISSING": {"exit": 1, "retryable": False, "hint": "o slide de origem não tem a forma pedida; escolha outro modelo ou ajuste o slide"},
+    "DECK_PLACEHOLDER_LEFT": {"exit": 1, "retryable": False, "hint": "sobrou texto de modelo (Lorem ipsum, Insert...) no slide; preencha o campo, ou liste a forma em `remover` no catálogo"},
     "DECK_CONVERT_FAILED": {"exit": 3, "retryable": True, "hint": "a conversão do deck falhou; tente de novo e, se persistir, reporte"},
     "ASSET_HASH_MISMATCH": {"exit": 1, "retryable": False, "hint": "o hash do ativo não confere com o manifesto; re-registre o ativo antes de compor"},
 }
