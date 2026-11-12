@@ -27,6 +27,13 @@ from pathlib import Path
 
 import pytest
 
+# O script de prova checa /usr/bin/google-chrome-stable de verdade (caminho absoluto, fora do mapeamento do CT
+# falso). Onde o Chrome real existe (ex.: o CT fixo da Forja) a checagem o executaria: o simulador so e
+# hermetico em maquina sem Chrome (macOS de desenvolvimento, CI limpo).
+pytestmark = pytest.mark.skipif(
+    os.path.exists("/usr/bin/google-chrome-stable"),
+    reason="simulador do PVE exige maquina sem /usr/bin/google-chrome-stable")
+
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts" / "prova-kit" / "lxc-descartavel.sh"
 CONTRATO = Path(__file__).with_name("test_lxc_descartavel.py")
