@@ -16,6 +16,9 @@ Dado e texto: tudo em `brands/leo-lions/` (paleta em `variants.json`, grafia em 
 ## Família 2: editorial (menos engessada)
 Inspirada no post do Dia Nacional do LEO do clube: foto inteira, tipografia gigante, data espaçada, logo discreto. `editorial-capa` (título uppercase 150 px em Roboto 900 branco, fio amarelo) e `editorial-numero` (caixa de chamada branca, numeral gigante amarelo sobre véu cinza, legenda). É desenho **nosso**, ancorado na paleta oficial; o laranja do post de referência **não** é cor do LEO (a paleta LEO é cinza, amarelo, azul-claro e verde).
 
+## Versão Story (1080×1920, `ig-story`)
+Os seis templates são **independentes do formato**: altura e margens vêm de variáveis CSS (`--h`, `--mx`, `--mt`, `--mb`) que o `compose.py` calcula a partir da `safe_zone` do `formats.json` (feed 5 %, com piso de 72 px; story 15 % em cima e embaixo e 10 % nas laterais, ou seja 288 px e 108 px). Uma peça Story é a mesma peça com `preset: ig-story` e `altura: 1920` em `pecas.json`; o feed ficou **idêntico** (contraste e gates medidos iguais antes e depois). Diferenças deliberadas no Story: sem o "Arraste" (Story não desliza), título editorial do LEO em 128 px (a palavra mais longa do exemplo estourava a zona segura a 150 px). As peças `*-story` passam nos mesmos gates (lint, zona segura, contraste, mídia, grafia).
+
 ## Contraste medido (gate `contrast_photo`, pior região sob o texto; regra: 3:1 para texto ≥ 24 px)
 | Peça | mínimo |
 |---|---|
@@ -39,4 +42,3 @@ Inspirada no post do Dia Nacional do LEO do clube: foto inteira, tipografia giga
 ## Pendente com o dono
 - Identidade própria do clube (a logo "LEO Clube de Taquaritinga" dos prints **não** está no kit oficial; não foi inventada): enviar o arquivo.
 - Derivadas (`Leoísmo`) e plural `LEOs`; Leo-Lion em português.
-- Versão story (1080×1920) das peças novas.
