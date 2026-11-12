@@ -45,6 +45,7 @@ def test_describe_json_usa_envelope():
         "workflows",
         "providers",
         "schemas",
+        "mcp_tools",
     }
 
 
