@@ -35,51 +35,102 @@
   "models": {
     "capa_foto": {
       "slide": 2, "layout": "L26", "shapes": ["Headline", "Subhead", "Picture 1"],
-      "limits": {"titulo": {"palavras": 8, "chars": 48}, "subtitulo": {"palavras": 12, "chars": 80}}
+      "limits": {"titulo": {"palavras": 8, "chars": 48}, "subtitulo": {"palavras": 12, "chars": 80}},
+      "campos": {
+        "titulo": {"shape": "Headline", "tipo": "texto"},
+        "subtitulo": {"shape": "Subhead", "tipo": "texto"},
+        "imagem": {"shape": "Picture 1", "tipo": "imagem"}
+      },
+      "suportado": true
     },
     "secao": {
       "slide": 7, "layout": "L26", "shapes": ["Text Placeholder 1"],
-      "limits": {"titulo": {"palavras": 6, "chars": 40}}
+      "limits": {"titulo": {"palavras": 6, "chars": 40}},
+      "campos": {
+        "titulo": {"shape": "Text Placeholder 1", "tipo": "texto"}
+      },
+      "suportado": true
     },
     "texto": {
       "slide": 16, "layout": "L26", "shapes": ["Large #", "Body Copy"],
-      "limits": {"titulo": {"palavras": 8, "chars": 48}, "corpo": {"chars": 180}}
+      "limits": {"titulo": {"palavras": 8, "chars": 48}, "corpo": {"chars": 180}},
+      "campos": {
+        "titulo": {"shape": "Large #", "tipo": "texto"},
+        "corpo": {"shape": "Body Copy", "tipo": "lista"}
+      },
+      "suportado": true
     },
     "imagem_texto": {
       "slide": 48, "layout": "L26", "shapes": ["Body Copy", "Body Copy", "Background - Image"],
-      "limits": {"titulo": {"palavras": 8}, "corpo": {"chars": 220}}
+      "limits": {"titulo": {"palavras": 8}, "corpo": {"chars": 220}},
+      "campos": {
+        "titulo": {"shape": "Body Copy", "contains": "Insert headline", "tipo": "texto"},
+        "corpo": {"shape": "Body Copy", "contains": "Body Copy Excepteur", "tipo": "lista"},
+        "imagem": {"shape": "Background - Image", "tipo": "imagem"}
+      },
+      "suportado": true
     },
     "citacao": {
       "slide": 60, "layout": "L26", "shapes": ["Body Copy", "Quote"],
-      "limits": {"citacao": {"chars": 140}, "atribuicao": {"chars": 60}}
+      "limits": {"citacao": {"chars": 140}, "atribuicao": {"chars": 60}},
+      "campos": {
+        "citacao": {"shape": "Body Copy", "tipo": "texto"}
+      },
+      "suportado": true
     },
     "numeros": {
       "slide": 84, "layout": "L26", "shapes": ["TextBox 6", "TextBox 3", "TextBox 8", "TextBox 9", "TextBox 10"],
-      "limits": {"numero": {"chars": 6}, "legenda": {"chars": 90}, "apoios": {"chars": 40}}
+      "limits": {"numero": {"chars": 6}, "legenda": {"chars": 90}, "apoios": {"chars": 40}},
+      "campos": {
+        "numero": {"shape": "TextBox 8", "tipo": "texto"},
+        "legenda": {"shape": "TextBox 9", "tipo": "texto"},
+        "apoios": {"shape": "TextBox 10", "tipo": "texto"}
+      },
+      "suportado": true
     },
     "grafico": {
       "slide": 76, "layout": "L26", "shapes": ["Headline", "Chart 2"],
-      "limits": {"titulo": {"palavras": 8}}
+      "limits": {"titulo": {"palavras": 8}},
+      "campos": {},
+      "suportado": false
     },
     "agenda": {
       "slide": 31, "layout": "L26", "shapes": ["Text Placeholder 18", "TextBox 138"],
-      "limits": {"titulo": {"palavras": 6}, "itens": {"chars": 60}}
+      "limits": {"titulo": {"palavras": 6}, "itens": {"chars": 60}},
+      "campos": {
+        "titulo": {"shape": "Text Placeholder 18", "tipo": "texto"},
+        "itens": {"shape": "TextBox 138", "tipo": "lista"}
+      },
+      "suportado": true
     },
     "tabela": {
       "slide": 59, "layout": "L26", "shapes": ["Table 7"],
-      "limits": {"celula": {"chars": 40}}
+      "limits": {"celula": {"chars": 40}},
+      "campos": {},
+      "suportado": false
     },
     "equipe": {
       "slide": 64, "layout": "L25", "shapes": ["Rectangle 25"],
-      "limits": {"nome": {"chars": 28}, "cargo": {"chars": 40}}
+      "limits": {"nome": {"chars": 28}, "cargo": {"chars": 40}},
+      "campos": {},
+      "suportado": false
     },
     "contato": {
       "slide": 57, "layout": "L26", "shapes": ["Headline"],
-      "limits": {"linha": {"chars": 60}}
+      "limits": {"linha": {"chars": 60}},
+      "campos": {
+        "linha": {"shape": "Headline", "contains": "Name - Department", "tipo": "texto"}
+      },
+      "suportado": true
     },
     "fechamento": {
       "slide": 70, "layout": "L26", "shapes": ["Title 1", "TextBox 7"],
-      "limits": {"titulo": {"palavras": 6}, "rodape": {"chars": 80}}
+      "limits": {"titulo": {"palavras": 6}, "rodape": {"chars": 80}},
+      "campos": {
+        "titulo": {"shape": "Title 1", "tipo": "texto"},
+        "rodape": {"shape": "TextBox 7", "tipo": "texto"}
+      },
+      "suportado": true
     }
   }
 }
