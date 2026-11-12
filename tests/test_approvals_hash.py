@@ -87,6 +87,8 @@ def test_hash_piece_covers_artifacts(tmp_path):
 def test_hash_piece_orders_artifacts(tmp_path):
     from forja import approvals
     a, b = tmp_path / "a", tmp_path / "b"
+    a.mkdir()
+    b.mkdir()
     _art(_proj(a), "out/1.mp4", b"x")
     _art(a, "out/2.mp4", b"y")
     _art(_proj(b), "out/2.mp4", b"y")
