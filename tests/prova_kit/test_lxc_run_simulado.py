@@ -83,8 +83,10 @@ elif cmd == "exec":
     if not (cfg(i).exists() and root.exists()): fail("CT nao existe", 2)
     for sub in ("srv", "tmp", "usr_local_bin", "root"): (root / sub).mkdir(exist_ok=True)
     def m(s):
-        for pre, sub in (("/srv/", "srv"), ("/tmp/", "tmp"), ("/usr/local/bin/", "usr_local_bin"), ("/root/", "root")):
-            s = s.replace(pre, str(root / sub) + "/")
+        # passada unica: trocar em sequencia reescreveria o proprio tmp do pytest no Linux (/tmp/pytest-of-...)
+        pres = (("/srv/", "srv"), ("/tmp/", "tmp"), ("/usr/local/bin/", "usr_local_bin"), ("/root/", "root"))
+        for k, (pre, _) in enumerate(pres): s = s.replace(pre, "@@P%d@@" % k)
+        for k, (_, sub) in enumerate(pres): s = s.replace("@@P%d@@" % k, str(root / sub) + "/")
         return s
     if argv[:2] == ["bash", "-lc"] or argv[:2] == ["bash", "-c"]:
         argv = ["bash", "-c", m(argv[2])]
