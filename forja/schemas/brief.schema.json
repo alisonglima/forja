@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forja.local/schemas/brief.schema.json",
+  "title": "Brief v2",
+  "description": "Brief humano de uma peca: COMPASS (7 chaves), itens obrigatorios com fonte, dados que a IA nao pode inventar, licencas por ativo, rotulo de IA, aprovador, ponto-mae, pontos-chave (ate 3), CTA unico, restricoes, idioma e acessibilidade. O campo `variant` e condicional: a lista fechada de valores vem de `variants.json`, nunca deste schema.",
+  "type": "object",
+  "properties": {
+    "variant": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Slug da variante da marca (ex.: lista de `variants.json`). Obrigatorio quando a marca declara mais de uma variante; a decisao e do validador, nao deste schema."
+    },
+    "compass": {
+      "type": "object",
+      "description": "Esqueleto COMPASS do brief. As cinco chaves de contexto (publico, plataforma/formato, tom, objetivo/CTA e contexto) atravessam estes campos e o restante do brief.",
+      "properties": {
+        "context": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Contexto da peca."
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Objetivo SMART e KPI."
+        },
+        "persona": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Modo/persona da comunicacao."
+        },
+        "people": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Publico e dor."
+        },
+        "attitude": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Atitude e tom."
+        },
+        "style": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Estilo visual e verbal."
+        },
+        "specifications": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Especificacoes e restricoes tecnicas."
+        }
+      },
+      "required": [
+        "context",
+        "objective",
+        "persona",
+        "people",
+        "attitude",
+        "style",
+        "specifications"
+      ]
+    },
+    "itens_obrigatorios": {
+      "type": "array",
+      "description": "Itens que a peca precisa preservar; cada um com sua fonte.",
+      "items": {
+        "$ref": "#/$defs/item_com_fonte"
+      }
+    },
+    "dados_nao_inventar": {
+      "type": "array",
+      "description": "Dados que a IA nao pode inventar; ausente vira a regra \"nao encontrei\".",
+      "items": {
+        "type": "string"
+      }
+    },
+    "licencas": {
+      "type": "array",
+      "description": "Licenca por ativo usado na peca.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fonte": {
+            "type": "string",
+            "minLength": 1
+          },
+          "licenca": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prova": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "tipo",
+          "fonte",
+          "licenca",
+          "prova"
+        ]
+      }
+    },
+    "rotulo_ia": {
+      "type": "object",
+      "properties": {
+        "necessario": {
+          "type": "boolean"
+        },
+        "texto": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "necessario",
+        "texto"
+      ]
+    },
+    "aprovador": {
+      "type": "object",
+      "description": "Humano responsavel por aprovar o brief.",
+      "properties": {
+        "nome": {
+          "type": "string",
+          "minLength": 1
+        },
+        "papel": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "nome",
+        "papel"
+      ]
+    },
+    "fonte_mae": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Peca-mae ou fonte de onde os derivados saem."
+    },
+    "pontos_chave": {
+      "type": "array",
+      "description": "No maximo tres pontos-chave, cada um com fonte.",
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/item_com_fonte"
+      }
+    },
+    "cta": {
+      "type": "object",
+      "description": "CTA unico da peca.",
+      "properties": {
+        "texto": {
+          "type": "string",
+          "minLength": 1
+        },
+        "destino": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "texto",
+        "destino"
+      ]
+    },
+    "restricoes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "idioma": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Idioma da peca, incluindo transcriacao quando houver."
+    },
+    "acessibilidade": {
+      "type": "object",
+      "properties": {
+        "alt": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "alt"
+      ]
+    }
+  },
+  "$defs": {
+    "item_com_fonte": {
+      "type": "object",
+      "properties": {
+        "texto": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fonte": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "texto",
+        "fonte"
+      ]
+    }
+  }
+}
