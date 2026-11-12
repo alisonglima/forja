@@ -298,7 +298,8 @@ ssh_pve "pct exec $CTID -- mkdir -p /srv/prova/evidencias /srv/prova/workspace /
 ssh_pve "$CMD_PUSH" >/dev/null || { erro "pct push falhou"; exit 1; }
 fase_base || { erro "provisao da base falhou"; exit 1; }
 montar_exports
-rodar_inside || { erro "fase do kit falhou"; exit 1; }
+FASE_RC=0
+rodar_inside || { FASE_RC=$?; erro "fase do kit falhou (exit $FASE_RC); trago as evidencias antes de destruir"; }
 ssh_pve "pct exec $CTID -- tar czf /srv/prova/evidencias.tar.gz -C /srv/prova evidencias" >/dev/null || { erro "tar das evidencias falhou"; exit 1; }
 ssh_pve "$CMD_PULL" >/dev/null || { erro "pct pull falhou"; exit 1; }
 ssh_pve "cat $EVID_TAR" > "$OUT/evidencias-$CTID.tar.gz" || { erro "evidencias nao chegaram ao Mac"; exit 1; }
@@ -309,6 +310,7 @@ if [ -z "$SHA_CT" ] || [ "$SHA_LOCAL" != "$SHA_CT" ]; then
   erro "sha256 divergente entre Mac e CT para o CT $CTID"; exit 1
 fi
 FIM=$(data_utc)
+[ "$FASE_RC" -eq 0 ] || { erro "evidencias parciais gravadas em $OUT/evidencias-$CTID.tar.gz (fase exit $FASE_RC)"; exit 1; }
 
 DESTRUIDO=0
 if destruir; then DESTRUIDO=1; CRIADO=0; fi

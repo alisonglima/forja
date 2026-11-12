@@ -314,3 +314,14 @@ def test_falha_na_base_destroi_e_limpa_tmp_do_pve(tmp_path):
     assert _linhas(log, "pct destroy ") == ["pct destroy 920 --purge"]
     sobras = sorted(p.name for p in (st / "pve_tmp").glob("*920*"))
     assert not sobras, f"sobrou lixo meu no /tmp do PVE: {sobras}"
+
+
+def test_fase_que_falha_ainda_traz_as_evidencias_antes_de_destruir(tmp_path):
+    """2a execucao real: a fase falhou e o CT foi destruido SEM trazer as evidencias (perdi o diagnostico)."""
+    proc, out, st, log = _rodar(tmp_path, "ok", extra_env={
+        "FASE_CMD": "mkdir -p evidencias/p5-x && echo oi > evidencias/p5-x/a.txt && exit 3"})
+    assert proc.returncode != 0, "fase com exit 3 deve falhar a execucao"
+    assert (out / "evidencias-920.tar.gz").is_file(), "evidencias da fase que falhou nao chegaram ao Mac"
+    assert _linhas(log, "pct destroy ") == ["pct destroy 920 --purge"], "CT proprio tem de ser destruido"
+    sobras = sorted(p.name for p in (st / "pve_tmp").glob("*920*"))
+    assert not sobras, f"sobrou lixo meu no /tmp do PVE: {sobras}"
