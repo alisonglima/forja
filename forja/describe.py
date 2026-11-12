@@ -44,6 +44,9 @@ _COMMANDS = [
             _arg("--overlays", False, "aprova os overlays"),
             _arg("--publish", False, "aprova a publicacao"),
             _arg("--by", False, "quem aprovou (nome ou papel)"),
+            _arg("--brief", False, "aprova o hash do brief"),
+            _arg("--post", False, "aprova a arte final do fluxo post/lote-digital"),
+            _arg("--hash", False, "arquivo da arte aprovada (repetivel)"),
         ],
     },
     {
@@ -235,6 +238,8 @@ def builtin_providers(env=None) -> list[dict]:
 
 def describe(workflows: dict, version: str) -> dict:
     """Documento unico que descreve a plataforma para agentes e humanos."""
+    from . import mcp
+
     return {
         "version": version,
         "exit_codes": dict(_EXIT_CODES),
@@ -248,4 +253,12 @@ def describe(workflows: dict, version: str) -> dict:
             "config": copy.deepcopy(config.DEFAULTS),
             "cues": copy.deepcopy(_CUES_SCHEMA),
         },
+        "mcp_tools": [
+            {
+                "name": tool["name"],
+                "args": list(tool["inputSchema"]["properties"]),
+                "retorno": "envelope JSON",
+            }
+            for tool in mcp.TOOLS
+        ],
     }
