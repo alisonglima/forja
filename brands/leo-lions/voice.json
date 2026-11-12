@@ -1,0 +1,47 @@
+{
+  "schema": "forja-brand-voice/v1",
+  "variantes": {
+    "lions": {
+      "tom": "Breve e direto ao ponto, voz ativa e terceira pessoa por padrão; confiável, empático e informativo; títulos emotivos e subtítulos explicativos.",
+      "exemplos_titulo": [
+        "Nós Servimos",
+        "A serviço de um mundo carente",
+        "Melhorar a saúde e o bem-estar"
+      ],
+      "termos_proibidos": [
+        "LI",
+        "LCI",
+        "\"Lions\" ou \"Lions Clubs\" como substituto de \"Lions Clubs International\""
+      ],
+      "origem": "Diretrizes da marca Lions International V4.0 (5/23), p.7-12: lema, pilares da missão, voz, tom e guia de estilo",
+      "nota_exemplos": "O guia Lions não traz bloco HEADLINE EXAMPLES; os três itens são lema e pilares oficiais literais, não headlines inventados."
+    },
+    "leo": {
+      "tom": "Espírito brincalhão como o do Lions, mas energético, comprometido e apaixonado; títulos diretos e vivos, sem coloquialismo excessivo.",
+      "exemplos_titulo": [
+        "Leos get things done.",
+        "Leo like you mean it.",
+        "Where there’s a need, there’s a Leo."
+      ],
+      "termos_proibidos": [
+        "coloquialismo excessivo"
+      ],
+      "origem": "Leo Brand Guidelines V1.0 (09/24 EN), p.4: TONE e HEADLINE EXAMPLES",
+      "nota_termos_proibidos": "O guia Leo não lista palavras proibidas; proíbe frases excessivamente coloquiais (\"phrases that are too colloquial\")."
+    },
+    "leo-lion": {
+      "tom": "Voz do Lions com inclinação mais inovadora; títulos, subtítulos e slogans mais informativos e explicativos.",
+      "exemplos_titulo": [
+        "A new breed of Lion.",
+        "Lion, your way.",
+        "There’s a different way to Lion."
+      ],
+      "termos_proibidos": [
+        "frases não informativas",
+        "frases não explicativas"
+      ],
+      "origem": "Leo-Lion Brand Guidelines V1.0 (09/24 EN), p.4: TONE e HEADLINE EXAMPLES",
+      "nota_termos_proibidos": "O guia Leo-Lion não lista palavras proibidas; exige títulos, subtítulos e slogans informativos e explicativos."
+    }
+  }
+}
