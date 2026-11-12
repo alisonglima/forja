@@ -210,7 +210,7 @@ export const VerticalBrand = ({
       {/* Legenda limitada a 10% de cada lado; a base continua a do Captions. */}
       <div style={{ position: "absolute", top: 0, left: side, right: side, height: "100%" }}>
         <Captions
-          subs={subs} lowerThirds={lowerThirds} fps={fps}
+          subs={subs} lowerThirds={windows.map((w) => [w.start, w.end, w.text, w.subtext])} fps={fps}
           width={width - 2 * side} height={height} fontSize={fontSize}
         />
       </div>

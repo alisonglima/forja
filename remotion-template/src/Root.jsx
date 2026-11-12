@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { Legendas } from "./Legendas.jsx";
 import { Storyboard } from "./Storyboard.jsx";
+import { VerticalBrand } from "./VerticalBrand.jsx";
 
 export const Root = () => (
   <>
@@ -45,6 +46,32 @@ export const Root = () => (
         width: 1280,
         height: 720,
         fontSize: 32,
+      }}
+      calculateMetadata={({ props }) => ({
+        durationInFrames: Math.max(1, Math.round(props.durationS * props.fps)),
+        fps: props.fps,
+        width: props.width,
+        height: props.height,
+      })}
+    />
+    <Composition
+      id="VerticalBrand"
+      component={VerticalBrand}
+      durationInFrames={1}
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={{
+        brand: {},
+        subs: [],
+        lowerThirds: [],
+        title: "",
+        subtitle: "",
+        durationS: 5,
+        fps: 30,
+        width: 1080,
+        height: 1920,
+        fontSize: 44,
       }}
       calculateMetadata={({ props }) => ({
         durationInFrames: Math.max(1, Math.round(props.durationS * props.fps)),
