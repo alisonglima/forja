@@ -87,6 +87,7 @@ def _build_parser():
         return sub.add_parser(name, add_help=False, exit_on_error=False)
 
     approve = command("approve")
+    approve.add_argument("--slides", action="store_true")
     approve.add_argument("--script", action="store_true")
     approve.add_argument("--voice", action="store_true")
     approve.add_argument("--overlays", action="store_true")
@@ -95,6 +96,15 @@ def _build_parser():
     approve.add_argument("--post", action="store_true")
     approve.add_argument("--hash", action="append", default=None)
     approve.add_argument("--by", default=None)
+
+    slides = command("slides")
+    slides.add_argument("--deck", default="deck.yaml")
+    slides.add_argument("--template", default=None)
+    slides.add_argument("--sources", default=None)
+    slides.add_argument("--out", default="out")
+    slides.add_argument("--only", default=None)
+    slides.add_argument("--force", action="store_true")
+    slides.add_argument("--captures", default="1280,360")
 
     deliver = command("deliver")
     deliver.add_argument("--post", action="store_true")
@@ -461,7 +471,36 @@ def _save_approvals(root, data):
     tmp.replace(path)
 
 
+def _cmd_approve_slides(project_dir, args, json_mode, out):
+    """Aprova um deck pelo hash de cada artefato; falha fechada sem --by."""
+    project = _require_project(project_dir)
+    by = (args.by or "").strip()
+    if not by:
+        raise ForjaError("USAGE", "informe quem aprovou em --by", hint="ex.: forja approve --slides --hash out/deck.pptx --hash out/deck.pdf --by Ana")
+    values = list(args.hash or [])
+    if len(values) < 2:
+        raise ForjaError("USAGE", "informe --hash para cada artefato (pptx e pdf)", hint="ex.: forja approve --slides --hash out/deck.pptx --hash out/deck.pdf --by Ana")
+    data = brief.load_approvals(project.root)
+    records = []
+    for value in values:
+        path, relative = _project_artifact(project.root, value)
+        records.append({"path": relative, "sha256": _file_sha256(path), "bytes": path.stat().st_size})
+    records.sort(key=lambda item: item["path"])
+    updates = {key: bool(data.get(key)) for key in brief.APPROVAL_KEYS}
+    saved = brief.write_approvals(project.root, updates, by=by)
+    saved["schema_version"] = 2
+    saved["artifacts"] = records
+    _save_approvals(project.root, saved)
+    if json_mode:
+        _write_json(out, _envelope({"approvals": saved, "path": brief.APPROVALS_FILE}))
+        return 0
+    _stream_write(out, "artefatos aprovados: %d por %s" % (len(records), saved["by"]))
+    return 0
+
+
 def _cmd_approve(project_dir, args, json_mode, out):
+    if getattr(args, "slides", False):
+        return _cmd_approve_slides(project_dir, args, json_mode, out)
     project = _require_project(project_dir)
     updates = {
         key: True
@@ -654,6 +693,38 @@ def _cmd_providers(json_mode, env, out):
     return 0
 
 
+def _cmd_slides(args, project_dir, json_mode, env, out, err):
+    """Roda o workflow slides; sem --template o deck falha antes de tudo."""
+    template = (args.template or "").strip()
+    if not template:
+        raise ForjaError("DECK_TEMPLATE_MISSING", "informe --template: o deck exige um template do acervo", hint="ex.: forja slides --template lions-oficial-2022")
+    project = _require_project(project_dir)
+    cfg = _load_config(project)
+    run_env = dict(env)
+    if args.sources:
+        sources = Path(args.sources).expanduser()
+        run_env["FORJA_BRAND_SOURCES"] = str(sources if sources.is_absolute() else project.root / sources)
+    ctx = _make_ctx(project, cfg, run_env, err)
+    deck = Path(args.deck).expanduser()
+    ctx.deck = deck if deck.is_absolute() else project.root / deck
+    ctx.template = template
+    try:
+        ctx.captures = tuple(int(part.strip()) for part in args.captures.split(","))
+    except ValueError:
+        raise _UsageError("--captures deve ser LARGURA,ALTURA") from None
+    if len(ctx.captures) != 2 or any(part <= 0 for part in ctx.captures):
+        raise _UsageError("--captures deve ser LARGURA,ALTURA")
+    target = Path(args.out).expanduser()
+    ctx.out = target if target.is_absolute() else project.root / target
+    ctx.out.mkdir(parents=True, exist_ok=True)
+    results = steps_module.run_steps(ctx, _workflow_steps("slides"), only=_parse_only(args.only), force=bool(args.force))
+    if json_mode:
+        _write_json(out, _envelope({"steps": results, "deck": str(ctx.deck), "template": template, "captures": list(ctx.captures)}, artifacts=_artifacts_from(results)))
+        return 0
+    _stream_write(out, "\n".join(_results_text(results)))
+    return 0
+
+
 def _which(tool, env):
     search_path = env.get("PATH")
     return shutil.which(tool, path="" if search_path is None else search_path)
@@ -664,6 +735,44 @@ def _key_is_set(env, name):
     if value is None:
         return False
     return bool(value.strip()) if isinstance(value, str) else bool(value)
+
+
+def _slides_doctor_checks(project_dir, env):
+    """Checks de slides do doctor; detalhes nunca expoem caminho absoluto."""
+    checks = []
+    found = _which("soffice", env)
+    checks.append(("soffice", found is not None, "encontrado no PATH" if found is not None else "nao encontrado no PATH"))
+    base = Path(project_dir)
+    source = env.get("FORJA_BRAND_SOURCES")
+    root = Path(source).expanduser() if isinstance(source, str) and source.strip() else base / ".work" / "fontes" / "lions"
+    index = next(iter(sorted(base.glob("brands/*/assets-index.json"))), None)
+    if not root.is_dir():
+        checks.append(("brand_sources", False, "raiz do acervo ausente: defina FORJA_BRAND_SOURCES"))
+    elif index is None:
+        checks.append(("brand_sources", False, "indice de ativos ausente em brands/"))
+    else:
+        checks.append(("brand_sources", True, "acervo ok: " + index.relative_to(base).as_posix()))
+    deck_path = base / "deck.yaml"
+    if not deck_path.is_file():
+        checks.append(("pptx_template", False, "deck.yaml ausente: template nao conferido"))
+        return checks
+    try:
+        deck = (yaml.safe_load(deck_path.read_text(encoding="utf-8")) or {}).get("deck") or {}
+        catalog = json.loads((base / str(deck.get("modelo_catalogo") or "")).read_text(encoding="utf-8"))
+        entry = next((item for item in catalog.get("templates") or [] if item.get("template_id") == deck.get("template")), None)
+    except (OSError, ValueError, yaml.YAMLError, AttributeError, TypeError):
+        checks.append(("pptx_template", False, "deck ou catalogo ilegivel: template nao conferido"))
+        return checks
+    template = deck.get("template")
+    if entry is None or not isinstance(template, str) or not template.strip():
+        checks.append(("pptx_template", False, "template do deck ausente no catalogo"))
+    elif not isinstance(entry.get("file"), str) or not (root / entry["file"]).is_file():
+        checks.append(("pptx_template", False, "arquivo do template ausente no acervo"))
+    elif _file_sha256(root / entry["file"]) != entry.get("sha256"):
+        checks.append(("pptx_template", False, "sha256 do template nao confere"))
+    else:
+        checks.append(("pptx_template", True, "template %s confere" % template))
+    return checks
 
 
 def _cmd_doctor(project_dir, json_mode, env, out, err):
@@ -677,12 +786,14 @@ def _cmd_doctor(project_dir, json_mode, env, out, err):
     for tool in ("ffmpeg", "ffprobe", "node"):
         found = _which(tool, env)
         add(tool, found is not None, "encontrado" if found is not None else "nao encontrado no PATH")
-    for library in ("numpy", "scipy", "yaml", "faster_whisper"):
+    for library in ("numpy", "scipy", "yaml", "faster_whisper", "pptx"):
         try:
             spec = importlib.util.find_spec(library)
         except Exception:
             spec = None
         add("python:" + library, spec is not None, "importavel" if spec is not None else "nao instalada")
+    for name, ok, detail in _slides_doctor_checks(project_dir, env):
+        add(name, ok, detail)
 
     voices = cfg.get("voices") if isinstance(cfg, dict) else {}
     if not isinstance(voices, dict):
@@ -838,6 +949,8 @@ def _dispatch(args, project_dir, json_mode, env, out, err):
         return _cmd_doctor(project_dir, json_mode, env, out, err)
     if command == "approve":
         return _cmd_approve(project_dir, args, json_mode, out)
+    if command == "slides":
+        return _cmd_slides(args, project_dir, json_mode, env, out, err)
     if command == "deliver":
         return _cmd_deliver(args, project_dir, json_mode, out)
     if command == "providers":
@@ -872,6 +985,7 @@ def main(argv=None, env=None, out=sys.stdout, err=sys.stderr):
         from .workflows import dub as _dub  # noqa: F401
         from .workflows import lote_digital as _lote_digital  # noqa: F401
         from .workflows import post as _post  # noqa: F401
+        from .workflows import slides as _slides  # noqa: F401
         from .workflows import storyboard as _storyboard  # noqa: F401
 
         rest, json_mode, project_dir = _split_globals(raw_argv)
