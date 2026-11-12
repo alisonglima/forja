@@ -2,8 +2,8 @@
 // L-PROVA-KIT-02: exporta A5, A4 e folder multipagina em PDF e registra a
 // evidencia p5-02-pdf. So executa e grava; quem julga e tests/prova_kit/.
 import { createHash } from 'node:crypto';
-import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync,
-  renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync,
+  readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
@@ -20,6 +20,7 @@ e qpdf. Tambem grava comandos.log, sha256sums.txt e prova.json.
 `;
 let LOG = '';
 let FALHA = null;
+let PAGINAS_FOLDER = 4;
 
 function erro(msg) { process.stderr.write(`erro: ${msg}\n`); process.exit(2); }
 
@@ -31,21 +32,35 @@ function formatar(argv, env) {
 }
 
 function planejar(out) {
-  const ev = path.join(out, EVIDENCIA), fix = path.join(out, 'fixtures'), tmp = path.join(out, '.tmp-p5-02'), cmds = [];
+  const ws = path.join(out, 'workspace'), fix = path.join(ws, 'fixtures');
+  const ev = path.join(out, EVIDENCIA), tmp = path.join(out, '.tmp-p5-02');
+  const cmds = [], sidecars = [];
   for (const [base, preset] of PECAS) {
-    cmds.push({ argv: [...KIT, 'export', path.join(fix, `${base}.html`), '--format', 'pdf', '--preset', preset, '--bleed', '0'], env: { OPEN_DESIGN_OUTPUT_DIR: ev, OPEN_DESIGN_BROWSER_PATH: '/usr/local/bin/google-chrome-prova' }, log: path.join(ev, `${base}.kit.log`), kit: base });
+    const entry = `fixtures/${base}.html`;
+    sidecars.push(path.relative(out, path.join(fix, `${base}.html.artifact.json`)));
+    cmds.push({ argv: [...KIT, 'export', entry, '--format', 'pdf', '--preset', preset,
+      '--bleed', '0', '--workspace', ws], cwd: ws,
+      env: { OPEN_DESIGN_BROWSER_PATH: '/usr/local/bin/google-chrome-prova' },
+      log: path.join(ev, `${base}.kit.log`), kit: base,
+      origem: path.join(fix, 'exports', `${base}.pdf`), destino: path.join(ev, `${base}.pdf`) });
   }
   for (const [base] of PECAS) {
     const pdf = path.join(ev, `${base}.pdf`);
-    cmds.push({ argv: base === 'folder' ? ['pdfinfo', '-f', '1', '-l', '4', pdf] : ['pdfinfo', pdf], saida: path.join(ev, `${base}.pdfinfo.txt`) });
+    if (base === 'folder') {
+      cmds.push({ argv: ['pdfinfo', pdf], contarPaginas: true, tolerante: true });
+      cmds.push({ argv: ['pdfinfo', '-f', '1', '-l', '4', pdf], faixaPaginas: true,
+        saida: path.join(ev, `${base}.pdfinfo.txt`), tolerante: true });
+    } else {
+      cmds.push({ argv: ['pdfinfo', pdf], saida: path.join(ev, `${base}.pdfinfo.txt`) });
+    }
     cmds.push({ argv: ['pdffonts', pdf], saida: path.join(ev, `${base}.pdffonts.txt`) });
     cmds.push({ argv: ['pdftotext', '-layout', pdf, '-'], saida: path.join(ev, `${base}.pdftotext.txt`) });
     cmds.push({ argv: ['pdfimages', '-list', pdf], saida: path.join(ev, `${base}.pdfimages.txt`) });
     cmds.push({ argv: ['pdftocairo', '-png', '-r', '72', pdf, path.join(ev, `${base}-page`)] });
     cmds.push({ argv: ['qpdf', '--qdf', pdf, path.join(tmp, `${base}.qdf.pdf`)], tolerante: true, qdf: base });
   }
-  for (let p = 1; p <= 4; p += 1) cmds.push({ argv: ['pdftotext', '-f', String(p), '-l', String(p), '-layout', path.join(ev, 'folder.pdf'), '-'], anexar: path.join(ev, 'folder-paginas.txt'), separar: true });
-  return { ev, fix, tmp, cmds };
+  for (let p = 1; p <= 4; p += 1) cmds.push({ argv: ['pdftotext', '-f', String(p), '-l', String(p), '-layout', path.join(ev, 'folder.pdf'), '-'], anexar: path.join(ev, 'folder-paginas.txt'), separar: true, tolerante: true, pagina: p });
+  return { ev, ws, fix, tmp, cmds, sidecars, workspace: path.relative(out, ws) };
 }
 
 function cartao(rotulo, w, h) {
@@ -66,17 +81,18 @@ function folder() {
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Folder A5</title><style>${css}</style></head><body>\n${secoes}\n</body></html>\n`;
 }
 
-function escreverFixtures(fix) {
-  writeFileSync(path.join(fix, 'a5.html'), cartao('A5', 148, 210));
-  writeFileSync(path.join(fix, 'a4.html'), cartao('A4', 210, 297));
-  writeFileSync(path.join(fix, 'folder.html'), folder());
+function sidecar(entry, formato) {
+  return JSON.stringify({ version: 1, kind: 'html', entry, renderer: 'html',
+    exports: ['pdf'], status: 'complete', metadata: { format: formato } }, null, 2) + '\n';
 }
 
-function pdfsEm(dir) {
-  const achados = [];
-  const andar = (d) => { for (const e of readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) andar(p); else if (e.name.toLowerCase().endsWith('.pdf')) achados.push(p); } };
-  andar(dir);
-  return achados;
+function escreverFixtures(fix) {
+  for (const [base, formato] of PECAS) {
+    const html = base === 'a5' ? cartao('A5', 148, 210)
+      : base === 'a4' ? cartao('A4', 210, 297) : folder();
+    writeFileSync(path.join(fix, `${base}.html`), html);
+    writeFileSync(path.join(fix, `${base}.html.artifact.json`), sidecar(`${base}.html`, formato));
+  }
 }
 
 function limpar(ev) {
@@ -90,7 +106,7 @@ function limpar(ev) {
 function rodar(c) {
   const t0 = process.hrtime.bigint();
   const r = spawnSync(c.argv[0], c.argv.slice(1), {
-    cwd: path.dirname(LOG), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024,
+    cwd: c.cwd || path.dirname(LOG), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024,
     env: { ...process.env, ...(c.env || {}) },
   });
   const dur = Number(process.hrtime.bigint() - t0) / 1e6;
@@ -114,16 +130,16 @@ function rodar(c) {
   return { code, out, err };
 }
 
-function garantirPdf(ev, base, antes) {
-  const alvo = path.join(ev, `${base}.pdf`);
-  if (existsSync(alvo)) return;
-  const novos = pdfsEm(ev).filter((p) => !antes.has(p));
-  if (novos.length) {
-    novos.sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs);
-    renameSync(novos[0], alvo);
+function coletarPdf(c, r) {
+  const listados = (r.out || '').split(/\r?\n/).map((s) => s.trim())
+    .filter((s) => s.toLowerCase().endsWith('.pdf'));
+  const origem = [...listados.map((p) => path.resolve(c.cwd || '.', p)), c.origem]
+    .find((p) => existsSync(p));
+  if (origem) {
+    copyFileSync(origem, c.destino);
   } else if (!FALHA) {
-    FALHA = { exit_code: 1, argv: [...KIT, 'export', `${base}.html`],
-      stderr: `kit nao gerou ${base}.pdf em ${ev}` };
+    FALHA = { exit_code: 1, argv: c.argv,
+      stderr: `kit nao gerou ${c.origem} (stdout: ${(r.out || '').trim()})` };
   }
 }
 
@@ -165,14 +181,17 @@ function main() {
   if (help) { process.stdout.write(USO); return; }
   if (!out) { process.stderr.write(`erro: --out e obrigatorio\n${USO}`); process.exit(2); }
 
-  const { ev, fix, tmp, cmds } = planejar(path.resolve(out));
+  const { ev, ws, fix, tmp, cmds, sidecars, workspace } = planejar(path.resolve(out));
   if (dry) {
     process.stdout.write(JSON.stringify({ script: path.resolve(process.argv[1]),
-      evidencia: EVIDENCIA, comandos: cmds.map((c) => formatar(c.argv, c.env)) }) + '\n');
+      evidencia: EVIDENCIA, workspace, sidecars,
+      comandos: cmds.map((c) => formatar(c.argv, c.env)) }) + '\n');
     return;
   }
 
   mkdirSync(ev, { recursive: true });
+  rmSync(fix, { recursive: true, force: true });
+  mkdirSync(path.join(ws, '.open-design'), { recursive: true });
   mkdirSync(fix, { recursive: true });
   mkdirSync(tmp, { recursive: true });
   LOG = path.join(ev, 'comandos.log');
@@ -180,14 +199,19 @@ function main() {
   escreverFixtures(fix);
   try {
     for (const c of cmds) {
-      if (c.kit) {
-        const antes = new Set(pdfsEm(ev));
-        rodar(c);
-        garantirPdf(ev, c.kit, antes);
-      } else {
-        const r = rodar(c);
-        if (c.qdf) resumoQpdf(c.qdf, r, ev, tmp);
+      if (c.pagina && c.pagina > PAGINAS_FOLDER) continue;
+      if (c.contarPaginas) {
+        const m = /^Pages:\s*(\d+)\s*$/m.exec(rodar(c).out);
+        if (m) PAGINAS_FOLDER = Math.max(1, Number(m[1]));
+        continue;
       }
+      if (c.faixaPaginas) {
+        const i = c.argv.indexOf('-l');
+        if (i >= 0) c.argv[i + 1] = String(PAGINAS_FOLDER);
+      }
+      const r = rodar(c);
+      if (c.kit) coletarPdf(c, r);
+      if (c.qdf) resumoQpdf(c.qdf, r, ev, tmp);
     }
   } finally {
     rmSync(tmp, { recursive: true, force: true });
