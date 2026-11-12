@@ -9,10 +9,12 @@ import hashlib
 import json
 import re, subprocess
 import zipfile
+from copy import deepcopy
 from pathlib import Path
 
 import yaml
 
+from .. import pptx_deck
 from ..errors import ForjaError
 from ..steps import Step
 from . import WORKFLOWS, register_workflow
@@ -133,17 +135,102 @@ def _run_template(ctx):
     if actual != entry.get("sha256") or actual != deck.get("template_sha256"): raise _fail("TEMPLATE_HASH_MISMATCH", "sha256 nao confere")
     _write_json(_p(ctx, "template.json"), {"path": str(path), "sha256": actual}); return {"ok": True}
 
+def _catalog(ctx):
+    """Le o deck normalizado e o catalogo de modelos da marca."""
+    deck = _read_json(_p(ctx, "deck.json"))
+    relative = (deck.get("deck") or {}).get("modelo_catalogo")
+    if not isinstance(relative, str) or not relative.strip():
+        raise _fail("CONFIG_INVALID", "deck.modelo_catalogo ausente",
+                    campo="modelo_catalogo")
+    return deck, _read_json(Path(ctx.root) / relative, "CONFIG_INVALID")
+
+def _model(catalog, modelo):
+    """Devolve o modelo suportado do catalogo ou falha em CONFIG_INVALID."""
+    models = catalog.get("models")
+    model = models.get(modelo) if isinstance(models, dict) else None
+    if not isinstance(model, dict) or model.get("suportado") is False:
+        raise _fail("CONFIG_INVALID", "modelo nao suportado: %r" % (modelo,),
+                    campo="modelo")
+    fields = model.get("campos")
+    return model, fields if isinstance(fields, dict) else {}
+
 def _run_compose(ctx):
-    _write_json(_p(ctx, "compose.json"), _read_json(_p(ctx, "deck.json"))); return {"ok": True}
+    deck, catalog = _catalog(ctx)
+    slides = []
+    for item in deck.get("slides") or []:
+        if not isinstance(item, dict):
+            raise _fail("DECK_SCHEMA", "slides[] invalido")
+        modelo = item.get("modelo")
+        model, fields = _model(catalog, modelo)
+        origem = model.get("slide")
+        if not isinstance(origem, int) or isinstance(origem, bool) or origem < 1:
+            raise _fail("CONFIG_INVALID", "modelo sem slide: %r" % (modelo,),
+                        campo="modelo")
+        valores = {key: value for key, value in item.items()
+                   if key not in ("modelo", "notas", "imagem_sha256")}
+        for field in valores:
+            if field not in fields:
+                raise _fail("CONFIG_INVALID", "campo sem mapeamento: %r" % (field,),
+                            campo=field)
+        slides.append({"modelo": modelo, "origem": origem, "valores": valores,
+                       "notas": item.get("notas")})
+    _write_json(_p(ctx, "compose.json"), {"slides": slides})
+    return {"ok": True, "slides": len(slides)}
+
+def _fill_list(slide, spec, value):
+    """Preenche campo lista: primeiro item via put, o resto em paragrafos."""
+    items = [str(part) for part in value] if isinstance(value, list) else [str(value)]
+    pptx_deck.put(slide, spec["shape"], items[0] if items else "",
+                  spec.get("contains"))
+    if len(items) <= 1:
+        return
+    matches = [shape for shape in slide.shapes
+               if shape.name == spec["shape"]
+               and getattr(shape, "has_text_frame", False)
+               and shape.text_frame.text == items[0]]
+    if len(matches) != 1:
+        raise _fail("DECK_SHAPE_MISSING", "slide sem forma unica %r" % spec["shape"],
+                    name=spec["shape"])
+    text_frame = matches[0].text_frame
+    source = text_frame.paragraphs[0].runs[0]._r
+    for text in items[1:]:
+        run = text_frame.add_paragraph().add_run()
+        run.text = text
+        if source.rPr is not None:
+            run._r.insert(0, deepcopy(source.rPr))
 
 def _run_pptx(ctx, *, run=subprocess.run):
     from pptx import Presentation
     compose = _read_json(_p(ctx, "compose.json"))
+    _, catalog = _catalog(ctx)
     prs = Presentation(_read_json(_p(ctx, "template.json"))["path"])
-    for item in compose.get("slides") or []:
-        slide = prs.slides.add_slide(prs.slide_layouts[-1])
-        slide.shapes.add_textbox(0, 0, prs.slide_width, prs.slide_height).text_frame.text = item.get("titulo") or item["modelo"]
-    target = _out(ctx, ".pptx"); prs.save(str(target)); return {"ok": True, "output": str(target)}
+    count = len(prs.slides)
+    items = compose.get("slides") or []
+    for item in items:
+        origem = item.get("origem")
+        if not isinstance(origem, int) or isinstance(origem, bool) or not 1 <= origem <= count:
+            raise _fail("CONFIG_INVALID", "slide de origem invalido: %r" % (origem,))
+        slide = pptx_deck.clone(prs, prs.slides[origem - 1])
+        _, fields = _model(catalog, item.get("modelo"))
+        for field, value in (item.get("valores") or {}).items():
+            spec = fields.get(field) or {}
+            if not isinstance(spec, dict) or not spec.get("shape"):
+                raise _fail("CONFIG_INVALID", "campo sem mapeamento: %r" % (field,),
+                            campo=field)
+            if spec.get("tipo") == "imagem":
+                pptx_deck.set_pic(slide, spec["shape"],
+                                  Path(ctx.root) / str(value))
+            elif spec.get("tipo") == "lista":
+                _fill_list(slide, spec, value)
+            else:
+                pptx_deck.put(slide, spec["shape"], "" if value is None else str(value),
+                              spec.get("contains"))
+        if item.get("notas") is not None:
+            slide.notes_slide.notes_text_frame.text = str(item["notas"])
+    pptx_deck.drop_slides(prs, range(count, count + len(items)))
+    pptx_deck.slim(prs, [])
+    target = _out(ctx, ".pptx"); prs.save(str(target))
+    return {"ok": True, "output": str(target), "slides": len(items)}
 
 def _run_pdf(ctx, *, run=subprocess.run):
     source, target = _out(ctx, ".pptx"), _out(ctx, ".pdf")
