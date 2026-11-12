@@ -198,3 +198,23 @@ def validate(path, catalog, template_sha256) -> list:
         if actual_notes != list(expected_notes):
             issues.append(_error("notas do deck nao conferem com o catalogo"))
     return issues
+
+
+def drop_slides(prs, keep) -> None:
+    """Mantem so os slides de `keep`, soltando a relacao do descartado."""
+    indexes = {int(index) for index in keep}
+    total = len(prs.slides)
+    if not indexes:
+        raise ValueError("keep vazio: o deck ficaria sem slides")
+    for index in sorted(indexes):
+        if index < 0 or index >= total:
+            raise IndexError(f"slide fora do deck: {index} (total {total})")
+    slide_ids = prs.slides._sldIdLst
+    relations = prs.part.rels
+    for position, slide_id in enumerate(list(slide_ids)):
+        if position in indexes:
+            continue
+        rel_id = slide_id.get(qn("r:id"))
+        slide_ids.remove(slide_id)
+        if rel_id in relations:
+            relations.pop(rel_id)
