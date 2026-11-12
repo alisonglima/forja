@@ -137,12 +137,14 @@ echo "vmdata  zfspool  active"
 
 CT_STUBS = {
     "ip": '#!/bin/sh\necho "2: eth0    inet 10.0.0.5/24 scope global eth0"\n',
-    "apt-get": '#!/bin/sh\necho "apt-get $*" >> "$FAKE_STATE/log.txt"\nexit 0\n',
+    "apt-get": '#!/bin/sh\necho "apt-get $*" >> "$FAKE_STATE/log.txt"\n[ "$FAKE_SCENARIO" = falha_na_base ] && exit 1\nexit 0\n',
     "curl": '#!/bin/sh\necho "curl $*" >> "$FAKE_STATE/log.txt"\nwhile [ $# -gt 0 ]; do [ "$1" = -o ] && : > "$2"; shift; done\nexit 0\n',
     "google-chrome": '#!/bin/sh\necho "Google Chrome 130.0.0.0"\n',
     "node": '#!/bin/sh\necho "v22.0.0"\n',
     "npm": '#!/bin/sh\necho "npm $*" >> "$FAKE_STATE/log.txt"\necho "sha512-FAKEINTEGRITY"\n',
-    "npx": '#!/bin/sh\necho "npx $*" >> "$FAKE_STATE/log.txt"\necho "0.4.0"\n',
+    "npx": ('#!/bin/sh\necho "npx $*" >> "$FAKE_STATE/log.txt"\n'
+            'for a in "$@"; do [ "$a" = --version ] && { echo "error: unknown option \'--version\'" >&2; exit 1; }; done\n'
+            'echo "Usage: open-design-agent-kit [options] [command]"\n'),
     "systemctl": "#!/bin/sh\nexit 0\n",
     "tcpdump": "#!/bin/sh\nexit 0\n",
 }
@@ -296,3 +298,19 @@ def test_ambiente_do_kit_e_fixo_e_nao_herda_do_mac(tmp_path):
                    "OPEN_DESIGN_PREVIEW", "OPEN_DESIGN_FFMPEG_PATH", "unset OPEN_DESIGN_FIGMA_TOKEN"):
         assert trecho in log, f"faltou no ambiente do kit: {trecho}"
     assert "/usr/local/bin/google-chrome-prova" in log and "/srv/prova/out" in log
+
+
+def test_base_nao_usa_version_que_o_kit_nao_tem(tmp_path):
+    """O kit 0.4.0 nao tem --version (erro real da 1a execucao): a base usa --help e guarda a saida."""
+    proc, out, st, log = _rodar(tmp_path, "ok")
+    assert proc.returncode == 0, proc.stderr + "\n" + log
+    assert "agent-kit@0.4.0 --version" not in log.replace("npx --yes @feimacode/open-design-agent-kit@0.4.0 --help", "")
+    assert "kit-help.txt" in log
+
+
+def test_falha_na_base_destroi_e_limpa_tmp_do_pve(tmp_path):
+    proc, out, st, log = _rodar(tmp_path, "falha_na_base")
+    assert proc.returncode != 0
+    assert _linhas(log, "pct destroy ") == ["pct destroy 920 --purge"]
+    sobras = sorted(p.name for p in (st / "pve_tmp").glob("*920*"))
+    assert not sobras, f"sobrou lixo meu no /tmp do PVE: {sobras}"
