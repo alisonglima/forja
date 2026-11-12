@@ -1,0 +1,85 @@
+{
+  "schema": "forja-deck-models/v2",
+  "brand": "leo-lions",
+  "default_template_id": "lions-oficial-2022",
+  "templates": [
+    {
+      "template_id": "lions-oficial-2022", "role": "base", "optional": false, "compose": true,
+      "file": "box/C-apresentacoes/LI_BrandResources_Template_PPT_13.3x7.5_Presentation_00a.pptx",
+      "sha256": "4a5b521de577453a7e50065a2a1fc5d658879ccde37267a1e8a56ad84f6f9d24",
+      "bytes": 18518334, "slides": 115, "masters": 3, "layouts": 30,
+      "variants": ["lions", "leo-lion"]
+    },
+    {
+      "template_id": "mission-brief-2026", "role": "slide-source", "optional": true, "compose": false,
+      "file": "site-extra/resources/152441463__Mission Brief Presentation_en.pptx",
+      "sha256": "07e0302a650c2c0028c2e31f370ef1a9a4248424219c0c83d00314fc42b3e9fc",
+      "bytes": 66852075, "slides": 32, "masters": 2, "layouts": 0,
+      "variants": ["lions"]
+    },
+    {
+      "template_id": "service-journey-2026", "role": "slide-source", "optional": true, "compose": false,
+      "file": "site-extra/resources/122465944__ContinuingtheServiceJourney_en.pptx",
+      "sha256": "155a5452e0533d5113cf4594576df65436f4196bf7c6d472328ff18a73b3960f",
+      "bytes": 22297824, "slides": 26, "masters": 2, "layouts": 0,
+      "variants": ["lions"]
+    },
+    {
+      "template_id": "new-club-development-2026", "role": "slide-source", "optional": true, "compose": false,
+      "file": "site-extra/resources/97013210__New Club Development WorkshopTraining_en.pptx",
+      "sha256": "62ce24a3240c274d8a3275a3912bcee6953c5d1908e0cda67508da644677d313",
+      "bytes": 138849830, "slides": 88, "masters": 3, "layouts": 0,
+      "variants": ["lions"]
+    }
+  ],
+  "models": {
+    "capa_foto": {
+      "slide": 2, "layout": "L26", "shapes": ["Headline", "Subhead", "Picture 1"],
+      "limits": {"titulo": {"palavras": 8, "chars": 48}, "subtitulo": {"palavras": 12, "chars": 80}}
+    },
+    "secao": {
+      "slide": 7, "layout": "L26", "shapes": ["Text Placeholder 1"],
+      "limits": {"titulo": {"palavras": 6, "chars": 40}}
+    },
+    "texto": {
+      "slide": 16, "layout": "L26", "shapes": ["Large #", "Body Copy"],
+      "limits": {"titulo": {"palavras": 8, "chars": 48}, "corpo": {"chars": 180}}
+    },
+    "imagem_texto": {
+      "slide": 48, "layout": "L26", "shapes": ["Body Copy", "Body Copy", "Background - Image"],
+      "limits": {"titulo": {"palavras": 8}, "corpo": {"chars": 220}}
+    },
+    "citacao": {
+      "slide": 60, "layout": "L26", "shapes": ["Body Copy", "Quote"],
+      "limits": {"citacao": {"chars": 140}, "atribuicao": {"chars": 60}}
+    },
+    "numeros": {
+      "slide": 84, "layout": "L26", "shapes": ["TextBox 6", "TextBox 3", "TextBox 8", "TextBox 9", "TextBox 10"],
+      "limits": {"numero": {"chars": 6}, "legenda": {"chars": 90}, "apoios": {"chars": 40}}
+    },
+    "grafico": {
+      "slide": 76, "layout": "L26", "shapes": ["Headline", "Chart 2"],
+      "limits": {"titulo": {"palavras": 8}}
+    },
+    "agenda": {
+      "slide": 31, "layout": "L26", "shapes": ["Text Placeholder 18", "TextBox 138"],
+      "limits": {"titulo": {"palavras": 6}, "itens": {"chars": 60}}
+    },
+    "tabela": {
+      "slide": 59, "layout": "L26", "shapes": ["Table 7"],
+      "limits": {"celula": {"chars": 40}}
+    },
+    "equipe": {
+      "slide": 64, "layout": "L25", "shapes": ["Rectangle 25"],
+      "limits": {"nome": {"chars": 28}, "cargo": {"chars": 40}}
+    },
+    "contato": {
+      "slide": 57, "layout": "L26", "shapes": ["Headline"],
+      "limits": {"linha": {"chars": 60}}
+    },
+    "fechamento": {
+      "slide": 70, "layout": "L26", "shapes": ["Title 1", "TextBox 7"],
+      "limits": {"titulo": {"palavras": 6}, "rodape": {"chars": 80}}
+    }
+  }
+}

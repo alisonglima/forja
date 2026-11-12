@@ -1,0 +1,41 @@
+schema: forja-deck/v1
+deck:
+  template: lions-oficial-2022
+  template_sha256: "4a5b521de577453a7e50065a2a1fc5d658879ccde37267a1e8a56ad84f6f9d24"
+  brand: leo-lions
+  variant: lions
+  size: 13.333x7.5in
+  locale: pt-BR
+  notas: true
+  modelo_catalogo: "brands/leo-lions/decks/modelos.json"
+
+slides:
+  - modelo: capa_foto
+    titulo: "LEOs em ação"
+    subtitulo: "Encontro distrital 2027"
+    notas: "Abertura: 2 min"
+
+  - modelo: secao
+    titulo: "Nossa identidade"
+    notas: "Transição para o bloco institucional"
+
+  - modelo: texto
+    titulo: "O que fazemos"
+    corpo:
+      - "Serviço"
+      - "Companheirismo"
+      - "Impacto na comunidade"
+
+  - modelo: imagem_texto
+    titulo: "Visão 2027"
+    corpo:
+      - "Cada clube, um projeto."
+      - "Cada projeto, uma vida."
+
+  - modelo: numeros
+    numero: "40%"
+    legenda: "dos associados participam de ações locais"
+
+  - modelo: fechamento
+    titulo: "Obrigado"
+    rodape: "LEO Clube de Exemplo"

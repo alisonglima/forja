@@ -47,7 +47,7 @@
     "reprova": [
       {
         "codigo": "GRAFIA_LEO",
-        "padrao": "(?<!\\w)Leos?(?!\\w)",
+        "padrao": "(?<!\\w)Leos?(?![\\w-])",
         "mensagem": "em pt-BR a sigla e LEO (plural LEOs)"
       },
       {
@@ -67,16 +67,11 @@
       },
       {
         "codigo": "GRAFIA_LEO_DERIVADO",
-        "padrao": "(?<!\\w)(?:Leoísmo|Leoísta|Leoístico)(?!\\w)",
-        "mensagem": "derivados mantem LEO maiusculo: LEOísmo, LEOísta"
+        "padrao": "(?<!\\w)(?:Leoísmo|Leoístas?|Leoístic[oa]s?)(?!\\w)",
+        "mensagem": "derivados mantem LEO maiusculo: LEOísmo, LEOísta, LEOístico"
       }
     ],
     "avisa": [
-      {
-        "codigo": "GRAFIA_LEO_DERIVADO",
-        "padrao": "(?<!\\w)(?:leoísmo|leoísta|leoístico)(?!\\w)",
-        "mensagem": "norma geral, fora do padrao de marca (LEOísmo, LEOísta)"
-      },
       {
         "codigo": "GRAFIA_LEO_NOME",
         "padrao": "(?<!\\w)LEOs\\s+Clubes?(?!\\w)",
@@ -106,6 +101,51 @@
         "codigo": "GRAFIA_LEO_NOME",
         "padrao": "(?<!\\w)Dia\\s+Nacional\\s+do\\s+LEO(?!ísmo)(?!\\w)",
         "mensagem": "nome consagrado da data: Dia Nacional do LEOísmo (28/8)"
+      },
+      {
+        "codigo": "GRAFIA_LEO_TERMO",
+        "padrao": "(?<!\\w)Companheir[oa][ -]Le[ãa]o(?!\\w)",
+        "mensagem": "termo substituido por Leão no Brasil (LC-6, 14/07/2025); texto antigo"
+      },
+      {
+        "codigo": "GRAFIA_LEO_TERMO",
+        "padrao": "(?<!\\w)Leo[ -]?(?:Lion|Le[ãa]o)(?!\\w)",
+        "mensagem": "forma atestada: Leo-Lion; LEO Leão para quem foi LEO e virou Leão"
+      },
+      {
+        "codigo": "GRAFIA_LEO_TERMO",
+        "padrao": "(?<!\\w)Clube\\s+Padrinho(?!\\w)",
+        "mensagem": "nao encontrado em fonte BR; use Clube Patrocinador"
+      },
+      {
+        "codigo": "GRAFIA_LEO_TERMO",
+        "padrao": "(?<!\\w)Domador(?!\\w)",
+        "mensagem": "so Domadora/Domadoras atestado"
+      },
+      {
+        "codigo": "GRAFIA_LEO_TERMO",
+        "padrao": "(?<!\\w)(?:Semana\\s+LEO|M[êe]s\\s+do\\s+LEO)(?!\\w)",
+        "mensagem": "nao confirmado como data oficial"
+      },
+      {
+        "codigo": "GRAFIA_LEO_TERMO",
+        "padrao": "(?<!\\w)leoizar(?!\\w)",
+        "mensagem": "nao atestado"
+      },
+      {
+        "codigo": "GRAFIA_LEO_TERMO",
+        "padrao": "(?<!\\w)Leonino(?!\\w)",
+        "mensagem": "evitar no contexto do Lions (aparece como ofensa no protocolo do LC-6)"
+      },
+      {
+        "codigo": "GRAFIA_LEO_DERIVADO",
+        "padrao": "(?<!\\w)(?:LEOismo|Leoismo|LEOistas?|LEOistic[oa]s?|leoistic[oa]s?)(?!\\w)",
+        "mensagem": "falta o acento: LEOísmo, LEOísta, LEOístico"
+      },
+      {
+        "codigo": "GRAFIA_LEO_DERIVADO",
+        "padrao": "(?<!\\w)(?:leoísmo|leoísta|leoístic[oa]s?)(?!\\w)",
+        "mensagem": "norma geral, fora do padrao de marca (LEOísmo, LEOísta, LEOístico)"
       }
     ],
     "falso_positivo": "pessoa chamada Leo cai na regra dura: manter allowlist por contexto ou revisao humana; nao aplicar a conteudo em outro idioma"
@@ -114,5 +154,6 @@
     "derivados LEOísmo/LEOísta e plural LEOs: adotados por pesquisa e boa pratica (12/11/2026), a confirmar com o dono ao ver as pecas",
     "'Dia Nacional do LEO' (usado em post do proprio clube) x 'Dia Nacional do LEOísmo' (consagrado nas paginas LEO): so avisa",
     "grafia de Leo-Lion em portugues (Leo-Leao?): nao definida; nao usar nesta fase"
-  ]
+  ],
+  "fonte_termos": "docs/estudio/termos-lions-leo-pesquisa-2026-11-12.md (12/11/2026): so entra em reprova o que o dono confirmou; o resto avisa"
 }
