@@ -1,0 +1,47 @@
+{
+  "schema": "forja-brand-manifest/v1",
+  "brand_id": "leo-lions",
+  "name": "Leo Clube / Lions Clube",
+  "placeholder": true,
+  "status": "provisorio",
+  "default_variant": "lions",
+  "variants": [
+    "lions",
+    "leo",
+    "leo-lion"
+  ],
+  "variants_file": "variants.json",
+  "voice_file": "voice.json",
+  "palette": [
+    "#FFFFFF",
+    "#F4F4F2",
+    "#0D2240",
+    "#55565A",
+    "#B3B2B1"
+  ],
+  "palette_roles": {
+    "bg": "#FFFFFF",
+    "surface": "#F4F4F2",
+    "fg": "#0D2240",
+    "muted": "#55565A",
+    "border": "#B3B2B1"
+  },
+  "typography": {
+    "official": "Helvetica Neue",
+    "fallback": [
+      "Helvetica",
+      "Arial",
+      "Times"
+    ],
+    "digital_substitute": "Roboto",
+    "source": ".work/fontes/lions/guia-de-marca/leo/tokens-submarcas.json"
+  },
+  "source": {
+    "variants": ".work/fontes/lions/guia-de-marca/leo/tokens-submarcas.json",
+    "neutrals": ".work/fontes/lions/guia-de-marca/leo/tokens-submarcas.json",
+    "brand": ".work/fontes/lions/paginas-vivas/brand-guidelines-pt.json",
+    "brand_en": ".work/fontes/lions/paginas-vivas/brand-guidelines-en.json",
+    "index": ".work/fontes/lions/README.md",
+    "plan": ".work/reports/plano-estudio-20261111.md:1967-1997"
+  }
+}
