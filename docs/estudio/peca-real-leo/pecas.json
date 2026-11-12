@@ -1,0 +1,287 @@
+{
+ "pecas": [
+  {
+   "id": "leo-post-foto-feed",
+   "template": "post-foto",
+   "marca": "leo",
+   "idioma": "pt-BR",
+   "formato": "feed",
+   "preset": "ig-feed-4x5",
+   "altura": 1350,
+   "foto": {
+    "src": "assets/foto-feed.jpg"
+   },
+   "overlay": null,
+   "emb_w": 177,
+   "copy_arquivo": "copy.json"
+  },
+  {
+   "id": "leo-post-foto-story",
+   "template": "post-foto",
+   "marca": "leo",
+   "idioma": "pt-BR",
+   "formato": "story",
+   "preset": "ig-story",
+   "altura": 1920,
+   "foto": {
+    "src": "assets/foto-story.jpg"
+   },
+   "overlay": null,
+   "emb_w": 220,
+   "copy_arquivo": "copy.json"
+  },
+  {
+   "id": "lions-capa-campanha",
+   "template": "capa-oficial-lions",
+   "marca": "lions",
+   "idioma": "pt-BR",
+   "formato": "feed",
+   "preset": "ig-feed-4x5",
+   "altura": 1350,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-419.jpg",
+    "focal": [
+     0.4,
+     0.45
+    ]
+   },
+   "overlay": {
+    "cor1": "azul",
+    "cor2": "roxo",
+    "opacidade": 0.85
+   },
+   "logo": {
+    "arquivo": "logos/Assinaturas_de_Lions_International/153581946__Logo_cmyk_LI_Signature_Horz1_1C_White.render600.png",
+    "largura_visivel": 620
+   },
+   "copy": {
+    "clube": "Lions Clube",
+    "periodo": "AL 2026/2027",
+    "eyebrow": "Campanha",
+    "titulo": "Caminhada contra o diabetes",
+    "subtitulo": "Participe e inspire quem está ao seu lado.",
+    "arraste": "Arraste",
+    "alt": "Voluntários de camisetas azul-claras e coletes amarelos riem e se cumprimentam em uma caminhada ao ar livre, com balões azuis."
+   },
+   "regras": {
+    "max_accents": 3,
+    "allow_brand_gradient": true
+   },
+   "logos_extra": [
+    "logos/Assinaturas_de_Lions_International/"
+   ]
+  },
+  {
+   "id": "leo-capa-campanha",
+   "template": "capa-oficial-leo",
+   "marca": "leo",
+   "idioma": "pt-BR",
+   "formato": "feed",
+   "preset": "ig-feed-4x5",
+   "altura": 1350,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Environment/20180517_rw_Tree_Planting_-133.jpg",
+    "focal": [
+     0.55,
+     0.5
+    ]
+   },
+   "overlay": {
+    "cor1": "azul_claro",
+    "cor2": "azul_claro",
+    "opacidade": 0.9,
+    "base_cor": "cinza",
+    "base_opacidade": 0.5
+   },
+   "logo": {
+    "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+    "largura_visivel": 190
+   },
+   "copy": {
+    "clube": "LEO Clube",
+    "periodo": "AL 2026/2027",
+    "eyebrow": "Campanha",
+    "titulo": "Plantio de árvores",
+    "subtitulo": "Cada muda é um gesto de cuidado com a comunidade.",
+    "arraste": "Arraste",
+    "alt": "Duas pessoas de camisetas verdes plantam uma árvore em um gramado, com um carrinho de mão ao lado."
+   }
+  },
+  {
+   "id": "lions-data-comemorativa",
+   "template": "data-oficial-lions",
+   "marca": "lions",
+   "idioma": "pt-BR",
+   "formato": "feed",
+   "preset": "ig-feed-4x5",
+   "altura": 1350,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-109.jpg",
+    "focal": [
+     0.45,
+     0.45
+    ]
+   },
+   "overlay": {
+    "cor1": "azul",
+    "cor2": "roxo",
+    "opacidade": 0.85
+   },
+   "logo": {
+    "arquivo": "logos/Assinaturas_de_Lions_International/153581946__Logo_cmyk_LI_Signature_Horz1_1C_White.render600.png",
+    "largura_visivel": 560
+   },
+   "copy": {
+    "data": "14 de novembro",
+    "rotulo": "dia mundial do",
+    "titulo": "Diabetes",
+    "assinatura": "Nós Servimos",
+    "clube": "Lions Clube · AL 2026/2027",
+    "alt": "Voluntário idoso de camiseta azul-clara sorri durante uma caminhada ao ar livre."
+   },
+   "regras": {
+    "max_accents": 3,
+    "allow_brand_gradient": true
+   },
+   "logos_extra": [
+    "logos/Assinaturas_de_Lions_International/"
+   ]
+  },
+  {
+   "id": "leo-data-comemorativa",
+   "template": "data-oficial-leo",
+   "marca": "leo",
+   "idioma": "pt-BR",
+   "formato": "feed",
+   "preset": "ig-feed-4x5",
+   "altura": 1350,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Environment/2015_03_16_California_Seal Beach_Clean up_Service Project_Leos_Lions - 02.jpg",
+    "focal": [
+     0.52,
+     0.45
+    ]
+   },
+   "overlay": {
+    "cor1": "azul_claro",
+    "cor2": "azul_claro",
+    "opacidade": 0.9,
+    "base_cor": "cinza",
+    "base_opacidade": 0.5,
+    "cor_rotulo": "cinza"
+   },
+   "logo": {
+    "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+    "largura_visivel": 220
+   },
+   "copy": {
+    "data": "5 de dezembro",
+    "rotulo": "dia internacional do",
+    "titulo": "Voluntário",
+    "assinatura": "",
+    "clube": "LEO Clube · AL 2026/2027",
+    "alt": "Jovens LEOs de camiseta azul-marinho caminham juntos, levando latas de tinta, à beira-mar."
+   }
+  },
+  {
+   "id": "leo-editorial-capa",
+   "template": "editorial-capa",
+   "marca": "leo",
+   "idioma": "pt-BR",
+   "formato": "feed",
+   "preset": "ig-feed-4x5",
+   "altura": 1350,
+   "titulo_px": 150,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Environment/2015_03_16_California_Seal Beach_Clean up_Service Project_Leos_Lions - 02.jpg",
+    "focal": [
+     0.52,
+     0.45
+    ]
+   },
+   "overlay": {
+    "cor1": "cinza",
+    "cor2": "cinza",
+    "opacidade": 0.7
+   },
+   "logo": {
+    "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+    "largura_visivel": 170
+   },
+   "copy": {
+    "data": "5 de dezembro",
+    "titulo": "Dia do voluntário",
+    "clube": "LEO Clube",
+    "periodo": "AL 2026/2027",
+    "alt": "Jovens LEOs de camiseta azul-marinho caminham juntos, levando latas de tinta, à beira-mar."
+   }
+  },
+  {
+   "id": "lions-editorial-capa",
+   "template": "editorial-capa",
+   "marca": "lions",
+   "idioma": "pt-BR",
+   "formato": "feed",
+   "preset": "ig-feed-4x5",
+   "altura": 1350,
+   "titulo_px": 150,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-109.jpg",
+    "focal": [
+     0.45,
+     0.45
+    ]
+   },
+   "overlay": {
+    "cor1": "azul_marinho",
+    "cor2": "azul_marinho",
+    "opacidade": 0.62
+   },
+   "logo": {
+    "arquivo": "logos/Emblemas_do_Lions/90878829__LCI_emblem_white.png",
+    "largura_visivel": 170
+   },
+   "copy": {
+    "data": "14 de novembro",
+    "titulo": "Dia mundial do diabetes",
+    "clube": "Lions Clube",
+    "periodo": "AL 2026/2027",
+    "alt": "Voluntário idoso de camiseta azul-clara sorri durante uma caminhada ao ar livre."
+   }
+  },
+  {
+   "id": "leo-editorial-numero",
+   "template": "editorial-numero",
+   "marca": "leo",
+   "idioma": "pt-BR",
+   "formato": "feed",
+   "preset": "ig-feed-4x5",
+   "altura": 1350,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Environment/20180517_rw_Tree_Planting_-133.jpg",
+    "focal": [
+     0.55,
+     0.5
+    ]
+   },
+   "overlay": {
+    "cor1": "cinza",
+    "cor2": "cinza",
+    "opacidade": 0.93,
+    "cor_rotulo": "cinza"
+   },
+   "logo": {
+    "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+    "largura_visivel": 170
+   },
+   "copy": {
+    "chamada": "Exemplo de dado em destaque",
+    "numero": "000.000",
+    "legenda": "Troque pelo número e pela fonte reais da ação.",
+    "clube": "LEO Clube",
+    "periodo": "AL 2026/2027",
+    "alt": "Duas pessoas plantam uma árvore em um gramado."
+   }
+  }
+ ]
+}

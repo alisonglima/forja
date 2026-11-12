@@ -1,50 +1,19 @@
 {
- "feed": {
+ "leo-post-foto-feed": {
+  "grafia_texto_fonte": [],
   "brand_lint": [],
   "measure": {
    "width": 1080,
    "height": 1350,
-   "bytes": 1777311,
-   "sha256": "ad22ba87104f6bbf3d0e24158785f59913d89dd218e8f729226388a053ff703b"
+   "bytes": 1777125,
+   "sha256": "77da8690477b990fabdda28509f80cddcd92c9cb71d56bcff8b34b3ce2a964ad"
   },
   "inspect_artifact": {
    "ok": true,
    "issues": [],
    "width": 1080,
    "height": 1350,
-   "sha256": "ad22ba87104f6bbf3d0e24158785f59913d89dd218e8f729226388a053ff703b"
-  },
-  "formato_linha": {
-   "id": "ig-feed-4x5",
-   "plataforma": "instagram",
-   "formato": "feed-retrato",
-   "largura": 1080,
-   "altura": 1350,
-   "razao": "4:5",
-   "limite_bytes": 8388608,
-   "duracao_max_s": null,
-   "safe_zone": {
-    "top": 0.05,
-    "bottom": 0.05,
-    "left": 0.05,
-    "right": 0.05,
-    "fonte": "casa: 5% + 40 px; sem % oficial (F1)",
-    "status": "provisorio"
-   },
-   "max_chars": 2200,
-   "max_hashtags": 5,
-   "alt_max": 100,
-   "alt_max_plataforma": 1000,
-   "fonte": "https://help.instagram.com/1631821640426723",
-   "fonte_secundaria": "https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/media",
-   "fonte_tipo": "oficial",
-   "checked_at": "2026-11-11",
-   "verificado_em": "2026-11-11",
-   "status": "provisorio",
-   "verificacao": "DIVERGENTE",
-   "divergencia": "F1 aceita até 3:4 (1080x1440); F2 aceita até 4:5 (1080x1350); adotado 4:5. Hashtags: API 30 x ajuda 5 (não confirmado na interface); max_hashtags=5 provisório",
-   "constantes": [],
-   "notas": "Help: 1080 px e 3:4; API: 4:5; adotado 4:5; alt 100 é casa"
+   "sha256": "77da8690477b990fabdda28509f80cddcd92c9cb71d56bcff8b34b3ce2a964ad"
   },
   "media_validate": [],
   "dom": {
@@ -52,44 +21,42 @@
     {
      "id": "titulo",
      "x": 72,
-     "y": 940,
-     "w": 936,
-     "h": 69
+     "y": 937,
+     "w": 621,
+     "h": 144,
+     "cor": "#ffffff",
+     "px": 64
     },
     {
      "id": "corpo",
      "x": 72,
-     "y": 1061,
-     "w": 936,
-     "h": 39
+     "y": 1129,
+     "w": 695,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
     },
     {
      "id": "cta",
      "x": 72,
-     "y": 1234,
-     "w": 214,
-     "h": 44
+     "y": 1237,
+     "w": 218,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
     }
    ],
    "emblema": [
     {
      "id": "emblema-box",
      "x": 884,
-     "y": 1163,
+     "y": 1165,
      "w": 124,
-     "h": 115
+     "h": 115,
+     "cor": "#ffffff",
+     "px": 16
     }
    ],
-   "foto": [
-    {
-     "id": "foto",
-     "x": 0,
-     "y": 0,
-     "w": 1080,
-     "h": 880
-    }
-   ],
-   "barra": [],
    "fonts": [
     "Roboto 400 loaded",
     "Roboto 700 loaded",
@@ -112,13 +79,13 @@
    "titulo": {
     "min": 3.7275428261897705,
     "p5": 3.7275428261897705,
-    "mean": 4.08563336061166,
+    "mean": 4.057775791863216,
     "pass": true
    },
    "corpo": {
     "min": 3.7275428261897705,
     "p5": 3.7275428261897705,
-    "mean": 4.0856789069623725,
+    "mean": 4.032802962955696,
     "pass": true
    },
    "cta": {
@@ -128,59 +95,23 @@
     "pass": true
    }
   },
-  "contraste_no_png_final_com_texto(uso_errado)": {
-   "min": 1.0,
-   "p5": 1.0,
-   "mean": 3.1298217035490343,
-   "pass": false
-  }
+  "texto_pequeno(<24px)": []
  },
- "story": {
+ "leo-post-foto-story": {
+  "grafia_texto_fonte": [],
   "brand_lint": [],
   "measure": {
    "width": 1080,
    "height": 1920,
-   "bytes": 2102155,
-   "sha256": "3b3cfdde291bd0a9de0cf239a75fd6976a6ee32a76692b7abb95a4cab8672033"
+   "bytes": 2101054,
+   "sha256": "787a9b4531ddb2933d63d0dc3f2463acbc6da5438046885919ce8acd21595e2d"
   },
   "inspect_artifact": {
    "ok": true,
    "issues": [],
    "width": 1080,
    "height": 1920,
-   "sha256": "3b3cfdde291bd0a9de0cf239a75fd6976a6ee32a76692b7abb95a4cab8672033"
-  },
-  "formato_linha": {
-   "id": "ig-story",
-   "plataforma": "instagram",
-   "formato": "story",
-   "largura": 1080,
-   "altura": 1920,
-   "razao": "9:16",
-   "limite_bytes": 104857600,
-   "duracao_max_s": 60,
-   "safe_zone": {
-    "top": 0.15,
-    "bottom": 0.15,
-    "left": 0.1,
-    "right": 0.1,
-    "fonte": "convenção 15/15/10/10 a validar; Meta só pede bordas livres",
-    "status": "provisorio"
-   },
-   "max_chars": 2200,
-   "max_hashtags": 5,
-   "alt_max": 100,
-   "alt_max_plataforma": null,
-   "fonte": "https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/media",
-   "fonte_secundaria": "https://help.instagram.com/1038071743007909",
-   "fonte_tipo": "oficial",
-   "checked_at": "2026-11-11",
-   "verificado_em": "2026-11-11",
-   "status": "provisorio",
-   "verificacao": "DIVERGENTE",
-   "divergencia": "Hashtags: API 30 x ajuda 5. Alt não suportado na API; casa ≤100 no HTML",
-   "constantes": [],
-   "notas": "100 MB e 60 s (F2); 9:16 recomendado"
+   "sha256": "787a9b4531ddb2933d63d0dc3f2463acbc6da5438046885919ce8acd21595e2d"
   },
   "media_validate": [],
   "dom": {
@@ -188,23 +119,29 @@
     {
      "id": "titulo",
      "x": 108,
-     "y": 1184,
-     "w": 864,
-     "h": 138
+     "y": 1181,
+     "w": 621,
+     "h": 144,
+     "cor": "#ffffff",
+     "px": 64
     },
     {
      "id": "corpo",
      "x": 108,
-     "y": 1374,
-     "w": 864,
-     "h": 39
+     "y": 1377,
+     "w": 695,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
     },
     {
      "id": "cta",
      "x": 108,
      "y": 1588,
-     "w": 214,
-     "h": 44
+     "w": 218,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
     }
    ],
    "emblema": [
@@ -213,19 +150,11 @@
      "x": 818,
      "y": 1489,
      "w": 154,
-     "h": 143
+     "h": 143,
+     "cor": "#ffffff",
+     "px": 16
     }
    ],
-   "foto": [
-    {
-     "id": "foto",
-     "x": 0,
-     "y": 0,
-     "w": 1080,
-     "h": 1112
-    }
-   ],
-   "barra": [],
    "fonts": [
     "Roboto 400 loaded",
     "Roboto 700 loaded",
@@ -248,13 +177,13 @@
    "titulo": {
     "min": 3.7275428261897705,
     "p5": 3.7275428261897705,
-    "mean": 4.07289255488122,
+    "mean": 4.054713236027053,
     "pass": true
    },
    "corpo": {
     "min": 3.7275428261897705,
     "p5": 3.7275428261897705,
-    "mean": 4.072911063805764,
+    "mean": 4.032816105830239,
     "pass": true
    },
    "cta": {
@@ -264,37 +193,908 @@
     "pass": true
    }
   },
-  "contraste_no_png_final_com_texto(uso_errado)": {
-   "min": 1.0,
-   "p5": 1.0,
-   "mean": 3.5386944919816137,
-   "pass": false
-  }
+  "texto_pequeno(<24px)": []
  },
- "manifesto_foto": {
-  "manifest": {
-   "input_sha256": "f904dc115ed68469940a5c6f036089a19f098cbea77ae9df86c0ba1f04995d72",
-   "output_sha256": "aa0eff809a284010849d6ef84270d57262b89d479d4e7fd5290bca011be5dcd2",
-   "steps": [
+ "lions-capa-campanha": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1350,
+   "bytes": 987978,
+   "sha256": "c6cc907aba1de48f932f608b1f50c3450d3d757be86aeb290886d2497618c436"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1350,
+   "sha256": "c6cc907aba1de48f932f608b1f50c3450d3d757be86aeb290886d2497618c436"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
     {
-     "name": "crop_focal",
-     "params": {
-      "focal": [
-       0.5,
-       0.5
-      ],
-      "target": [
-       2160,
-       1680
-      ]
-     }
+     "id": "arraste",
+     "x": 890,
+     "y": 82,
+     "w": 118,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
+    },
+    {
+     "id": "eyebrow",
+     "x": 72,
+     "y": 763,
+     "w": 204,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
+    },
+    {
+     "id": "titulo",
+     "x": 72,
+     "y": 807,
+     "w": 897,
+     "h": 262,
+     "cor": "#ffffff",
+     "px": 120
+    },
+    {
+     "id": "subtitulo",
+     "x": 72,
+     "y": 1129,
+     "w": 667,
+     "h": 42,
+     "cor": "#ffffff",
+     "px": 36
+    },
+    {
+     "id": "clube",
+     "x": 72,
+     "y": 1247,
+     "w": 149,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    },
+    {
+     "id": "periodo",
+     "x": 237,
+     "y": 1247,
+     "w": 177,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
     }
    ],
-   "brand_id": "leo-lions",
-   "origin": "Lions Clubs International - biblioteca de fotos (box-extra/G-fotos-biblioteca/_Environment)",
-   "license": "(c) Lions Clubs International; uso autorizado a associados; termos da biblioteca NAO verificados",
-   "ai_elements": []
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 72,
+     "y": 72,
+     "w": 620,
+     "h": 129,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
   },
-  "verify": []
+  "safe_zone": {
+   "zona": {
+    "top": 0.05,
+    "bottom": 0.05,
+    "left": 0.05,
+    "right": 0.05,
+    "fonte": "casa: 5% + 40 px; sem % oficial (F1)",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "arraste": {
+    "min": 7.1249894889602325,
+    "p5": 7.221277937566752,
+    "mean": 7.5159165740197045,
+    "pass": true
+   },
+   "eyebrow": {
+    "min": 8.387518658594226,
+    "p5": 8.66595348269728,
+    "mean": 9.174125969675178,
+    "pass": true
+   },
+   "titulo": {
+    "min": 5.29582964394249,
+    "p5": 6.251384505989917,
+    "mean": 8.38781146099063,
+    "pass": true
+   },
+   "subtitulo": {
+    "min": 7.946422944945461,
+    "p5": 8.015633985850185,
+    "mean": 8.3947788804092,
+    "pass": true
+   },
+   "clube": {
+    "min": 8.290259686861301,
+    "p5": 8.299039742117518,
+    "mean": 9.490950779206022,
+    "pass": true
+   },
+   "periodo": {
+    "min": 8.056235904534981,
+    "p5": 8.18369282414672,
+    "mean": 8.5123505580485,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "leo-capa-campanha": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1350,
+   "bytes": 909042,
+   "sha256": "c1e2ce0b4842c88faca7a5cb3cd398d2a01a4c742b46a1f5efd083dcb47a2f5f"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1350,
+   "sha256": "c1e2ce0b4842c88faca7a5cb3cd398d2a01a4c742b46a1f5efd083dcb47a2f5f"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "arraste",
+     "x": 890,
+     "y": 82,
+     "w": 118,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
+    },
+    {
+     "id": "eyebrow",
+     "x": 190,
+     "y": 717,
+     "w": 204,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
+    },
+    {
+     "id": "titulo",
+     "x": 190,
+     "y": 761,
+     "w": 523,
+     "h": 262,
+     "cor": "#ffffff",
+     "px": 120
+    },
+    {
+     "id": "subtitulo",
+     "x": 190,
+     "y": 1082,
+     "w": 664,
+     "h": 89,
+     "cor": "#ffffff",
+     "px": 36
+    },
+    {
+     "id": "clube",
+     "x": 190,
+     "y": 1247,
+     "w": 130,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    },
+    {
+     "id": "periodo",
+     "x": 336,
+     "y": 1247,
+     "w": 177,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 190,
+     "y": 72,
+     "w": 190,
+     "h": 177,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.05,
+    "bottom": 0.05,
+    "left": 0.05,
+    "right": 0.05,
+    "fonte": "casa: 5% + 40 px; sem % oficial (F1)",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "arraste": {
+    "min": 3.989378267765768,
+    "p5": 3.989378267765768,
+    "mean": 3.989378267765767,
+    "pass": true
+   },
+   "eyebrow": {
+    "min": 3.4161292207737506,
+    "p5": 3.4161292207737506,
+    "mean": 3.6663519784683163,
+    "pass": true
+   },
+   "titulo": {
+    "min": 3.4161292207737506,
+    "p5": 3.477125192333261,
+    "mean": 3.7600638937207043,
+    "pass": true
+   },
+   "subtitulo": {
+    "min": 3.4214541627872057,
+    "p5": 3.545123464059377,
+    "mean": 3.985126388145075,
+    "pass": true
+   },
+   "clube": {
+    "min": 3.989378267765768,
+    "p5": 4.119221548635817,
+    "mean": 4.351647213013915,
+    "pass": true
+   },
+   "periodo": {
+    "min": 3.4219011057005555,
+    "p5": 3.47738841687174,
+    "mean": 3.707414760878358,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "lions-data-comemorativa": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1350,
+   "bytes": 1067920,
+   "sha256": "5d0d9f9900dc9186d34c5b54706aaf2307f0030f3f49c78bd520fe5bacdc46f1"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1350,
+   "sha256": "5d0d9f9900dc9186d34c5b54706aaf2307f0030f3f49c78bd520fe5bacdc46f1"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "data",
+     "x": 315,
+     "y": 492,
+     "w": 450,
+     "h": 42,
+     "cor": "#ffffff",
+     "px": 36
+    },
+    {
+     "id": "rotulo",
+     "x": 330,
+     "y": 565,
+     "w": 419,
+     "h": 75,
+     "cor": "#00338d",
+     "px": 64
+    },
+    {
+     "id": "titulo",
+     "x": 150,
+     "y": 651,
+     "w": 780,
+     "h": 200,
+     "cor": "#ffffff",
+     "px": 170
+    },
+    {
+     "id": "assinatura",
+     "x": 414,
+     "y": 1186,
+     "w": 251,
+     "h": 47,
+     "cor": "#ffffff",
+     "px": 40
+    },
+    {
+     "id": "clube",
+     "x": 346,
+     "y": 1244,
+     "w": 388,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 260,
+     "y": 72,
+     "w": 560,
+     "h": 116,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.05,
+    "bottom": 0.05,
+    "left": 0.05,
+    "right": 0.05,
+    "fonte": "casa: 5% + 40 px; sem % oficial (F1)",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "data": {
+    "min": 7.257320121126375,
+    "p5": 7.323924042727322,
+    "mean": 9.085731505231784,
+    "pass": true
+   },
+   "rotulo": {
+    "min": 11.301575094962985,
+    "p5": 11.301575094962985,
+    "mean": 11.301575094962983,
+    "pass": true
+   },
+   "titulo": {
+    "min": 6.292486033801601,
+    "p5": 7.491791380732937,
+    "mean": 8.658812253887284,
+    "pass": true
+   },
+   "assinatura": {
+    "min": 8.90943697000338,
+    "p5": 9.176222045460642,
+    "mean": 9.347126756008018,
+    "pass": true
+   },
+   "clube": {
+    "min": 7.446594934305722,
+    "p5": 7.925008614782038,
+    "mean": 9.194591581941124,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "leo-data-comemorativa": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1350,
+   "bytes": 734200,
+   "sha256": "43401a271fbd6c334dbdc0669de9edb44a726f11f48c5c055a215e551ffe7cc6"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1350,
+   "sha256": "43401a271fbd6c334dbdc0669de9edb44a726f11f48c5c055a215e551ffe7cc6"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "data",
+     "x": 335,
+     "y": 582,
+     "w": 411,
+     "h": 42,
+     "cor": "#ffffff",
+     "px": 36
+    },
+    {
+     "id": "rotulo",
+     "x": 260,
+     "y": 655,
+     "w": 559,
+     "h": 75,
+     "cor": "#55565a",
+     "px": 64
+    },
+    {
+     "id": "titulo",
+     "x": 130,
+     "y": 745,
+     "w": 819,
+     "h": 159,
+     "cor": "#ffffff",
+     "px": 136
+    },
+    {
+     "id": "clube",
+     "x": 356,
+     "y": 1244,
+     "w": 367,
+     "h": 33,
+     "cor": "#ffffff",
+     "px": 28
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 430,
+     "y": 72,
+     "w": 220,
+     "h": 204,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.05,
+    "bottom": 0.05,
+    "left": 0.05,
+    "right": 0.05,
+    "fonte": "casa: 5% + 40 px; sem % oficial (F1)",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "data": {
+    "min": 3.4267613312082923,
+    "p5": 3.5981299639525575,
+    "mean": 3.9321423450745216,
+    "pass": true
+   },
+   "rotulo": {
+    "min": 7.329813707112641,
+    "p5": 7.329813707112641,
+    "mean": 7.329813707112638,
+    "pass": true
+   },
+   "titulo": {
+    "min": 3.4161292207737506,
+    "p5": 3.510950623407132,
+    "mean": 4.14369628713343,
+    "pass": true
+   },
+   "clube": {
+    "min": 3.4161292207737506,
+    "p5": 3.5508980054172024,
+    "mean": 3.8406287802846335,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "leo-editorial-capa": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1350,
+   "bytes": 1545968,
+   "sha256": "6cbf777484d5260ed3f5ee619df6e0bc55c53ab52e49b93c0e0f9a0c9d9ac276"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1350,
+   "sha256": "6cbf777484d5260ed3f5ee619df6e0bc55c53ab52e49b93c0e0f9a0c9d9ac276"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "data",
+     "x": 72,
+     "y": 78,
+     "w": 358,
+     "h": 35,
+     "cor": "#ffffff",
+     "px": 30
+    },
+    {
+     "id": "titulo",
+     "x": 72,
+     "y": 861,
+     "w": 874,
+     "h": 311,
+     "cor": "#ffffff",
+     "px": 150
+    },
+    {
+     "id": "clube",
+     "x": 72,
+     "y": 1248,
+     "w": 130,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    },
+    {
+     "id": "periodo",
+     "x": 218,
+     "y": 1248,
+     "w": 177,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 838,
+     "y": 72,
+     "w": 170,
+     "h": 158,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.05,
+    "bottom": 0.05,
+    "left": 0.05,
+    "right": 0.05,
+    "fonte": "casa: 5% + 40 px; sem % oficial (F1)",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "data": {
+    "min": 3.633708295106869,
+    "p5": 5.11988571002269,
+    "mean": 6.474979377875736,
+    "pass": true
+   },
+   "titulo": {
+    "min": 3.5345634009559572,
+    "p5": 3.544507704130098,
+    "mean": 6.951422290959332,
+    "pass": true
+   },
+   "clube": {
+    "min": 4.915067260555436,
+    "p5": 5.140189744575497,
+    "mean": 6.865072988814721,
+    "pass": true
+   },
+   "periodo": {
+    "min": 3.5958814181423633,
+    "p5": 4.842278510367056,
+    "mean": 6.051508428752644,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "lions-editorial-capa": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1350,
+   "bytes": 1226885,
+   "sha256": "ce180c20274c5df662d16ffeb6b34d02b1ff5bf78d55dcaaab746c1caf3dcf1f"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1350,
+   "sha256": "ce180c20274c5df662d16ffeb6b34d02b1ff5bf78d55dcaaab746c1caf3dcf1f"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "data",
+     "x": 72,
+     "y": 78,
+     "w": 392,
+     "h": 35,
+     "cor": "#ffffff",
+     "px": 30
+    },
+    {
+     "id": "titulo",
+     "x": 72,
+     "y": 861,
+     "w": 897,
+     "h": 311,
+     "cor": "#ffffff",
+     "px": 150
+    },
+    {
+     "id": "clube",
+     "x": 72,
+     "y": 1248,
+     "w": 149,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    },
+    {
+     "id": "periodo",
+     "x": 237,
+     "y": 1248,
+     "w": 177,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 838,
+     "y": 72,
+     "w": 170,
+     "h": 161,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.05,
+    "bottom": 0.05,
+    "left": 0.05,
+    "right": 0.05,
+    "fonte": "casa: 5% + 40 px; sem % oficial (F1)",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "data": {
+    "min": 4.612086794085452,
+    "p5": 4.612086794085452,
+    "mean": 4.677874674739233,
+    "pass": true
+   },
+   "titulo": {
+    "min": 4.612086794085452,
+    "p5": 4.827753902281526,
+    "mean": 7.35765812436286,
+    "pass": true
+   },
+   "clube": {
+    "min": 7.407388385591862,
+    "p5": 8.231089768491607,
+    "mean": 10.101988632489588,
+    "pass": true
+   },
+   "periodo": {
+    "min": 6.957517150989897,
+    "p5": 7.191542486200662,
+    "mean": 8.247620162880338,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
+ },
+ "leo-editorial-numero": {
+  "grafia_texto_fonte": [],
+  "brand_lint": [],
+  "measure": {
+   "width": 1080,
+   "height": 1350,
+   "bytes": 1005506,
+   "sha256": "583448c5a62e02f9cca475cc0c017711f8f25fffb9000f29bb1df4839ea8c739"
+  },
+  "inspect_artifact": {
+   "ok": true,
+   "issues": [],
+   "width": 1080,
+   "height": 1350,
+   "sha256": "583448c5a62e02f9cca475cc0c017711f8f25fffb9000f29bb1df4839ea8c739"
+  },
+  "media_validate": [],
+  "dom": {
+   "fields": [
+    {
+     "id": "chamada",
+     "x": 100,
+     "y": 589,
+     "w": 633,
+     "h": 54,
+     "cor": "#55565a",
+     "px": 46
+    },
+    {
+     "id": "numero",
+     "x": 72,
+     "y": 669,
+     "w": 763,
+     "h": 251,
+     "cor": "#ebb700",
+     "px": 214
+    },
+    {
+     "id": "legenda",
+     "x": 72,
+     "y": 904,
+     "w": 834,
+     "h": 47,
+     "cor": "#ffffff",
+     "px": 40
+    },
+    {
+     "id": "clube",
+     "x": 72,
+     "y": 1248,
+     "w": 130,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    },
+    {
+     "id": "periodo",
+     "x": 218,
+     "y": 1248,
+     "w": 177,
+     "h": 30,
+     "cor": "#ffffff",
+     "px": 26
+    }
+   ],
+   "emblema": [
+    {
+     "id": "emblema-box",
+     "x": 838,
+     "y": 72,
+     "w": 170,
+     "h": 158,
+     "cor": "#ffffff",
+     "px": 16
+    }
+   ],
+   "fonts": [
+    "Roboto 400 loaded",
+    "Roboto 700 loaded",
+    "Roboto 900 loaded"
+   ]
+  },
+  "safe_zone": {
+   "zona": {
+    "top": 0.05,
+    "bottom": 0.05,
+    "left": 0.05,
+    "right": 0.05,
+    "fonte": "casa: 5% + 40 px; sem % oficial (F1)",
+    "status": "provisorio"
+   },
+   "issues": []
+  },
+  "overflow": [],
+  "contraste_sob_texto": {
+   "chamada": {
+    "min": 7.329813707112641,
+    "p5": 7.329813707112641,
+    "mean": 7.329813707112639,
+    "pass": true
+   },
+   "numero": {
+    "min": 3.2797017464216696,
+    "p5": 3.283459141118723,
+    "mean": 3.6322355696079494,
+    "pass": true
+   },
+   "legenda": {
+    "min": 6.091879024674587,
+    "p5": 6.212141262444792,
+    "mean": 6.987950186292312,
+    "pass": true
+   },
+   "clube": {
+    "min": 6.091879024674587,
+    "p5": 6.24679370651511,
+    "mean": 6.742111944815335,
+    "pass": true
+   },
+   "periodo": {
+    "min": 6.091879024674587,
+    "p5": 6.376507482400196,
+    "mean": 7.146998506420481,
+    "pass": true
+   }
+  },
+  "texto_pequeno(<24px)": [],
+  "manifesto_foto": {
+   "verify": []
+  }
  }
 }

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<title>Data comemorativa</title>
+<style>
+/*TOKENS*/
+@font-face { font-family: "Roboto"; font-weight: 400; src: url("fonts/roboto-400.woff2") format("woff2"); }
+@font-face { font-family: "Roboto"; font-weight: 700; src: url("fonts/roboto-700.woff2") format("woff2"); }
+@font-face { font-family: "Roboto"; font-weight: 900; src: url("fonts/roboto-900.woff2") format("woff2"); }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--ov1); }
+[data-od-card] {
+  position: relative; width: 1080px; height: 1350px; overflow: hidden;
+  background: var(--ov1); color: var(--white); font-family: "Roboto", sans-serif;
+}
+.foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.base { position: absolute; inset: 0; background: var(--base); opacity: var(--base-a); }
+.overlay { position: absolute; inset: 0; background: var(--ov1); opacity: var(--ov-a); }
+
+.col { position: absolute; left: 72px; right: 72px; top: 72px; bottom: 72px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.emblema-box { flex: none; overflow: hidden; }
+.emblema { display: block; max-width: none; }
+.centro { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+[data-od-field="data"] { font-size: 36px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 28px; }
+/* rotulo em caixa branca com texto na cor da marca (referencia do dono: "dia internacional") */
+[data-od-field="rotulo"] { background: var(--white); color: var(--lab); font-size: 64px; font-weight: 400; line-height: 1.1; padding: 6px 28px 10px; margin-bottom: 20px; }
+[data-od-field="titulo"] { font-size: {{titulo_px}}px; font-weight: 900; line-height: 0.98; letter-spacing: -0.01em; text-transform: uppercase; white-space: nowrap; }
+.fio { width: 360px; height: 6px; background: var(--yellow); margin: 40px 0 0; }
+.rodape { flex: none; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 28px; line-height: 1.25; }
+[data-od-field="assinatura"] { font-size: 40px; font-weight: 700; }
+[data-od-field="clube"] { font-weight: 400; letter-spacing: 0.06em; }
+</style>
+</head>
+<body>
+<div data-od-card data-variant="{{marca}}" data-format="{{formato}}">
+  <img class="foto" src="{{foto}}" alt="{{alt}}">
+  <div class="base"></div>
+  <div class="overlay"></div>
+  <div class="col">
+    <span class="emblema-box" data-od-logo style="width:{{logo_box_w}}px;height:{{logo_box_h}}px"><img class="emblema" src="{{logo_src}}" width="{{logo_img_w}}" style="margin-left:{{logo_ml}}px;margin-top:{{logo_mt}}px" alt="{{marca}}"></span>
+    <div class="centro">
+      <p data-od-field="data">{{data}}</p>
+      <p data-od-field="rotulo">{{rotulo}}</p>
+      <h1 data-od-field="titulo">{{titulo}}</h1>
+      <div class="fio"></div>
+    </div>
+    <div class="rodape">
+      <!--opt:assinatura--><span data-od-field="assinatura">{{assinatura}}</span><!--/opt:assinatura-->
+      <span data-od-field="clube">{{clube}}</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
