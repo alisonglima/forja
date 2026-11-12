@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "fonte": "plano:750 (§4.7); contrato tests/test_jury_data.py",
+  "fonte_tipo": "plano",
+  "nota": "Medido e editorial nunca se convertem; nota alta não substitui o gate humano.",
+  "scale": [1, 5],
+  "threshold": 85,
+  "min_criterion": 3,
+  "max_rounds": 2,
+  "correction_band": [70, 84.9],
+  "criteria": [
+    {
+      "name": "verdade e fonte",
+      "weight": 20,
+      "measured": ["hash", "aprovacoes"],
+      "editorial": ["verdade"]
+    },
+    {
+      "name": "hierarquia e legibilidade",
+      "weight": 25,
+      "measured": ["contraste", "overflow"],
+      "editorial": ["hierarquia"]
+    },
+    {
+      "name": "marca e identidade",
+      "weight": 20,
+      "measured": ["fontes"],
+      "editorial": ["tom"]
+    },
+    {
+      "name": "formato e plataforma",
+      "weight": 20,
+      "measured": ["dimensao", "overflow"],
+      "editorial": ["hierarquia"]
+    },
+    {
+      "name": "prontidão e entrega",
+      "weight": 15,
+      "measured": ["aprovacoes", "dedup", "hash"],
+      "editorial": ["tom"]
+    }
+  ]
+}
