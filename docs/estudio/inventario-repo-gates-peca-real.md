@@ -1,6 +1,6 @@
 # Inventário do repo para a peça real Leo/Lions
 
-Base: `dc2c4bdce1cbe2b2479b983b27f74784a3587683`. Lane só de leitura: nada foi executado além de `pytest`, `git`, inspeção local e da criação deste arquivo; kit, OD, Chrome, `ssh`, `scp`, `curl`, `npm` e rede não foram usados. O acervo oficial fica em `/Users/alisonglima/Documents/dev/projects/forja/.work/fontes/lions/`; este worktree não tem `.work/fontes` (só o checkout principal tem).
+Base: `dc2c4bdce1cbe2b2479b983b27f74784a3587683`. Lane só de leitura: nada foi executado além de `pytest`, `git`, inspeção local e da criação deste arquivo; kit, OD, Chrome, `ssh`, `scp`, `curl`, `npm` e rede não foram usados. O acervo oficial fica em `.work/fontes/lions/`; este worktree não tem `.work/fontes` (só o checkout principal tem).
 
 ## 1. Contratos G0a vermelhos relevantes
 
