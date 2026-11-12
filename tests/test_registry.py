@@ -21,7 +21,7 @@ def _entry(entries, name):
 def test_kinds_are_the_documented_tuple():
     from forja import registry
 
-    assert registry.KINDS == ("tts", "stt", "render", "clip")
+    assert registry.KINDS == ("tts", "stt", "render", "clip", "image", "music")
 
 
 def test_register_returns_the_decorated_object():

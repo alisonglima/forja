@@ -11,10 +11,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from PIL import Image
 
 
 def _solid(color=(255, 0, 0), size=(4, 4)):
+    Image = pytest.importorskip("PIL.Image")
     return Image.new("RGB", size, color)
 
 

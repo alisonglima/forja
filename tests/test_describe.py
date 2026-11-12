@@ -27,6 +27,7 @@ def test_describe_returns_documented_top_level_keys():
         "workflows",
         "providers",
         "schemas",
+        "mcp_tools",
     }
 
 

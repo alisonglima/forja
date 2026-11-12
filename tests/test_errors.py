@@ -20,7 +20,8 @@ EXPECTED_EXITS = {
 def test_error_codes_has_exactly_the_documented_codes():
     from forja import errors
 
-    assert set(errors.ERROR_CODES) == set(EXPECTED_EXITS)
+    # os 10 herdados continuam; a tabela final (28) e congelada em test_errors_final.py
+    assert set(EXPECTED_EXITS) <= set(errors.ERROR_CODES)
 
 
 @pytest.mark.parametrize("code,exit_code", sorted(EXPECTED_EXITS.items()))

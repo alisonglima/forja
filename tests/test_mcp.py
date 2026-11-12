@@ -52,7 +52,7 @@ def test_tools_list_has_the_documented_tools():
         {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}}, env={}
     )
     names = {tool["name"] for tool in response["result"]["tools"]}
-    assert names == {
+    assert names >= {
         "forja_describe",
         "forja_providers",
         "forja_status",

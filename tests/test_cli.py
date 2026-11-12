@@ -72,6 +72,7 @@ def test_describe_json_has_documented_top_level_keys():
         "workflows",
         "providers",
         "schemas",
+        "mcp_tools",
     }
     assert doc["next_actions"] == []
     assert doc["cost"] is None

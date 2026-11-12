@@ -6,6 +6,8 @@ variante, so o do guia (plano:1995,2080); 3 variantes lions|leo|leo-lion, exempl
 import json
 from pathlib import Path
 
+import pytest
+
 LEO = ["Leos get things done.", "Leo like you mean it.", "Where there's a need, there's a Leo."]
 LL = ["A new breed of Lion.", "Lion, your way.", "There's a different way to Lion."]
 
@@ -97,18 +99,12 @@ def test_arquivo_existe_e_json_dict_nao_vazio():
 def test_rejeita_json_truncado_e_topo_lista(tmp_path):
     trunc = tmp_path / "v.json"
     trunc.write_text("{truncado", encoding="utf-8")
-    try:
+    with pytest.raises(json.JSONDecodeError):
         _load(trunc)
-        raise SystemExit("truncado passou")
-    except json.JSONDecodeError:
-        pass
     lst = tmp_path / "l.json"
     lst.write_text("[1,2]", encoding="utf-8")
-    try:
+    with pytest.raises(AssertionError):
         _vars(_load(lst))
-        raise SystemExit("lista passou")
-    except AssertionError:
-        pass
 
 
 def test_payload_com_dois_exemplos_em_leo_falha_na_contagem(tmp_path):
