@@ -14,9 +14,11 @@ ROOTFS=vmdata:16
 MARC=''
 PVE_HOST=${PVE_HOST:-root@192.168.88.32}
 KIT_TAR=${KIT_TAR:-/tmp/prova-kit.tar.gz}
+EVID_TAR=''
+EXPORTS=''
 FASE_CMD=${FASE_CMD:-}
 
-uso() { echo "uso: $0 [--dry-run|--run] [--ctid N] [--out DIR]" >&2; }
+uso() { echo "uso: $0 [--dry-run|--run|--inside] [--ctid N] [--out DIR]" >&2; }
 erro() { echo "erro: $*" >&2; }
 
 # Valida antes de criar diretorio, gravar arquivo ou chamar qualquer coisa.
@@ -32,6 +34,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --dry-run) MODO=dry-run; shift ;;
     --run)     MODO=run; shift ;;
+    --inside)  MODO=inside; shift ;;
     --ctid)    [ $# -ge 2 ] || { erro "--ctid exige valor"; exit 2; }; CTID=$2; shift 2 ;;
     --out)     [ $# -ge 2 ] || { erro "--out exige valor"; exit 2; }; OUT=$2; shift 2 ;;
     -h|--help) uso; exit 0 ;;
@@ -39,7 +42,33 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+# Roda dentro do CT (nunca chama ssh/pct). Ordem fixa; nao para na primeira falha.
+modo_inside() {
+  local raiz=${INSIDE_ROOT:-/srv/prova}
+  local fases=(export-exato export-pdf preflight-provocado lote-csv video-compare medir-rede)
+  local fase alvo rc falhou=0 primeiro=1 json='['
+  mkdir -p "$raiz/evidencias"
+  for fase in "${fases[@]}"; do
+    alvo="$raiz/scripts/prova-kit/$fase.mjs"
+    [ -f "$alvo" ] || continue
+    rc=0
+    node "$alvo" --out "$raiz/evidencias" || rc=$?
+    [ "$rc" -eq 0 ] || falhou=1
+    if [ "$primeiro" -eq 1 ]; then primeiro=0; else json+=','; fi
+    json+="{\"fase\": \"$fase\", \"exit\": $rc}"
+  done
+  json+=']'
+  printf '%s\n' "$json" > "$raiz/evidencias/fases.json"
+  [ "$falhou" -eq 0 ]
+}
+
+if [ "$MODO" = inside ]; then
+  if modo_inside; then exit 0; else exit 1; fi
+fi
+
 validar_ctid "$CTID"
+KIT_TAR="/tmp/prova-kit-$CTID.tar.gz"
+EVID_TAR="/tmp/evidencias-$CTID.tar.gz"
 HOSTNAME="prova-kit-$CTID"
 MARC="forja-prova-kit-$CTID-$(date -u +%Y%m%dT%H%M%SZ)"
 data_utc() { date -u +%Y-%m-%dT%H:%M:%SZ; }
@@ -51,9 +80,9 @@ montar_comandos() {
   CMD_CREATE="pct create $CTID '$TEMPLATE' --hostname $HOSTNAME --cores 4 --memory 6144 --swap 1024 --rootfs '$ROOTFS' --net0 name=eth0,bridge=vmbr0,ip=dhcp --unprivileged 1 --features nesting=1 --onboot 0 --description '$MARC'"
   CMD_START="pct start $CTID"
   CMD_PUSH="pct push $CTID $KIT_TAR /srv/prova/prova-kit.tar.gz"
-  CMD_EXEC="pct exec $CTID -- bash -lc 'cd /srv/prova && tar xzf prova-kit.tar.gz'"
-  CMD_PULL="pct pull $CTID /srv/prova/evidencias.tar.gz $OUT/evidencias-$CTID.tar.gz"
-  CMD_SHA="sha256sum $OUT/evidencias-$CTID.tar.gz"
+  CMD_EXEC="pct exec $CTID -- bash -lc 'cd /srv/prova && tar xzf prova-kit.tar.gz && INSIDE_ROOT=/srv/prova bash scripts/prova-kit/lxc-descartavel.sh --inside'"
+  CMD_PULL="pct pull $CTID /srv/prova/evidencias.tar.gz $EVID_TAR"
+  CMD_SHA="sha256sum $EVID_TAR"
   CMD_DESTROY="pct stop $CTID || true; pct destroy $CTID --purge"
   CMD_STATUS="pct status $CTID"
 }
@@ -97,7 +126,9 @@ sha_local() {
 }
 
 puxar_erro() {
-  ssh_pve "pct pull $CTID /srv/prova/erro.json '$OUT/erro.json'" >/dev/null 2>&1 || true
+  if ssh_pve "pct pull $CTID /srv/prova/erro.json /tmp/erro-$CTID.json" >/dev/null 2>&1; then
+    ssh_pve "cat /tmp/erro-$CTID.json" > "$OUT/erro.json" 2>/dev/null || true
+  fi
 }
 
 confirmar_marcador() {
@@ -123,7 +154,7 @@ cleanup() {
   set +e
   if [ "$CRIADO" -eq 1 ] && [ "$DESTRUIDO" -eq 0 ]; then
     puxar_erro
-    destruir >/dev/null 2>&1 && DESTRUIDO=1
+    if destruir >/dev/null; then DESTRUIDO=1; fi
   fi
   exit "$rc"
 }
@@ -143,6 +174,69 @@ with open(sys.argv[1], "w", encoding="utf-8") as fh:
 PY
 }
 
+# Provisao da base no CT (K.1 passos 2 e 3). Versoes vao para ambiente.json.
+fase_base() {
+  local script
+  script=$(cat <<'BASE'
+set -e
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y --no-install-recommends ca-certificates curl xz-utils gnupg jq poppler-utils imagemagick qpdf tcpdump ffmpeg fonts-dejavu-core fonts-liberation
+curl -fsSL -o /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+apt-get install -y /tmp/chrome.deb
+google-chrome --version
+curl -fsSL -o /tmp/nodesource_setup.sh https://deb.nodesource.com/setup_22.x
+NODE_SHA=$(sha256sum /tmp/nodesource_setup.sh | awk '{print $1}')
+echo "nodesource sha256: $NODE_SHA"
+bash /tmp/nodesource_setup.sh
+apt-get install -y nodejs
+node --version
+npx --yes @feimacode/open-design-agent-kit@0.4.0 --version
+npm view @feimacode/open-design-agent-kit@0.4.0 dist.integrity
+printf '%s\n' '#!/bin/sh' 'exec google-chrome --headless --no-sandbox --disable-gpu "$@"' > /usr/local/bin/google-chrome-prova
+chmod 0755 /usr/local/bin/google-chrome-prova
+/usr/local/bin/google-chrome-prova --version
+CHROME_VER=$(google-chrome --version 2>/dev/null || echo desconhecido)
+NODE_VER=$(node --version 2>/dev/null || echo desconhecido)
+KIT_VER=$(npx --yes @feimacode/open-design-agent-kit@0.4.0 --version 2>/dev/null | tail -n1 || echo desconhecido)
+KIT_INTEG=$(npm view @feimacode/open-design-agent-kit@0.4.0 dist.integrity 2>/dev/null | tail -n1 || echo desconhecido)
+{
+  printf '{\n'
+  printf '  "chrome": "%s",\n' "$CHROME_VER"
+  printf '  "node": "%s",\n' "$NODE_VER"
+  printf '  "kit": "%s",\n' "$KIT_VER"
+  printf '  "kit_integrity": "%s",\n' "$KIT_INTEG"
+  printf '  "sha256_nodesource": "%s"\n' "$NODE_SHA"
+  printf '}\n'
+} > /srv/prova/evidencias/ambiente.json
+BASE
+)
+  ssh_pve "pct exec $CTID -- bash -lc $(printf '%q' "$script")"
+}
+
+montar_exports() {
+  local nome
+  EXPORTS=''
+  for nome in $(env | awk -F= '/^OPEN_DESIGN_[A-Za-z0-9_]+=/ {print $1}'); do
+    EXPORTS+="export $nome=$(printf '%q' "${!nome}"); "
+  done
+}
+
+rodar_inside() {
+  local script="cd /srv/prova && tar xzf prova-kit.tar.gz && ${EXPORTS}INSIDE_ROOT=/srv/prova bash scripts/prova-kit/lxc-descartavel.sh --inside"
+  [ -z "$FASE_CMD" ] || script="cd /srv/prova && tar xzf prova-kit.tar.gz && ${EXPORTS}${FASE_CMD}"
+  ssh_pve "pct exec $CTID -- bash -lc $(printf '%q' "$script")"
+}
+
+empacotar_kit() {
+  local raiz
+  local itens=(scripts/prova-kit)
+  raiz=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+  if [ -f "$raiz/remotion-template/package.json" ]; then itens+=(remotion-template/package.json); fi
+  if [ -d "$raiz/remotion-template/src" ]; then itens+=(remotion-template/src); fi
+  tar czf "$OUT/prova-kit.tar.gz" -C "$raiz" "${itens[@]}"
+}
+
 if [ "$MODO" = dry-run ]; then
   mkdir -p "$OUT"
   montar_comandos
@@ -153,9 +247,14 @@ fi
 # --run: a partir daqui ha rede/PVE. Nunca reutiliza CT existente.
 mkdir -p "$OUT"
 trap cleanup EXIT
-if ssh_pve "pct status $CTID >/dev/null 2>&1 || qm status $CTID >/dev/null 2>&1"; then
-  erro "CT/VM $CTID ja existe; preservar e usar outro id"; exit 2
+if ! STATUS_TOKEN=$(ssh_pve "if pct status $CTID >/dev/null 2>&1 || qm status $CTID >/dev/null 2>&1; then echo EXISTE; else echo LIVRE; fi"); then
+  erro "ssh/PVE falhou ao consultar o CT/VM $CTID"; exit 1
 fi
+case "$STATUS_TOKEN" in
+  LIVRE) ;;
+  EXISTE) erro "CT/VM $CTID ja existe; preservar e usar outro id"; exit 2 ;;
+  *) erro "resposta inesperada do ssh/PVE para o CT/VM $CTID: '$STATUS_TOKEN'"; exit 1 ;;
+esac
 
 TEMPLATE_RUN=$(ssh_pve "pveam list local | awk '/debian-13-standard/{print \$1; exit}'" 2>/dev/null | tr -d '\r' || true)
 if [ -z "$TEMPLATE_RUN" ]; then
@@ -168,6 +267,7 @@ ROOTFS_RUN="$STORAGE:16"
 TEMPLATE=$TEMPLATE_RUN
 ROOTFS=$ROOTFS_RUN
 montar_comandos
+escrever_plano >/dev/null
 
 INICIO=$(data_utc)
 ssh_pve "$CMD_CREATE" || { erro "pct create falhou"; exit 1; }
@@ -178,16 +278,22 @@ while [ "$i" -lt 30 ]; do
   ssh_pve "pct exec $CTID -- ip -4 -o addr show eth0" 2>/dev/null | grep -q 'inet ' && break
   i=$((i + 1)); sleep 2
 done
+empacotar_kit || { erro "empacotar kit falhou"; exit 1; }
+ssh_pve "cat > $KIT_TAR" < "$OUT/prova-kit.tar.gz" || { erro "envio do kit falhou"; exit 1; }
+ssh_pve "pct exec $CTID -- mkdir -p /srv/prova/evidencias /usr/local/bin" >/dev/null || { erro "mkdir no CT falhou"; exit 1; }
 ssh_pve "$CMD_PUSH" >/dev/null || { erro "pct push falhou"; exit 1; }
-if [ -n "$FASE_CMD" ]; then
-  ssh_pve "pct exec $CTID -- bash -lc 'cd /srv/prova && tar xzf prova-kit.tar.gz && $FASE_CMD'" || { erro "fase do kit falhou"; exit 1; }
-else
-  ssh_pve "$CMD_EXEC" >/dev/null || { erro "unpack do kit falhou"; exit 1; }
-fi
+fase_base || { erro "provisao da base falhou"; exit 1; }
+montar_exports
+rodar_inside || { erro "fase do kit falhou"; exit 1; }
 ssh_pve "pct exec $CTID -- tar czf /srv/prova/evidencias.tar.gz -C /srv/prova evidencias" >/dev/null || { erro "tar das evidencias falhou"; exit 1; }
 ssh_pve "$CMD_PULL" >/dev/null || { erro "pct pull falhou"; exit 1; }
+ssh_pve "cat $EVID_TAR" > "$OUT/evidencias-$CTID.tar.gz" || { erro "evidencias nao chegaram ao Mac"; exit 1; }
 SHA_LOCAL=$(sha_local "$OUT/evidencias-$CTID.tar.gz")
-SHA_CT=$(ssh_pve "pct exec $CTID -- sha256sum /srv/prova/evidencias.tar.gz" | awk '{print $1}' | tr -d '\r')
+SHA_CT=$(ssh_pve "pct exec $CTID -- sha256sum /srv/prova/evidencias.tar.gz" | awk '{print $1}' | tr -d '\r' || true)
+ssh_pve "rm -f $KIT_TAR $EVID_TAR" >/dev/null || true
+if [ -z "$SHA_CT" ] || [ "$SHA_LOCAL" != "$SHA_CT" ]; then
+  erro "sha256 divergente entre Mac e CT para o CT $CTID"; exit 1
+fi
 FIM=$(data_utc)
 
 DESTRUIDO=0
