@@ -612,7 +612,7 @@
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.72,
+    "opacidade": 0.74,
     "cor_rotulo": "azul"
    },
    "logo": {
@@ -653,7 +653,7 @@
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.72,
+    "opacidade": 0.74,
     "cor_rotulo": "azul"
    },
    "logo": {
@@ -694,7 +694,7 @@
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.6,
+    "opacidade": 0.5,
     "cor_rotulo": "azul"
    },
    "logo": {
@@ -735,7 +735,7 @@
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.6,
+    "opacidade": 0.5,
     "cor_rotulo": "azul"
    },
    "logo": {
