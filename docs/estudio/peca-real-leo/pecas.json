@@ -616,8 +616,8 @@
     "cor_rotulo": "azul"
    },
    "logo": {
-    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
-    "largura_visivel": 230
+    "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+    "largura_visivel": 160
    },
    "copy": {
     "clube": "LEO Clube",
@@ -630,7 +630,10 @@
    },
    "regras": {
     "max_accents": 3
-   }
+   },
+   "logos_extra": [
+    "logos/Emblemas_de_Leos/"
+   ]
   },
   {
    "id": "leo-lion-capa-campanha-story",
@@ -654,8 +657,8 @@
     "cor_rotulo": "azul"
    },
    "logo": {
-    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
-    "largura_visivel": 230
+    "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+    "largura_visivel": 160
    },
    "copy": {
     "clube": "LEO Clube",
@@ -668,7 +671,10 @@
    },
    "regras": {
     "max_accents": 3
-   }
+   },
+   "logos_extra": [
+    "logos/Emblemas_de_Leos/"
+   ]
   },
   {
    "id": "leo-lion-data-comemorativa",
@@ -692,8 +698,8 @@
     "cor_rotulo": "azul"
    },
    "logo": {
-    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
-    "largura_visivel": 230
+    "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+    "largura_visivel": 160
    },
    "copy": {
     "data": "5 de dezembro",
@@ -705,7 +711,10 @@
    },
    "regras": {
     "max_accents": 3
-   }
+   },
+   "logos_extra": [
+    "logos/Emblemas_de_Leos/"
+   ]
   },
   {
    "id": "leo-lion-data-comemorativa-story",
@@ -729,8 +738,8 @@
     "cor_rotulo": "azul"
    },
    "logo": {
-    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
-    "largura_visivel": 230
+    "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+    "largura_visivel": 160
    },
    "copy": {
     "data": "5 de dezembro",
@@ -742,7 +751,10 @@
    },
    "regras": {
     "max_accents": 3
-   }
+   },
+   "logos_extra": [
+    "logos/Emblemas_de_Leos/"
+   ]
   }
  ]
 }

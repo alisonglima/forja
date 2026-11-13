@@ -17,7 +17,7 @@ html, body { background: var(--ov1); }
   --fita-h: 252px; --fita-b: calc(var(--mb) - 72px);
 }
 .foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* guia Leo-Lion (V1.0, p.10): overlay azul chapado + fita azul na base com a assinatura de cor unica branca */
+/* guia Leo-Lion (V1.0, p.10): overlay azul chapado + fita azul na base com o emblema LEO (estetica Leo-Lion + emblema proprio do LEO, decisao do dono 13/11/2026) */
 .overlay { position: absolute; inset: 0; background: var(--ov1); opacity: var(--ov-a); }
 .fita { position: absolute; left: 0; right: 0; bottom: var(--fita-b); height: var(--fita-h); background: var(--sky);
   display: flex; align-items: center; justify-content: space-between; padding: 28px var(--mx) 72px; }  /* 72px = zona segura inferior minima do feed */
@@ -48,7 +48,7 @@ html, body { background: var(--ov1); }
   </div>
   <div class="fita">
     <div class="fita-txt"><span data-od-field="clube">{{clube}}</span></div>
-    <span class="emblema-box" data-od-logo style="width:{{logo_box_w}}px;height:{{logo_box_h}}px"><img class="emblema" src="{{logo_src}}" width="{{logo_img_w}}" style="margin-left:{{logo_ml}}px;margin-top:{{logo_mt}}px" alt="Leo-Lion"></span>
+    <span class="emblema-box" data-od-logo style="width:{{logo_box_w}}px;height:{{logo_box_h}}px"><img class="emblema" src="{{logo_src}}" width="{{logo_img_w}}" style="margin-left:{{logo_ml}}px;margin-top:{{logo_mt}}px" alt="LEO"></span>
   </div>
 </div>
 </body>

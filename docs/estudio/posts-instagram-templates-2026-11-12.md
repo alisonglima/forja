@@ -13,13 +13,13 @@
 
 Dado e texto: tudo em `brands/leo-lions/` (paleta em `variants.json`, grafia em `grafia.json`); logo e foto vêm do acervo privado e **não** são versionados aqui.
 
-## Leo-Lion: principal para as capas LEO (decisão do dono, 13/11/2026)
-Para **capa de campanha** e **data comemorativa** de LEO, o visual **principal** é o do guia Leo-Lion V1.0 (p.10, "key visuals"): foto sob **overlay azul chapado** (`azul` `#00338D`, opacidade 0,82), **fita azul** (`azul_claro`) que ancora a base com o clube/período e a **assinatura de cor única branca** (`109141428__Logo_rgb_Leo-Lion_1C_White.png`: o guia proíbe a assinatura primária sobre fundo azul, a secundária de cor única é a permitida), **chevrons amarelos** como acento e título em peso forte. A peça anterior (azul-claro chapado + cunha amarela + emblema LEO) fica como **variação alternativa**.
+## Leo-Lion: estética principal das capas LEO, com o emblema do próprio LEO (decisão do dono, 13/11/2026)
+Para **capa de campanha** e **data comemorativa** de LEO, o visual **principal** usa a estética do guia Leo-Lion V1.0 (p.10, "key visuals"): foto sob **overlay azul chapado** (`azul` `#00338D`, opacidade 0,82), **fita azul** (`azul_claro`) que ancora a base com o clube/período e **chevrons amarelos** como acento, título em peso forte. **A assinatura Leo-Lion NÃO é usada**: no lugar vai o **emblema LEO geral** (`logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png`, sem designação Alpha/Omega). É um híbrido deliberado (paleta e composição Leo-Lion + emblema LEO); o guia LEO diz que LEO não usa o azul 287 como primária, e aqui o dono pediu expressamente o overlay azul. A peça anterior (azul-claro chapado + cunha amarela) fica como **variação alternativa**.
 | Peça | Principal (Leo-Lion) | Alternativa (LEO) |
 |---|---|---|
 | Capa de campanha | `leo-lion-capa-campanha` (+ `-story`) | `leo-capa-campanha` (+ `-story`) |
 | Data comemorativa | `leo-lion-data-comemorativa` (+ `-story`) | `leo-data-comemorativa` (+ `-story`) |
-Templates: `capa-leo-lion.html` e `data-leo-lion.html`. Gates medidos (feed e story): grafia, lint de marca, zona segura, overflow e mídia sem pendência; contraste mínimo do texto 4,24 (o texto da fita) e 6,92 nos títulos. A fita no Story fica acima da zona segura inferior (15 %), não colada na borda.
+Templates: `capa-leo-lion.html` e `data-leo-lion.html`. Gates medidos (feed e story): grafia, lint de marca, zona segura, overflow e mídia sem pendência; contraste mínimo do texto 4,24 (o texto da fita) e 6,92 nos títulos. A fita no Story fica acima da zona segura inferior (15 %), não colada na borda. O lint recebe `logos_extra` (`logos/Emblemas_de_Leos/`) porque a peça é da variante `leo-lion` com o emblema da variante `leo`.
 
 ## Editoriais como foto de data especial e capa de carrossel
 As peças editoriais (`editorial-capa` e `editorial-numero`, Lions e LEO) são o formato recomendado para (a) **foto de uma data especial / dia comemorativo** e (b) **capa de carrossel**, com os miolos `carrossel-miolo` (Lions e LEO) em seguida. Para o carrossel, use a capa editorial com o título curto e depois até 9 miolos (limite de 10 slides).
