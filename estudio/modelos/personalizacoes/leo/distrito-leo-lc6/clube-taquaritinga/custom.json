@@ -1,0 +1,21 @@
+{
+ "schema": "forja-modelo-custom/v1",
+ "id": "clube-taquaritinga",
+ "extends": "../custom.json",
+ "nome": "LEO Clube de Taquaritinga",
+ "textos": {
+  "clube": "LEO Clube de Taquaritinga",
+  "periodo": "AL 2026/2027"
+ },
+ "logos": {
+  "extras": [
+   {
+    "id": "al-clube",
+    "descricao": "logo oficial do AL do clube",
+    "arquivo": null,
+    "status": "pendente"
+   }
+  ]
+ },
+ "status": "esqueleto"
+}

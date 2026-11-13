@@ -1,0 +1,17 @@
+{
+ "schema": "forja-modelo-custom/v1",
+ "id": "distrito-leo-lc6",
+ "extends": "../custom.json",
+ "nome": "Distrito LEO LC-6",
+ "logos": {
+  "extras": [
+   {
+    "id": "al-distrito",
+    "descricao": "logo oficial do AL do Distrito LEO LC-6",
+    "arquivo": null,
+    "status": "pendente: logo ainda nao fornecido; slot depende das regras de co-branding do relatorio an-guias-lions-01"
+   }
+  ]
+ },
+ "status": "esqueleto"
+}

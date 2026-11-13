@@ -1,0 +1,84 @@
+{
+ "schema": "forja-modelo-default/v1",
+ "descricao": "Pecas default: reproducao 1:1 dos graficos oficiais Leo-Lion (Social Media Kit). Sem nome de clube, sem AL, texto oficial em ingles. Personalizacoes herdam daqui e nao alteram medidas.",
+ "pecas": [
+  {
+   "id": "default-vertical",
+   "template": "capa-oficial-leo-lion",
+   "marca": "leo-lion",
+   "idioma": "en",
+   "formato": "vertical",
+   "preset": "ig-capa-reels",
+   "altura": 1920,
+   "referencia_oficial": "graficos-prontos/157443765__Leo-Lion_GeneralVertical_1080x1920_en.jpg",
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-488.jpg",
+    "focal": [
+     0.3,
+     0.45
+    ]
+   },
+   "overlay": {
+    "cor1": "azul",
+    "cor2": "azul_claro",
+    "opacidade": 1,
+    "cor_rotulo": "azul"
+   },
+   "logo": {
+    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
+    "largura_visivel": 280
+   },
+   "copy": {
+    "titulo": "Opportunity awaits you",
+    "subtitulo": "Become a Leo-Lion.\nMake a bigger impact.",
+    "alt": "Pessoas sorrindo em um evento de voluntariado Leo-Lion."
+   },
+   "regras": {
+    "max_accents": 3,
+    "allow_brand_gradient": true
+   },
+   "logos_extra": [
+    "logos/Logotipos_de_Leo_a_Leão/"
+   ]
+  },
+  {
+   "id": "default-quadrado",
+   "template": "quadrado-oficial-leo-lion",
+   "marca": "leo-lion",
+   "idioma": "en",
+   "formato": "quadrado",
+   "preset": "ig-feed-quadrado",
+   "altura": 1080,
+   "referencia_oficial": "graficos-prontos/157443769__Leo-Lion_GeneralSquare_en.jpg",
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-494.jpg",
+    "focal": [
+     0.5,
+     0.4
+    ]
+   },
+   "overlay": {
+    "cor1": "azul",
+    "cor2": "azul_claro",
+    "opacidade": 1,
+    "cor_rotulo": "azul"
+   },
+   "logo": {
+    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141439__Logo_rgb_Leo-Lion_3C_WhiteText.png",
+    "largura_visivel": 205
+   },
+   "copy": {
+    "titulo": "Opportunity awaits you",
+    "data": "#ProudLeoLion",
+    "alt": "Jovens Leo-Lion sorrindo em um evento."
+   },
+   "regras": {
+    "max_accents": 3,
+    "allow_brand_gradient": true
+   },
+   "logos_extra": [
+    "logos/Logotipos_de_Leo_a_Leão/"
+   ]
+  }
+ ]
+}

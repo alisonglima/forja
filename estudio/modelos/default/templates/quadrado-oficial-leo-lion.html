@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<title>Quadrado Leo-Lion com caixa e chevrons (modelo default, paridade com o grafico oficial 157443769)</title>
+<style>
+/*TOKENS*/
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--ov1); }
+[data-od-card] {
+  position: relative; width: 1080px; height: var(--h); overflow: hidden;
+  background: var(--ov1); color: var(--white); font-family: Arial, "Liberation Sans", Helvetica, sans-serif;
+}
+.foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* overlay medido no quadrado oficial: azul quase plano e escuro (sombras da foto 5,35,89 de cima a baixo), opacidade 0,50; sem faixas nem cunha (o oficial quadrado nao tem) */
+.overlay { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.emblema-box { flex: none; overflow: hidden; }
+.emblema { display: block; max-width: none; }
+/* metricas medidas no oficial 1080x1080: lockup 3C texto branco 205x134 em (73,66); caixa branca 796x248 em (63,733); titulo Arial Bold 64px azul; linha cinza regular 55px; tres chevrons amarelos presos ao canto inferior direito da caixa */
+.logo { position: absolute; left: 73px; top: 66px; }
+.caixa { position: absolute; left: 63px; width: 796px; bottom: 99px; background: var(--white); padding: 52px 34px 50px; }
+h1 { color: var(--lab); font-size: 64px; font-weight: 700; line-height: 70px; margin-bottom: 16px; }
+[data-od-field="data"] { color: var(--gray); font-size: 55px; font-weight: 400; line-height: 60px; }
+.chevs { position: absolute; right: 25px; bottom: -39px; display: flex; }
+.chev { width: 102px; height: 112px; margin-left: -17px; background: var(--yellow); clip-path: polygon(0 0, 52% 0, 100% 50%, 52% 100%, 0 100%, 48% 50%); }
+.chev:first-child { margin-left: 0; }
+</style>
+</head>
+<body>
+<div data-od-card data-variant="{{marca}}" data-format="{{formato}}">
+  <img class="foto" src="{{foto}}" alt="{{alt}}">
+  <svg class="overlay" data-od-allow="slop-glow" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="ov" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: color-mix(in srgb, var(--ov1) 85%, var(--ov2)); stop-opacity: 0.50"/><stop offset="1" style="stop-color: color-mix(in srgb, var(--ov1) 85%, var(--ov2)); stop-opacity: 0.50"/></linearGradient></defs><rect width="1" height="1" fill="url(#ov)"/></svg>
+  <span class="logo emblema-box" data-od-logo style="width:{{logo_box_w}}px;height:{{logo_box_h}}px"><img class="emblema" src="{{logo_src}}" width="{{logo_img_w}}" style="margin-left:{{logo_ml}}px;margin-top:{{logo_mt}}px" alt="Leo-Lion"></span>
+  <div class="caixa">
+    <h1 data-od-field="titulo">{{titulo}}</h1>
+    <p data-od-field="data">{{data}}</p>
+    <div class="chevs"><span class="chev"></span><span class="chev"></span><span class="chev"></span></div>
+  </div>
+</div>
+</body>
+</html>

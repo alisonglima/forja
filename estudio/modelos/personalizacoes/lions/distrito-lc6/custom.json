@@ -1,0 +1,17 @@
+{
+ "schema": "forja-modelo-custom/v1",
+ "id": "distrito-lc6",
+ "extends": "../custom.json",
+ "nome": "Distrito LC-6",
+ "logos": {
+  "extras": [
+   {
+    "id": "al-distrito",
+    "descricao": "logo oficial do AL do Distrito LC-6",
+    "arquivo": null,
+    "status": "pendente"
+   }
+  ]
+ },
+ "status": "esqueleto"
+}

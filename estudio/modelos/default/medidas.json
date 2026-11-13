@@ -1,0 +1,57 @@
+{
+  "schema": "forja-modelo-medidas/v1",
+  "descricao": "Medidas dos graficos oficiais Leo-Lion (Social Media Kit), obtidas por pixel nos arquivos 157443765 (vertical), 157443769 (quadrado) e 157443764 (horizontal). Sao a ENTRADA do gate de paridade: nenhuma personalizacao pode alterar estes valores.",
+  "medido_em": "2026-11-13",
+  "fonte_oficial": {
+    "vertical": "graficos-prontos/157443765__Leo-Lion_GeneralVertical_1080x1920_en.jpg",
+    "quadrado": "graficos-prontos/157443769__Leo-Lion_GeneralSquare_en.jpg",
+    "horizontal": "graficos-prontos/157443764__Leo-Lion_GeneralHorizontal_1920x1080_en.jpg"
+  },
+  "tipografia": {
+    "familia": "Arial",
+    "evidencia": "sobreposicao de pixels do titulo vertical: Arial Bold IoU 0,83; Helvetica Bold 0,80; Helvetica Neue Bold 0,70. Guia de marca 3.5 lista Arial como fonte padrao.",
+    "fallback_render": "Liberation Sans (metricamente equivalente)"
+  },
+  "faixas_60graus": {
+    "angulo_graus": 60,
+    "opacidade_branco": 0.077,
+    "estimativas_por_formato": {"vertical": [0.066, 0.069, 0.087], "horizontal": [0.076, 0.082, 0.077]},
+    "perfil": "degraus chapados (sem degrade)",
+    "bordas_px_da_borda_direita_no_rodape": {"vertical": [434, 356, 274], "horizontal": [464, 386, 304]},
+    "quadrado": "sem faixas"
+  },
+  "cunha_amarela": {
+    "cor": "amarelo da paleta (#EBB700)",
+    "perfil": "degrade perpendicular a diagonal: opacidade 0,30 na borda caindo linear a 0",
+    "comprimento_do_fade_px": {"vertical": 105, "horizontal": 160},
+    "perfil_oficial_vertical": {"4": 0.300, "16": 0.268, "28": 0.243, "40": 0.202, "52": 0.189, "64": 0.138, "76": 0.084, "88": 0.053, "100": 0.036},
+    "base_borda_px": {"vertical": 162, "horizontal": 192},
+    "altura_borda_px": {"vertical": 281, "horizontal": 332},
+    "quadrado": "sem cunha"
+  },
+  "overlay_azul": {
+    "vertical": {"opacidade_topo": 0.79, "opacidade_base_extrapolada": 0.59, "sombras_foto_por_altura": {"0-240": [13, 52, 113], "480-720": [16, 52, 112], "960-1200": [25, 63, 123], "1680-1920": [42, 83, 138]}, "direcao": "escuro no topo, claro embaixo"},
+    "quadrado": {"opacidade": 0.50, "sombras_foto": [5, 35, 89], "direcao": "quase plano"},
+    "horizontal": {"direcao": "escuro no topo-esquerda, claro no canto inferior direito", "sombras_foto_por_x": {"0-240": [19, 47, 118], "1680-1920": [27, 67, 137]}}
+  },
+  "vertical_1080x1920": {
+    "margem_esquerda_px": 110,
+    "margem_inferior_px": 110,
+    "lockup": {"arquivo": "109141428__Logo_rgb_Leo-Lion_1C_White.png", "largura_px": 280, "ink_bbox": [118, 1187, 395, 1368], "oficial_ink_bbox": [118, 1189, 395, 1368]},
+    "titulo": {"fonte_px": 107, "entrelinha_px": 112, "peso": 700, "ink_y": [[1417, 1514], [1549, 1606]], "oficial_ink_y": [[1417, 1512], [1546, 1603]]},
+    "regua": {"largura_px": 520, "altura_px": 10, "raio_px": 5, "cor": "amarelo"},
+    "subtitulo": {"fonte_px": 45, "entrelinha_px": 55, "peso": 400, "ink_y": [[1711, 1742], [1766, 1806]], "oficial_ink_y": [[1711, 1743], [1766, 1798]]},
+    "preset": "ig-capa-reels (sem zona segura: o oficial encosta a 110 px da base; a zona segura de story e personalizacao)"
+  },
+  "quadrado_1080x1080": {
+    "lockup": {"arquivo": "109141439__Logo_rgb_Leo-Lion_3C_WhiteText.png", "largura_px": 205, "posicao_xy": [73, 66], "correlacao_com_oficial": 0.987},
+    "caixa_branca": {"bbox": [63, 733, 859, 981], "largura_px": 796, "oficial_bbox": [63, 733, 859, 981]},
+    "titulo": {"fonte_px": 64, "peso": 700, "cor": "azul da paleta"},
+    "linha_secundaria": {"fonte_px": 55, "peso": 400, "cor": "cinza da paleta"},
+    "chevrons": {"quantidade": 3, "largura_px": 102, "altura_px": 112, "bbox_oficial": [568, 908, 834, 1020]}
+  },
+  "metodo": {
+    "estimador_opacidade": "regressao do degrau nos dois lados de cada borda, nos tres canais: alfa = soma(d*(cor-P)) / soma((cor-P)^2), com P = pixel fora e d = dentro - fora, deslocamentos de 4 a 9 px",
+    "armadilha": "um numero so na borda nao basta: a cunha casava no degrau e estava errada em profundidade; o overlay casava num ponto e estava invertido. O gate compara PERFIS (profundidade da cunha, faixas de altura do overlay, cada degrau, caixas dos elementos)."
+  }
+}

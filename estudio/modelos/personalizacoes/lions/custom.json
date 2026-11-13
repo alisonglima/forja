@@ -1,0 +1,15 @@
+{
+ "schema": "forja-modelo-custom/v1",
+ "id": "lions",
+ "extends": "default",
+ "nome": "Lions",
+ "marca": "lions",
+ "logos": {
+  "principal": {
+   "descricao": "emblema Lions oficial",
+   "arquivo": null,
+   "status": "a-definir"
+  }
+ },
+ "status": "esqueleto: sem personalizacao aplicada"
+}

@@ -1,0 +1,15 @@
+{
+ "schema": "forja-modelo-custom/v1",
+ "id": "leo",
+ "extends": "default",
+ "nome": "LEO",
+ "marca": "leo",
+ "logos": {
+  "principal": {
+   "descricao": "emblema LEO oficial no lugar do lockup Leo-Lion",
+   "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+   "status": "a-definir"
+  }
+ },
+ "status": "esqueleto: sem personalizacao aplicada"
+}
