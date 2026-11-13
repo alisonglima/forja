@@ -31,12 +31,17 @@ Todos usam as chaves que o PVE já aceita (Mac, `dsh-agent@oci`, `ubuntu@oci-lab
 ## Verificações medidas em 12/11/2026
 
 - `forja-ct.sh verify`: 6 de 6 (CT em execução, `onboot=1`, Mac, host OCI, agente DSH, root recusado). Conferido também com `hostname` por cada caminho, não só pelo código de saída.
-- Suíte completa **no CT** (Linux, Python 3.11): 1766 passam, 0 falham, 28 puladas (10 de evidência do kit e 18 do simulador do PVE, que exigem máquina sem Chrome).
+- Suíte completa **no CT** (Linux, Python 3.11): 1768 passam, 0 falham, 28 puladas (10 de evidência do kit e 18 do simulador do PVE, que exigem máquina sem Chrome).
 - Acervo copiado: os 145 hashes `sha256` do `photos-index.json` conferem byte a byte.
 - Render real no CT (Chrome + `open-design-agent-kit@0.4.0`): `lions-capa-campanha` e `leo-carrossel-miolo` com `check` e `export` exit 0; a capa é **pixel a pixel idêntica** (0 pixels diferentes) à da rodada no CT efêmero.
 - Wheel: `pip wheel` constrói (85 arquivos, JSON de dados e o entry point `forja`).
 - Deck real (`forja slides`, template oficial `lions-oficial-2022`, 115 slides) no CT: **6 slides** no `.pptx` e 6 páginas no PDF (LibreOffice), conferidos por imagem. **Correção de registro:** a primeira rodada do CT mostrou que `compose`/`pptx` eram esqueleto (saída com os 115 slides originais + 6 em branco, 121 no total), apesar de os passos reportarem "ok"; foram implementados de verdade (clona o slide-modelo, preenche as formas pelo catálogo, descarta os originais). Defeitos achados só pelo render e corrigidos: ícone de imagem-placeholder no slide "texto", texto de modelo vazando ("Lorem ipsum"), legenda sobrepondo no "números". Agora há trava `DECK_PLACEHOLDER_LEFT` contra texto de modelo no deck e `remover` por modelo no catálogo. **Não verificado:** os modelos `imagem_texto`, `citacao`, `agenda` e `contato` com a marca real (só testados no deck de exemplo de 6 slides e em testes sintéticos); `grafico`, `tabela` e `equipe` ficam fora (`suportado: false`).
-- Backup: o job de cluster é `all=1` sem exclusões e `not-backed-up` está vazio; a primeira cópia do CT 220 é a de 13/11 às 02:30 (`tankbackup`, snapshot, `keep-daily 7`, `weekly 4`, `monthly 3`). **Restauração não testada.**
+- Peças: as **18** peças (feed, story e carrossel, Lions e LEO) renderizadas no CT com `check --fail-on warning` e `export`: 0 achado e PNG **idêntico pixel a pixel** às referências do CT descartável.
+- Deck oficial com os 9 modelos suportados: 9 slides, 0 texto de modelo remanescente, conferido por imagem (agenda numerada, contato em português).
+- Backup: o job de cluster `all=1` (sem exclusões) copiou o CT 220 em 13/11 às 02:41 (59 s, 4,18 GB, `tankbackup`); `zstd -t` passa, 67.892 entradas, com o repositório e o `.pptx` oficial dentro. **Restauração real não testada** (exigiria criar um CT).
+- Rede: o roteador enxerga `192.168.88.58` na VLAN 40 (ARP), mas não há lease nem reserva e o pool `default-dhcp` cobre o endereço (ver Riscos).
+- Suíte no CT no commit final: 1768 passam, 0 falham, 28 puladas; os 14 avisos restantes estão só em arquivos de teste.
+- Uma queda de SSH ocorreu durante uma suíte longa (`Connection reset by peer`); o CT não reiniciou, sem OOM nem erro do `sshd` nos logs; **causa não determinada**, a repetição passou. Suítes longas: rodar em segundo plano no CT com log em arquivo.
 
 ## Como operar
 
@@ -48,7 +53,7 @@ Todos usam as chaves que o PVE já aceita (Mac, `dsh-agent@oci`, `ubuntu@oci-lab
 
 ## Riscos e pendências abertas
 
-1. **IP `.58` está dentro do pool DHCP** (`default-dhcp` = `.10–.254`), como os outros CTs fixos (`.55–.57`), sem reserva. Hoje não há lease nem ARP para `.58`. Convém uma reserva por MAC no RB5009 (escrita no roteador: do dono ou do agente DSH, que tem essa autorização). **Não verifiquei** se o RouterOS faz verificação de ping antes de entregar o endereço.
+1. **IP `.58` está dentro do pool DHCP** (`default-dhcp` = `.10–.254`), como os outros CTs fixos (`.55–.57`), sem reserva. O ARP do roteador o vê (VLAN 40), mas não há lease. Convém uma reserva por MAC no RB5009 (escrita no roteador: do dono ou do agente DSH, que tem essa autorização). **Não verifiquei** se o RouterOS faz verificação de ping antes de entregar o endereço.
 2. O acervo no CT é **cópia** de dados © Lions e de fotos com pessoas, na LAN privada do dono. Não sai do CT.
 3. Uma tela do CT não existe: logins interativos do Google (kit/Flow) continuam no CT 219.
-4. A restauração do backup do CT 220 não foi exercitada.
+4. A restauração do backup do CT 220 não foi exercitada (só a integridade do arquivo).
