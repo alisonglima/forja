@@ -611,13 +611,13 @@
    },
    "overlay": {
     "cor1": "azul",
-    "cor2": "azul",
-    "opacidade": 0.82,
+    "cor2": "azul_claro",
+    "opacidade": 0.86,
     "cor_rotulo": "azul"
    },
    "logo": {
     "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
-    "largura_visivel": 160
+    "largura_visivel": 190
    },
    "copy": {
     "clube": "LEO Clube",
@@ -629,7 +629,8 @@
     "alt": "Duas pessoas de camisetas verdes plantam uma árvore em um gramado, com um carrinho de mão ao lado."
    },
    "regras": {
-    "max_accents": 3
+    "max_accents": 3,
+    "allow_brand_gradient": true
    },
    "logos_extra": [
     "logos/Emblemas_de_Leos/"
@@ -652,13 +653,13 @@
    },
    "overlay": {
     "cor1": "azul",
-    "cor2": "azul",
-    "opacidade": 0.82,
+    "cor2": "azul_claro",
+    "opacidade": 0.86,
     "cor_rotulo": "azul"
    },
    "logo": {
     "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
-    "largura_visivel": 160
+    "largura_visivel": 190
    },
    "copy": {
     "clube": "LEO Clube",
@@ -670,7 +671,8 @@
     "alt": "Duas pessoas de camisetas verdes plantam uma árvore em um gramado, com um carrinho de mão ao lado."
    },
    "regras": {
-    "max_accents": 3
+    "max_accents": 3,
+    "allow_brand_gradient": true
    },
    "logos_extra": [
     "logos/Emblemas_de_Leos/"
@@ -693,13 +695,13 @@
    },
    "overlay": {
     "cor1": "azul",
-    "cor2": "azul",
-    "opacidade": 0.82,
+    "cor2": "azul_claro",
+    "opacidade": 0.86,
     "cor_rotulo": "azul"
    },
    "logo": {
     "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
-    "largura_visivel": 160
+    "largura_visivel": 220
    },
    "copy": {
     "data": "5 de dezembro",
@@ -710,7 +712,8 @@
     "alt": "Jovens LEOs de camiseta azul-marinho caminham juntos, levando latas de tinta, à beira-mar."
    },
    "regras": {
-    "max_accents": 3
+    "max_accents": 3,
+    "allow_brand_gradient": true
    },
    "logos_extra": [
     "logos/Emblemas_de_Leos/"
@@ -733,13 +736,13 @@
    },
    "overlay": {
     "cor1": "azul",
-    "cor2": "azul",
-    "opacidade": 0.82,
+    "cor2": "azul_claro",
+    "opacidade": 0.86,
     "cor_rotulo": "azul"
    },
    "logo": {
     "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
-    "largura_visivel": 160
+    "largura_visivel": 220
    },
    "copy": {
     "data": "5 de dezembro",
@@ -750,7 +753,8 @@
     "alt": "Jovens LEOs de camiseta azul-marinho caminham juntos, levando latas de tinta, à beira-mar."
    },
    "regras": {
-    "max_accents": 3
+    "max_accents": 3,
+    "allow_brand_gradient": true
    },
    "logos_extra": [
     "logos/Emblemas_de_Leos/"
