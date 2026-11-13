@@ -612,7 +612,7 @@
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.86,
+    "opacidade": 0.84,
     "cor_rotulo": "azul"
    },
    "logo": {
@@ -654,7 +654,7 @@
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.86,
+    "opacidade": 0.84,
     "cor_rotulo": "azul"
    },
    "logo": {
@@ -696,12 +696,12 @@
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.86,
+    "opacidade": 0.72,
     "cor_rotulo": "azul"
    },
    "logo": {
     "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
-    "largura_visivel": 220
+    "largura_visivel": 200
    },
    "copy": {
     "data": "5 de dezembro",
@@ -717,7 +717,8 @@
    },
    "logos_extra": [
     "logos/Emblemas_de_Leos/"
-   ]
+   ],
+   "titulo_px": 84
   },
   {
    "id": "leo-lion-data-comemorativa-story",
@@ -737,12 +738,12 @@
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.86,
+    "opacidade": 0.72,
     "cor_rotulo": "azul"
    },
    "logo": {
     "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
-    "largura_visivel": 220
+    "largura_visivel": 200
    },
    "copy": {
     "data": "5 de dezembro",
@@ -758,7 +759,8 @@
    },
    "logos_extra": [
     "logos/Emblemas_de_Leos/"
-   ]
+   ],
+   "titulo_px": 84
   }
  ]
 }

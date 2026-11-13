@@ -2,7 +2,7 @@
 <html lang="{{lang}}">
 <head>
 <meta charset="utf-8">
-<title>Data comemorativa Leo-Lion (estetica oficial, emblema LEO)</title>
+<title>Data comemorativa Leo-Lion (composicao oficial, emblema LEO)</title>
 <style>
 /*TOKENS*/
 @font-face { font-family: "Roboto"; font-weight: 400; src: url("fonts/roboto-400.woff2") format("woff2"); }
@@ -16,48 +16,41 @@ html, body { background: var(--ov1); }
   background: var(--ov1); color: var(--white); font-family: "Roboto", sans-serif;
 }
 .foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.base { position: absolute; inset: 0; background: var(--base); opacity: var(--base-a); }
-.overlay { position: absolute; inset: 0; opacity: var(--ov-a); background: linear-gradient(40deg, var(--ov1) 0%, var(--ov1) 42%, var(--ov2) 100%); }
-/* receita Leo-Lion (guia V1.0 p.10): degrade azul -> azul claro, duas faixas claras e cunha dourada no canto inferior direito */
+/* medido nos gráficos oficiais Leo-Lion do kit (157443764/65/69): foto sob overlay azul translúcido (a foto continua legível), duas faixas diagonais claras e cunha dourada translúcida no canto inferior direito */
+.overlay { position: absolute; inset: 0; opacity: var(--ov-a); background: linear-gradient(40deg, var(--ov1) 0%, var(--ov1) 25%, var(--ov2) 100%); }
 .faixa { position: absolute; inset: 0; background: var(--white); opacity: 0.08; clip-path: polygon(62% 100%, 78% 100%, 100% 38%, 100% 22%); }
 .faixa2 { position: absolute; inset: 0; background: var(--white); opacity: 0.14; clip-path: polygon(78% 100%, 100% 100%, 100% 40%); }
-.canto { position: absolute; right: 0; bottom: 0; width: 230px; height: 420px; background: var(--yellow); opacity: 0.5; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
-
-.col { position: absolute; left: var(--mx); right: var(--mx); top: var(--mt); bottom: var(--mb); display: flex; flex-direction: column; align-items: center; text-align: center; }
+.canto { position: absolute; right: 0; bottom: 0; width: 230px; height: 420px; background: var(--yellow); opacity: 0.4; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
 .emblema-box { flex: none; overflow: hidden; }
 .emblema { display: block; max-width: none; }
-.centro { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
-[data-od-field="data"] { font-size: 36px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 28px; }
-/* rotulo em caixa branca com texto na cor da marca (referencia do dono: "dia internacional") */
-[data-od-field="rotulo"] { background: var(--white); color: var(--lab); font-size: 64px; font-weight: 400; line-height: 1.1; padding: 6px 28px 10px; margin-bottom: 20px; }
-[data-od-field="titulo"] { font-size: {{titulo_px}}px; font-weight: 900; line-height: 0.98; letter-spacing: -0.01em; text-transform: uppercase; white-space: nowrap; }
-.chevs { display: flex; gap: 10px; margin: 40px 0 0; }
-.chev { width: 34px; height: 52px; background: var(--yellow); clip-path: polygon(0 0, 45% 0, 100% 50%, 45% 100%, 0 100%, 55% 50%); }
-.rodape { flex: none; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 28px; line-height: 1.25; }
-[data-od-field="assinatura"] { font-size: 40px; font-weight: 700; }
-[data-od-field="clube"] { font-weight: 400; letter-spacing: 0.06em; }
+.rotulo-clube { font-size: 26px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.2; }
+/* composicao do grafico oficial quadrado (157443769): caixa branca com titulo azul bold e linha cinza, tres chevrons amarelos presos ao canto inferior direito e vazando abaixo da caixa; emblema no alto a esquerda */
+.topo { position: absolute; left: var(--mx); top: var(--mt); display: flex; flex-direction: column; gap: 14px; }
+.caixa { position: absolute; left: var(--mx); width: 796px; bottom: calc(var(--mb) + 60px); background: var(--white); padding: 40px 44px 44px; }
+[data-od-field="rotulo"] { color: var(--lab); font-size: 50px; font-weight: 400; line-height: 1.15; }
+[data-od-field="titulo"] { color: var(--lab); font-size: {{titulo_px}}px; font-weight: 700; line-height: 1.05; letter-spacing: -0.01em; text-transform: uppercase; margin-bottom: 18px; white-space: nowrap; }
+[data-od-field="data"] { color: var(--gray); font-size: 48px; font-weight: 400; line-height: 1.2; }
+.chevs { position: absolute; right: 25px; bottom: -39px; display: flex; }
+.chev { width: 100px; height: 112px; margin-left: -17px; background: var(--yellow); clip-path: polygon(0 0, 52% 0, 100% 50%, 52% 100%, 0 100%, 48% 50%); }
+.chev:first-child { margin-left: 0; }
 </style>
 </head>
 <body>
 <div data-od-card data-variant="{{marca}}" data-format="{{formato}}">
   <img class="foto" src="{{foto}}" alt="{{alt}}">
-  <div class="base"></div>
   <div class="overlay" data-od-allow="slop-glow"></div><!-- degrade azul -> azul claro da paleta Leo-Lion; excecao declarada ao check slop-glow do Open Design -->
   <div class="faixa"></div>
   <div class="faixa2"></div>
   <div class="canto"></div>
-  <div class="col">
+  <div class="topo">
     <span class="emblema-box" data-od-logo style="width:{{logo_box_w}}px;height:{{logo_box_h}}px"><img class="emblema" src="{{logo_src}}" width="{{logo_img_w}}" style="margin-left:{{logo_ml}}px;margin-top:{{logo_mt}}px" alt="LEO"></span>
-    <div class="centro">
-      <p data-od-field="data">{{data}}</p>
-      <p data-od-field="rotulo">{{rotulo}}</p>
-      <h1 data-od-field="titulo">{{titulo}}</h1>
-      <div class="chevs"><span class="chev"></span><span class="chev"></span><span class="chev"></span></div>
-    </div>
-    <div class="rodape">
-      <!--opt:assinatura--><span data-od-field="assinatura">{{assinatura}}</span><!--/opt:assinatura-->
-      <span data-od-field="clube">{{clube}}</span>
-    </div>
+    <p class="rotulo-clube"><span data-od-field="clube">{{clube}}</span><!--opt:periodo--> <span data-od-field="periodo">&middot; {{periodo}}</span><!--/opt:periodo--></p>
+  </div>
+  <div class="caixa">
+    <p data-od-field="rotulo">{{rotulo}}</p>
+    <h1 data-od-field="titulo">{{titulo}}</h1>
+    <p data-od-field="data">{{data}}</p>
+    <div class="chevs"><span class="chev"></span><span class="chev"></span><span class="chev"></span></div>
   </div>
 </div>
 </body>
