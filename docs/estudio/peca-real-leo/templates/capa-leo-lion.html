@@ -5,23 +5,22 @@
 <title>Capa de campanha Leo-Lion (composicao oficial, emblema LEO)</title>
 <style>
 /*TOKENS*/
-@font-face { font-family: "Roboto"; font-weight: 400; src: url("fonts/roboto-400.woff2") format("woff2"); }
-@font-face { font-family: "Roboto"; font-weight: 700; src: url("fonts/roboto-700.woff2") format("woff2"); }
-@font-face { font-family: "Roboto"; font-weight: 900; src: url("fonts/roboto-900.woff2") format("woff2"); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { background: var(--ov1); }
 [data-od-card] {
   position: relative; width: 1080px; height: var(--h); overflow: hidden;
-  background: var(--ov1); color: var(--white); font-family: "Roboto", sans-serif;
+  background: var(--ov1); color: var(--white); font-family: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
 }
 .foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* medido nos gráficos oficiais Leo-Lion do kit (157443764/65/69): foto sob overlay azul translúcido (a foto continua legível), duas faixas diagonais claras e cunha dourada translúcida no canto inferior direito */
-.overlay { position: absolute; inset: 0; opacity: var(--ov-a); background: linear-gradient(40deg, var(--ov1) 0%, var(--ov1) 25%, var(--ov2) 100%); }
-.faixa { position: absolute; inset: 0; background: var(--white); opacity: 0.08; clip-path: polygon(62% 100%, 78% 100%, 100% 38%, 100% 22%); }
-.faixa2 { position: absolute; inset: 0; background: var(--white); opacity: 0.14; clip-path: polygon(78% 100%, 100% 100%, 100% 40%); }
-.canto { position: absolute; right: 0; bottom: 0; width: 230px; height: 420px; background: var(--yellow); opacity: 0.4; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
-.emblema-box { flex: none; overflow: hidden; }
+.overlay { position: absolute; inset: 0; opacity: var(--ov-a); background: linear-gradient(40deg, var(--ov1) 0%, var(--ov1) 55%, var(--ov2) 100%); }
+/* pilha de faixas translucidas paralelas a 60 graus + cunha dourada, medidas no grafico oficial horizontal (1920x1080): bordas a 464/386/304/192 px da borda direita no rodape (tan 60 = 1,732); mesmos px nos outros formatos */
+.faixa { position: absolute; inset: 0; background: var(--white); opacity: 0.05; }
+.faixa.f1 { clip-path: polygon(calc(100% - 464px) 100%, 100% 100%, 100% calc(100% - 804px)); }
+.faixa.f2 { clip-path: polygon(calc(100% - 386px) 100%, 100% 100%, 100% calc(100% - 669px)); }
+.faixa.f3 { clip-path: polygon(calc(100% - 304px) 100%, 100% 100%, 100% calc(100% - 527px)); }
+.canto { position: absolute; inset: 0; background: var(--yellow); opacity: 0.35; clip-path: polygon(calc(100% - 192px) 100%, 100% 100%, 100% calc(100% - 332px)); }
 .emblema { display: block; max-width: none; }
 .rotulo-clube { font-size: 26px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.2; }
 /* composicao do grafico oficial vertical (157443765): emblema no alto do bloco, titulo bold branco ~107px (entrelinha 1,2), linha amarela de pontas redondas (10px, ~47% da largura) e subtitulo regular ~44px; tudo alinhado a esquerda a ~110px da borda */
@@ -31,7 +30,7 @@ html, body { background: var(--ov1); }
 .bloco .emblema-box { margin-bottom: 14px; }
 .bloco .rotulo-clube { margin-bottom: 44px; }
 [data-od-field="eyebrow"] { font-size: 28px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 18px; }
-[data-od-field="titulo"] { font-size: 107px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; max-width: 860px; }
+[data-od-field="titulo"] { font-size: 112px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; max-width: 860px; }
 .regua { width: 507px; height: 10px; border-radius: 5px; background: var(--yellow); margin: 44px 0; }
 [data-od-field="subtitulo"] { font-size: 44px; font-weight: 400; line-height: 1.28; max-width: 800px; }
 </style>
@@ -40,8 +39,9 @@ html, body { background: var(--ov1); }
 <div data-od-card data-variant="{{marca}}" data-format="{{formato}}">
   <img class="foto" src="{{foto}}" alt="{{alt}}">
   <div class="overlay" data-od-allow="slop-glow"></div><!-- degrade azul -> azul claro da paleta Leo-Lion; excecao declarada ao check slop-glow do Open Design -->
-  <div class="faixa"></div>
-  <div class="faixa2"></div>
+  <div class="faixa f1"></div>
+  <div class="faixa f2"></div>
+  <div class="faixa f3"></div>
   <div class="canto"></div>
   <div class="topo">
     <!--opt:arraste--><span data-od-field="arraste">{{arraste}} &rsaquo;</span><!--/opt:arraste-->

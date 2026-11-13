@@ -14,11 +14,15 @@
 Dado e texto: tudo em `brands/leo-lions/` (paleta em `variants.json`, grafia em `grafia.json`); logo e foto vêm do acervo privado e **não** são versionados aqui.
 
 ## Leo-Lion: estética principal das capas LEO, com o emblema do próprio LEO (decisão do dono, 13/11/2026)
-**Base = os gráficos oficiais prontos do kit Leo-Lion** (`lions/graficos-prontos/157443764/65/69`). Eles são imagens achatadas (texto em inglês e logo gravados), então não dá para editar o arquivo: as composições foram **medidas neles e reproduzidas** (nunca inventadas), e o lockup Leo-Lion foi trocado pelo emblema LEO geral (`logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png`, sem Alpha/Omega).
-- **Capa de campanha** (gráfico vertical): emblema + linha "clube · período" no alto do bloco, título bold branco ~107 px (entrelinha 1,2), **linha amarela de pontas redondas** (10 px, ~507 px), subtítulo regular ~44 px; alinhado à esquerda a 110 px da borda.
-- **Data comemorativa** (gráfico quadrado): **caixa branca** com título azul bold e linha cinza (a data), **três chevrons amarelos** presos ao canto inferior direito e vazando abaixo da caixa (266×112 px, passo 83 px); emblema no alto à esquerda.
-- **Overlay**: azul → azul claro da paleta, translúcido (a foto continua legível), duas faixas claras e cunha dourada no canto inferior direito. Opacidade 0,84 na capa e 0,72 na data, calibradas pelo contraste (o oficial é mais claro e não passaria no nosso gate).
-A versão anterior (azul-claro chapado + cunha amarela) fica como **variação alternativa**. O degradê só passa no lint com `regras.allow_brand_gradient` e stops da paleta; o `overlay` leva `data-od-allow="slop-glow"`.
+**Base = os gráficos oficiais prontos do kit Leo-Lion** (`lions/graficos-prontos/157443764/65/69`). São imagens achatadas (texto em inglês e logo gravados), então não dá para editar o arquivo: a composição foi **medida neles e reproduzida**, com o emblema LEO geral (`logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png`) no lugar do lockup.
+- **Fonte:** a do oficial, Helvetica Neue → Helvetica/Arial (a guia Leo-Lion: "Helvetica Neue 35–96; fallback Helvetica/Arial"). No CT resolve para Liberation Sans (métrica Arial). Roboto é só a substituta declarada e **não** serve para estas peças.
+- **Faixas e cunha (medidos no gráfico horizontal 1920×1080):** pilha de faixas translúcidas **paralelas a 60°** com bordas a 464/386/304 px da borda direita no rodapé, e cunha dourada com borda a 192 px (triângulo 192×332). Atenção: a versão anterior tinha faixas com inclinações diferentes entre si, por isso parecia torta. Os mesmos px valem nos outros formatos (suposição: confere com o vertical a olho, não medi as bordas nele).
+- **Capa de campanha (vertical):** emblema + "LEO Clube de Taquaritinga · período" no alto do bloco, título bold branco 112 px (2 linhas), linha amarela de pontas redondas (507×10 px), subtítulo regular 44 px; esquerda a 110 px da borda.
+- **Data comemorativa (quadrado):** caixa branca com título azul bold (2 linhas) e a data em cinza, três chevrons amarelos vazando abaixo da caixa; emblema no alto à esquerda.
+- **Overlay:** azul → azul claro, translúcido (0,78 na capa, 0,66 na data; o oficial é mais claro e não passaria no nosso contraste).
+A versão anterior (azul-claro chapado + cunha amarela) fica como alternativa.
+
+**Nome do clube (decisão do dono, 13/11/2026):** toda peça LEO leva **"LEO Clube de Taquaritinga"** e toda peça Lions **"Lions Clube de Taquaritinga"** (`tests/test_pecas_nome_clube.py` trava isso).
 | Peça | Principal (Leo-Lion) | Alternativa (LEO) |
 |---|---|---|
 | Capa de campanha | `leo-lion-capa-campanha` (+ `-story`) | `leo-capa-campanha` (+ `-story`) |

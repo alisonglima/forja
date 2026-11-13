@@ -5,31 +5,30 @@
 <title>Data comemorativa Leo-Lion (composicao oficial, emblema LEO)</title>
 <style>
 /*TOKENS*/
-@font-face { font-family: "Roboto"; font-weight: 400; src: url("fonts/roboto-400.woff2") format("woff2"); }
-@font-face { font-family: "Roboto"; font-weight: 700; src: url("fonts/roboto-700.woff2") format("woff2"); }
-@font-face { font-family: "Roboto"; font-weight: 900; src: url("fonts/roboto-900.woff2") format("woff2"); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { background: var(--ov1); }
 [data-od-card] {
   position: relative; width: 1080px; height: var(--h); overflow: hidden;
-  background: var(--ov1); color: var(--white); font-family: "Roboto", sans-serif;
+  background: var(--ov1); color: var(--white); font-family: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
 }
 .foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* medido nos gráficos oficiais Leo-Lion do kit (157443764/65/69): foto sob overlay azul translúcido (a foto continua legível), duas faixas diagonais claras e cunha dourada translúcida no canto inferior direito */
-.overlay { position: absolute; inset: 0; opacity: var(--ov-a); background: linear-gradient(40deg, var(--ov1) 0%, var(--ov1) 25%, var(--ov2) 100%); }
-.faixa { position: absolute; inset: 0; background: var(--white); opacity: 0.08; clip-path: polygon(62% 100%, 78% 100%, 100% 38%, 100% 22%); }
-.faixa2 { position: absolute; inset: 0; background: var(--white); opacity: 0.14; clip-path: polygon(78% 100%, 100% 100%, 100% 40%); }
-.canto { position: absolute; right: 0; bottom: 0; width: 230px; height: 420px; background: var(--yellow); opacity: 0.4; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
-.emblema-box { flex: none; overflow: hidden; }
+.overlay { position: absolute; inset: 0; opacity: var(--ov-a); background: linear-gradient(40deg, var(--ov1) 0%, var(--ov1) 55%, var(--ov2) 100%); }
+/* pilha de faixas translucidas paralelas a 60 graus + cunha dourada, medidas no grafico oficial horizontal (1920x1080): bordas a 464/386/304/192 px da borda direita no rodape (tan 60 = 1,732); mesmos px nos outros formatos */
+.faixa { position: absolute; inset: 0; background: var(--white); opacity: 0.05; }
+.faixa.f1 { clip-path: polygon(calc(100% - 464px) 100%, 100% 100%, 100% calc(100% - 804px)); }
+.faixa.f2 { clip-path: polygon(calc(100% - 386px) 100%, 100% 100%, 100% calc(100% - 669px)); }
+.faixa.f3 { clip-path: polygon(calc(100% - 304px) 100%, 100% 100%, 100% calc(100% - 527px)); }
+.canto { position: absolute; inset: 0; background: var(--yellow); opacity: 0.35; clip-path: polygon(calc(100% - 192px) 100%, 100% 100%, 100% calc(100% - 332px)); }
 .emblema { display: block; max-width: none; }
 .rotulo-clube { font-size: 26px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.2; }
 /* composicao do grafico oficial quadrado (157443769): caixa branca com titulo azul bold e linha cinza, tres chevrons amarelos presos ao canto inferior direito e vazando abaixo da caixa; emblema no alto a esquerda */
 .topo { position: absolute; left: var(--mx); top: var(--mt); display: flex; flex-direction: column; gap: 14px; }
 .caixa { position: absolute; left: var(--mx); width: 796px; bottom: calc(var(--mb) + 60px); background: var(--white); padding: 40px 44px 44px; }
-[data-od-field="rotulo"] { color: var(--lab); font-size: 50px; font-weight: 400; line-height: 1.15; }
-[data-od-field="titulo"] { color: var(--lab); font-size: {{titulo_px}}px; font-weight: 700; line-height: 1.05; letter-spacing: -0.01em; text-transform: uppercase; margin-bottom: 18px; white-space: nowrap; }
-[data-od-field="data"] { color: var(--gray); font-size: 48px; font-weight: 400; line-height: 1.2; }
+h1 { color: var(--lab); font-size: 66px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 22px; }
+[data-od-field="rotulo"], [data-od-field="titulo"] { font-weight: 700; }
+[data-od-field="data"] { color: var(--gray); font-size: 54px; font-weight: 400; line-height: 1.2; }
 .chevs { position: absolute; right: 25px; bottom: -39px; display: flex; }
 .chev { width: 100px; height: 112px; margin-left: -17px; background: var(--yellow); clip-path: polygon(0 0, 52% 0, 100% 50%, 52% 100%, 0 100%, 48% 50%); }
 .chev:first-child { margin-left: 0; }
@@ -39,16 +38,16 @@ html, body { background: var(--ov1); }
 <div data-od-card data-variant="{{marca}}" data-format="{{formato}}">
   <img class="foto" src="{{foto}}" alt="{{alt}}">
   <div class="overlay" data-od-allow="slop-glow"></div><!-- degrade azul -> azul claro da paleta Leo-Lion; excecao declarada ao check slop-glow do Open Design -->
-  <div class="faixa"></div>
-  <div class="faixa2"></div>
+  <div class="faixa f1"></div>
+  <div class="faixa f2"></div>
+  <div class="faixa f3"></div>
   <div class="canto"></div>
   <div class="topo">
     <span class="emblema-box" data-od-logo style="width:{{logo_box_w}}px;height:{{logo_box_h}}px"><img class="emblema" src="{{logo_src}}" width="{{logo_img_w}}" style="margin-left:{{logo_ml}}px;margin-top:{{logo_mt}}px" alt="LEO"></span>
     <p class="rotulo-clube"><span data-od-field="clube">{{clube}}</span><!--opt:periodo--> <span data-od-field="periodo">&middot; {{periodo}}</span><!--/opt:periodo--></p>
   </div>
   <div class="caixa">
-    <p data-od-field="rotulo">{{rotulo}}</p>
-    <h1 data-od-field="titulo">{{titulo}}</h1>
+    <h1><span data-od-field="rotulo">{{rotulo}}</span> <span data-od-field="titulo">{{titulo}}</span></h1>
     <p data-od-field="data">{{data}}</p>
     <div class="chevs"><span class="chev"></span><span class="chev"></span><span class="chev"></span></div>
   </div>
