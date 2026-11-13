@@ -52,6 +52,11 @@ cat > /etc/fonts/conf.d/30-forja-helvetica-neue.conf <<'FONTCONF'
   <alias binding="same"><family>Helvetica Neue</family><prefer><family>Liberation Sans</family></prefer></alias>
 </fontconfig>
 FONTCONF
+# Arial e a fonte padrao do guia de marca Lions (3.5) e a usada nos graficos oficiais Leo-Lion (IoU 0,83 contra Liberation Sans/Helvetica Neue).
+# Os .ttf nao entram no git (repositorio publico): copie-os para /srv/forja/fonts/arial/ e este passo os instala.
+if ls /srv/forja/fonts/arial/*.ttf >/dev/null 2>&1; then
+  mkdir -p /usr/local/share/fonts/arial && cp /srv/forja/fonts/arial/*.ttf /usr/local/share/fonts/arial/
+fi
 fc-cache -f
 if ! command -v google-chrome-stable >/dev/null; then
   curl -fsSL -o /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
