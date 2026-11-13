@@ -38,3 +38,6 @@ Entram na personalização, ao lado do emblema principal, em slots definidos pel
 - Pronto: `default` vertical (1080×1920) e quadrado (1080×1080), com emblema LEO (branco onde o oficial usa logo branca, colorido onde usa colorida). O emblema branco e **derivado** do oficial (`logos/Derivados_LEO/`, fora do repo): a biblioteca so tem 2 cores.
 - Pendente: horizontal 1920×1080 (a largura de 1080 px está fixa em templates, no compose e no render), gate de paridade, resolvedor de herança, personalizações.
 - Os arquivos oficiais (imagens, logos, fontes) ficam no acervo privado e **não** entram neste repositório.
+
+## Documentação detalhada
+[`docs/estudio/modelo-default-leo-lions-2026-11-13.md`](../../docs/estudio/modelo-default-leo-lions-2026-11-13.md): decisões, medições, método, pipeline, erros, pendências. Pesquisa de vídeos e guias em [`docs/estudio/pesquisa-videos-guias-2026-11-13/`](../../docs/estudio/pesquisa-videos-guias-2026-11-13/).
