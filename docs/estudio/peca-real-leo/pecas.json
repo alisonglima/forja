@@ -603,21 +603,21 @@
    "preset": "ig-feed-4x5",
    "altura": 1350,
    "foto": {
-    "origem": "box-extra/G-fotos-biblioteca/_Environment/20180517_rw_Tree_Planting_-133.jpg",
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-419.jpg",
     "focal": [
-     0.55,
-     0.5
+     0.45,
+     0.4
     ]
    },
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.78,
+    "opacidade": 0.72,
     "cor_rotulo": "azul"
    },
    "logo": {
     "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
-    "largura_visivel": 190
+    "largura_visivel": 150
    },
    "copy": {
     "clube": "LEO Clube de Taquaritinga",
@@ -644,21 +644,21 @@
    "preset": "ig-story",
    "altura": 1920,
    "foto": {
-    "origem": "box-extra/G-fotos-biblioteca/_Environment/20180517_rw_Tree_Planting_-133.jpg",
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-488.jpg",
     "focal": [
-     0.55,
-     0.5
+     0.3,
+     0.45
     ]
    },
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.78,
+    "opacidade": 0.72,
     "cor_rotulo": "azul"
    },
    "logo": {
     "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
-    "largura_visivel": 190
+    "largura_visivel": 150
    },
    "copy": {
     "clube": "LEO Clube de Taquaritinga",
@@ -685,21 +685,21 @@
    "preset": "ig-feed-4x5",
    "altura": 1350,
    "foto": {
-    "origem": "box-extra/G-fotos-biblioteca/_Environment/2015_03_16_California_Seal Beach_Clean up_Service Project_Leos_Lions - 02.jpg",
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-494.jpg",
     "focal": [
-     0.52,
-     0.45
+     0.5,
+     0.4
     ]
    },
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.66,
+    "opacidade": 0.6,
     "cor_rotulo": "azul"
    },
    "logo": {
     "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
-    "largura_visivel": 200
+    "largura_visivel": 150
    },
    "copy": {
     "data": "5 de dezembro",
@@ -715,8 +715,7 @@
    },
    "logos_extra": [
     "logos/Emblemas_de_Leos/"
-   ],
-   "titulo_px": 84
+   ]
   },
   {
    "id": "leo-lion-data-comemorativa-story",
@@ -727,21 +726,21 @@
    "preset": "ig-story",
    "altura": 1920,
    "foto": {
-    "origem": "box-extra/G-fotos-biblioteca/_Environment/2015_03_16_California_Seal Beach_Clean up_Service Project_Leos_Lions - 02.jpg",
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-494.jpg",
     "focal": [
-     0.52,
-     0.45
+     0.28,
+     0.4
     ]
    },
    "overlay": {
     "cor1": "azul",
     "cor2": "azul_claro",
-    "opacidade": 0.66,
+    "opacidade": 0.6,
     "cor_rotulo": "azul"
    },
    "logo": {
     "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
-    "largura_visivel": 200
+    "largura_visivel": 150
    },
    "copy": {
     "data": "5 de dezembro",
@@ -757,8 +756,7 @@
    },
    "logos_extra": [
     "logos/Emblemas_de_Leos/"
-   ],
-   "titulo_px": 84
+   ]
   }
  ]
 }

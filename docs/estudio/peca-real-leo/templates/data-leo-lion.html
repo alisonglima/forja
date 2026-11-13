@@ -2,10 +2,9 @@
 <html lang="{{lang}}">
 <head>
 <meta charset="utf-8">
-<title>Data comemorativa Leo-Lion (composicao oficial, emblema LEO)</title>
+<title>Data comemorativa Leo-Lion (paridade com o grafico oficial, emblema LEO)</title>
 <style>
 /*TOKENS*/
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { background: var(--ov1); }
 [data-od-card] {
@@ -13,24 +12,26 @@ html, body { background: var(--ov1); }
   background: var(--ov1); color: var(--white); font-family: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
 }
 .foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* medido nos gráficos oficiais Leo-Lion do kit (157443764/65/69): foto sob overlay azul translúcido (a foto continua legível), duas faixas diagonais claras e cunha dourada translúcida no canto inferior direito */
-.overlay { position: absolute; inset: 0; opacity: var(--ov-a); background: linear-gradient(40deg, var(--ov1) 0%, var(--ov1) 55%, var(--ov2) 100%); }
-/* pilha de faixas translucidas paralelas a 60 graus + cunha dourada, medidas no grafico oficial horizontal (1920x1080): bordas a 464/386/304/192 px da borda direita no rodape (tan 60 = 1,732); mesmos px nos outros formatos */
+/* overlay medido nos graficos oficiais Leo-Lion (regressao nos pixels mais claros/escuros da foto): azul ~(20,65,165) a 0,64 (vertical), 0,73 (horizontal), 0,48 (quadrado); aqui degrade azul -> azul claro da paleta */
+.overlay { position: absolute; inset: 0; opacity: var(--ov-a); background: linear-gradient(0deg, var(--ov1) 0%, var(--ov2) 200%); }
+/* pilha de faixas translucidas paralelas a 60 graus + cunha dourada, medidas no grafico horizontal 1920x1080 (bordas a 464/386/304/192 px da borda direita no rodape; tan 60 = 1,732); mesmos px nos outros formatos */
 .faixa { position: absolute; inset: 0; background: var(--white); opacity: 0.05; }
 .faixa.f1 { clip-path: polygon(calc(100% - 464px) 100%, 100% 100%, 100% calc(100% - 804px)); }
 .faixa.f2 { clip-path: polygon(calc(100% - 386px) 100%, 100% 100%, 100% calc(100% - 669px)); }
 .faixa.f3 { clip-path: polygon(calc(100% - 304px) 100%, 100% 100%, 100% calc(100% - 527px)); }
 .canto { position: absolute; inset: 0; background: var(--yellow); opacity: 0.35; clip-path: polygon(calc(100% - 192px) 100%, 100% 100%, 100% calc(100% - 332px)); }
+.emblema-box { flex: none; overflow: hidden; }
 .emblema { display: block; max-width: none; }
-.rotulo-clube { font-size: 26px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.2; }
-/* composicao do grafico oficial quadrado (157443769): caixa branca com titulo azul bold e linha cinza, tres chevrons amarelos presos ao canto inferior direito e vazando abaixo da caixa; emblema no alto a esquerda */
-.topo { position: absolute; left: var(--mx); top: var(--mt); display: flex; flex-direction: column; gap: 14px; }
-.caixa { position: absolute; left: var(--mx); width: 796px; bottom: calc(var(--mb) + 60px); background: var(--white); padding: 40px 44px 44px; }
-h1 { color: var(--lab); font-size: 66px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 22px; }
+.rotulo-clube { font-size: 21px; font-weight: 700; letter-spacing: 0.04em; line-height: 25px; }
+/* metricas do grafico oficial quadrado 1080x1080 (157443769), medidas por pixel: caixa branca 796 de largura; titulo Arial Bold 64px (azul) e linha cinza regular 55px; tres chevrons amarelos 266x112 presos ao canto inferior direito, 25px da borda direita e 39px abaixo da caixa */
+.topo { position: absolute; left: var(--mx); top: var(--mt); display: flex; flex-direction: column; }
+.topo .emblema-box { margin-bottom: 9px; }
+.caixa { position: absolute; left: var(--mx); width: 796px; bottom: calc(var(--mb) + 39px); background: var(--white); padding: 52px 34px 50px; }
+h1 { color: var(--lab); font-size: 64px; font-weight: 700; line-height: 70px; margin-bottom: 16px; }
 [data-od-field="rotulo"], [data-od-field="titulo"] { font-weight: 700; }
-[data-od-field="data"] { color: var(--gray); font-size: 54px; font-weight: 400; line-height: 1.2; }
+[data-od-field="data"] { color: var(--gray); font-size: 55px; font-weight: 400; line-height: 60px; }
 .chevs { position: absolute; right: 25px; bottom: -39px; display: flex; }
-.chev { width: 100px; height: 112px; margin-left: -17px; background: var(--yellow); clip-path: polygon(0 0, 52% 0, 100% 50%, 52% 100%, 0 100%, 48% 50%); }
+.chev { width: 102px; height: 112px; margin-left: -17px; background: var(--yellow); clip-path: polygon(0 0, 52% 0, 100% 50%, 52% 100%, 0 100%, 48% 50%); }
 .chev:first-child { margin-left: 0; }
 </style>
 </head>

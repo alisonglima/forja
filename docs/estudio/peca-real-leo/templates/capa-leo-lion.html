@@ -2,10 +2,9 @@
 <html lang="{{lang}}">
 <head>
 <meta charset="utf-8">
-<title>Capa de campanha Leo-Lion (composicao oficial, emblema LEO)</title>
+<title>Capa de campanha Leo-Lion (paridade com o grafico oficial, emblema LEO)</title>
 <style>
 /*TOKENS*/
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { background: var(--ov1); }
 [data-od-card] {
@@ -13,26 +12,25 @@ html, body { background: var(--ov1); }
   background: var(--ov1); color: var(--white); font-family: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
 }
 .foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* medido nos gráficos oficiais Leo-Lion do kit (157443764/65/69): foto sob overlay azul translúcido (a foto continua legível), duas faixas diagonais claras e cunha dourada translúcida no canto inferior direito */
-.overlay { position: absolute; inset: 0; opacity: var(--ov-a); background: linear-gradient(40deg, var(--ov1) 0%, var(--ov1) 55%, var(--ov2) 100%); }
-/* pilha de faixas translucidas paralelas a 60 graus + cunha dourada, medidas no grafico oficial horizontal (1920x1080): bordas a 464/386/304/192 px da borda direita no rodape (tan 60 = 1,732); mesmos px nos outros formatos */
+/* overlay medido nos graficos oficiais Leo-Lion (regressao nos pixels mais claros/escuros da foto): azul ~(20,65,165) a 0,64 (vertical), 0,73 (horizontal), 0,48 (quadrado); aqui degrade azul -> azul claro da paleta */
+.overlay { position: absolute; inset: 0; opacity: var(--ov-a); background: linear-gradient(0deg, var(--ov1) 0%, var(--ov2) 200%); }
+/* pilha de faixas translucidas paralelas a 60 graus + cunha dourada, medidas no grafico horizontal 1920x1080 (bordas a 464/386/304/192 px da borda direita no rodape; tan 60 = 1,732); mesmos px nos outros formatos */
 .faixa { position: absolute; inset: 0; background: var(--white); opacity: 0.05; }
 .faixa.f1 { clip-path: polygon(calc(100% - 464px) 100%, 100% 100%, 100% calc(100% - 804px)); }
 .faixa.f2 { clip-path: polygon(calc(100% - 386px) 100%, 100% 100%, 100% calc(100% - 669px)); }
 .faixa.f3 { clip-path: polygon(calc(100% - 304px) 100%, 100% 100%, 100% calc(100% - 527px)); }
 .canto { position: absolute; inset: 0; background: var(--yellow); opacity: 0.35; clip-path: polygon(calc(100% - 192px) 100%, 100% 100%, 100% calc(100% - 332px)); }
+.emblema-box { flex: none; overflow: hidden; }
 .emblema { display: block; max-width: none; }
-.rotulo-clube { font-size: 26px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.2; }
-/* composicao do grafico oficial vertical (157443765): emblema no alto do bloco, titulo bold branco ~107px (entrelinha 1,2), linha amarela de pontas redondas (10px, ~47% da largura) e subtitulo regular ~44px; tudo alinhado a esquerda a ~110px da borda */
+.rotulo-clube { font-size: 21px; font-weight: 700; letter-spacing: 0.04em; line-height: 25px; }
+/* metricas do grafico oficial vertical 1080x1920 (157443765), medidas por pixel: lockup no topo do bloco; titulo Arial Bold 107px com entrelinha 112px (as duas linhas sao coladas); regua amarela 520x10 de pontas redondas a 49px da linha de base; subtitulo 45px/55px; bloco ancorado a 110px da borda inferior; tudo a 110px da esquerda */
 .topo { position: absolute; left: 110px; right: 110px; top: var(--mt); display: flex; justify-content: flex-end; }
 [data-od-field="arraste"] { font-size: 28px; font-weight: 700; letter-spacing: 0.04em; }
-.bloco { position: absolute; left: 110px; right: 110px; bottom: calc(var(--mb) + 40px); }
-.bloco .emblema-box { margin-bottom: 14px; }
-.bloco .rotulo-clube { margin-bottom: 44px; }
-[data-od-field="eyebrow"] { font-size: 28px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 18px; }
-[data-od-field="titulo"] { font-size: 112px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; max-width: 860px; }
-.regua { width: 507px; height: 10px; border-radius: 5px; background: var(--yellow); margin: 44px 0; }
-[data-od-field="subtitulo"] { font-size: 44px; font-weight: 400; line-height: 1.28; max-width: 800px; }
+.bloco { position: absolute; left: 110px; right: 110px; bottom: max(110px, var(--mb)); }
+.bloco .emblema-box { margin-bottom: 9px; }
+[data-od-field="titulo"] { margin-top: 26px; font-size: 107px; font-weight: 700; line-height: 112px; max-width: 860px; }
+.regua { width: 520px; height: 10px; border-radius: 5px; background: var(--yellow); margin-top: 29px; }
+[data-od-field="subtitulo"] { margin-top: 36px; font-size: 45px; font-weight: 400; line-height: 55px; max-width: 600px; white-space: pre-line; }
 </style>
 </head>
 <body>
@@ -49,7 +47,6 @@ html, body { background: var(--ov1); }
   <div class="bloco">
     <span class="emblema-box" data-od-logo style="width:{{logo_box_w}}px;height:{{logo_box_h}}px"><img class="emblema" src="{{logo_src}}" width="{{logo_img_w}}" style="margin-left:{{logo_ml}}px;margin-top:{{logo_mt}}px" alt="LEO"></span>
     <p class="rotulo-clube"><span data-od-field="clube">{{clube}}</span><!--opt:periodo--> <span data-od-field="periodo">&middot; {{periodo}}</span><!--/opt:periodo--></p>
-    <!--opt:eyebrow--><p data-od-field="eyebrow">{{eyebrow}}</p><!--/opt:eyebrow-->
     <h1 data-od-field="titulo">{{titulo}}</h1>
     <div class="regua"></div>
     <!--opt:subtitulo--><p data-od-field="subtitulo">{{subtitulo}}</p><!--/opt:subtitulo-->
