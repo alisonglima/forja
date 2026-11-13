@@ -11,5 +11,17 @@
    "status": "a-definir"
   }
  },
- "status": "esqueleto: sem personalizacao aplicada"
+ "status": "esqueleto: sem personalizacao aplicada",
+ "formatos": {
+  "story": {
+   "elevacao_zona_segura": {
+    "descricao": "unico formato que desloca o bloco de texto para cima, para sair da faixa que o Instagram cobre com a barra de resposta; o default permanece a 110 px da base, como o oficial",
+    "aplicar_em": [
+     "vertical 1080x1920 quando o destino for story"
+    ],
+    "deslocamento_px": null,
+    "status": "decidido pelo dono em 2026-11-13; valor a medir contra o gate de zona segura ao implementar"
+   }
+  }
+ }
 }

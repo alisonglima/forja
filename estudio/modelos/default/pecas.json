@@ -1,12 +1,12 @@
 {
  "schema": "forja-modelo-default/v1",
- "descricao": "Pecas default: reproducao 1:1 dos graficos oficiais Leo-Lion (Social Media Kit). Sem nome de clube, sem AL, texto oficial em ingles. Personalizacoes herdam daqui e nao alteram medidas.",
+ "descricao": "Pecas default: reproducao da parte ARTISTICA dos graficos oficiais (overlay, faixas, cunha, tipografia, posicoes), com o emblema LEO no lugar do lockup do programa Leo-Lion. Regra de equivalencia: onde o oficial usa a logo colorida, usa-se o emblema LEO colorido; onde usa a logo toda branca, o emblema LEO todo branco. Texto de exemplo em portugues; sem clube e sem AL: isso entra nas personalizacoes.",
  "pecas": [
   {
    "id": "default-vertical",
-   "template": "capa-oficial-leo-lion",
+   "template": "capa-vertical-oficial",
    "marca": "leo-lion",
-   "idioma": "en",
+   "idioma": "pt",
    "formato": "vertical",
    "preset": "ig-capa-reels",
    "altura": 1920,
@@ -25,27 +25,29 @@
     "cor_rotulo": "azul"
    },
    "logo": {
-    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
-    "largura_visivel": 280
+    "arquivo": "logos/Derivados_LEO/Leo_1C_White_derivado.png",
+    "largura_visivel": 200
    },
    "copy": {
-    "titulo": "Opportunity awaits you",
-    "subtitulo": "Become a Leo-Lion.\nMake a bigger impact.",
-    "alt": "Pessoas sorrindo em um evento de voluntariado Leo-Lion."
+    "titulo": "Faça a diferença",
+    "subtitulo": "Seja LEO.\nAjude sua comunidade.",
+    "alt": "Jovens voluntários sorrindo em um evento."
    },
    "regras": {
     "max_accents": 3,
     "allow_brand_gradient": true
    },
    "logos_extra": [
-    "logos/Logotipos_de_Leo_a_Leão/"
-   ]
+    "logos/Emblemas_de_Leos/",
+    "logos/Derivados_LEO/"
+   ],
+   "teste_variante": false
   },
   {
    "id": "default-quadrado",
-   "template": "quadrado-oficial-leo-lion",
+   "template": "quadrado-caixa-oficial",
    "marca": "leo-lion",
-   "idioma": "en",
+   "idioma": "pt",
    "formato": "quadrado",
    "preset": "ig-feed-quadrado",
    "altura": 1080,
@@ -64,21 +66,105 @@
     "cor_rotulo": "azul"
    },
    "logo": {
-    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141439__Logo_rgb_Leo-Lion_3C_WhiteText.png",
-    "largura_visivel": 205
+    "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+    "largura_visivel": 144
    },
    "copy": {
-    "titulo": "Opportunity awaits you",
-    "data": "#ProudLeoLion",
-    "alt": "Jovens Leo-Lion sorrindo em um evento."
+    "titulo": "Faça a diferença",
+    "data": "#SejaLEO",
+    "alt": "Jovens voluntários sorrindo em um evento."
    },
    "regras": {
     "max_accents": 3,
     "allow_brand_gradient": true
    },
    "logos_extra": [
-    "logos/Logotipos_de_Leo_a_Leão/"
-   ]
+    "logos/Emblemas_de_Leos/",
+    "logos/Derivados_LEO/"
+   ],
+   "teste_variante": false
+  },
+  {
+   "id": "teste-vertical-colorido",
+   "template": "capa-vertical-oficial",
+   "marca": "leo-lion",
+   "idioma": "pt",
+   "formato": "vertical",
+   "preset": "ig-capa-reels",
+   "altura": 1920,
+   "referencia_oficial": "graficos-prontos/157443765__Leo-Lion_GeneralVertical_1080x1920_en.jpg",
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-488.jpg",
+    "focal": [
+     0.3,
+     0.45
+    ]
+   },
+   "overlay": {
+    "cor1": "azul",
+    "cor2": "azul_claro",
+    "opacidade": 1,
+    "cor_rotulo": "azul"
+   },
+   "logo": {
+    "arquivo": "logos/Emblemas_de_Leos/109141433__Logo_rgb_Leo_2C.png",
+    "largura_visivel": 197
+   },
+   "copy": {
+    "titulo": "Faça a diferença",
+    "subtitulo": "Seja LEO.\nAjude sua comunidade.",
+    "alt": "Jovens voluntários sorrindo em um evento."
+   },
+   "regras": {
+    "max_accents": 3,
+    "allow_brand_gradient": true
+   },
+   "logos_extra": [
+    "logos/Emblemas_de_Leos/",
+    "logos/Derivados_LEO/"
+   ],
+   "teste_variante": true
+  },
+  {
+   "id": "teste-quadrado-branco",
+   "template": "quadrado-caixa-oficial",
+   "marca": "leo-lion",
+   "idioma": "pt",
+   "formato": "quadrado",
+   "preset": "ig-feed-quadrado",
+   "altura": 1080,
+   "referencia_oficial": "graficos-prontos/157443769__Leo-Lion_GeneralSquare_en.jpg",
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Diabetes/20180517_rw_diabetes_walk_-494.jpg",
+    "focal": [
+     0.5,
+     0.4
+    ]
+   },
+   "overlay": {
+    "cor1": "azul",
+    "cor2": "azul_claro",
+    "opacidade": 1,
+    "cor_rotulo": "azul"
+   },
+   "logo": {
+    "arquivo": "logos/Derivados_LEO/Leo_1C_White_derivado.png",
+    "largura_visivel": 146
+   },
+   "copy": {
+    "titulo": "Faça a diferença",
+    "data": "#SejaLEO",
+    "alt": "Jovens voluntários sorrindo em um evento."
+   },
+   "regras": {
+    "max_accents": 3,
+    "allow_brand_gradient": true
+   },
+   "logos_extra": [
+    "logos/Emblemas_de_Leos/",
+    "logos/Derivados_LEO/"
+   ],
+   "teste_variante": true
   }
  ]
 }

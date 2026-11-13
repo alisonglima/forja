@@ -2,7 +2,7 @@
 <html lang="{{lang}}">
 <head>
 <meta charset="utf-8">
-<title>Capa vertical Leo-Lion (modelo default, paridade com o grafico oficial 157443765)</title>
+<title>Capa vertical (modelo default, paridade artistica com o grafico oficial 157443765)</title>
 <style>
 /*TOKENS*/
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,7 +23,7 @@ html, body { background: var(--ov1); }
 .canto { position: absolute; right: 0; bottom: 0; width: 162px; height: 281px; display: block; }
 .emblema-box { flex: none; overflow: hidden; }
 .emblema { display: block; max-width: none; }
-/* metricas medidas no oficial 1080x1920: lockup 1C branco 280x183 em (116,1187); titulo Arial Bold 107px, entrelinha 112px (ink 1417-1514 e 1549-1606); regua 520x10 de pontas redondas; subtitulo 45px/55px; bloco a 110px da base; margem esquerda 110px */
+/* metricas medidas no oficial 1080x1920: emblema 1C branco 183 px de altura, topo em y1187, borda esquerda em x117; titulo Arial Bold 107px, entrelinha 112px (ink 1417-1514 e 1549-1606); regua 520x10 de pontas redondas; subtitulo 45px/55px; bloco a 110px da base; margem esquerda 110px */
 .bloco { position: absolute; left: 110px; right: 110px; bottom: 110px; }
 .bloco .emblema-box { display: block; margin-left: 7px; }
 [data-od-field="titulo"] { margin-top: 32px; font-size: 107px; font-weight: 700; line-height: 112px; max-width: 860px; }
@@ -40,7 +40,7 @@ html, body { background: var(--ov1); }
   <div class="faixa f3"></div>
   <svg class="canto" viewBox="0 0 162 281" aria-hidden="true"><defs><linearGradient id="cunha" gradientUnits="userSpaceOnUse" x1="0" y1="281" x2="90.9" y2="333.5"><stop offset="0" style="stop-color: var(--yellow); stop-opacity: 0.30"/><stop offset="1" style="stop-color: var(--yellow); stop-opacity: 0"/></linearGradient></defs><polygon points="0,281 162,281 162,0" fill="url(#cunha)"/></svg>
   <div class="bloco">
-    <span class="emblema-box" data-od-logo style="width:{{logo_box_w}}px;height:{{logo_box_h}}px"><img class="emblema" src="{{logo_src}}" width="{{logo_img_w}}" style="margin-left:{{logo_ml}}px;margin-top:{{logo_mt}}px" alt="Leo-Lion"></span>
+    <span class="emblema-box" data-od-logo style="width:{{logo_box_w}}px;height:{{logo_box_h}}px"><img class="emblema" src="{{logo_src}}" width="{{logo_img_w}}" style="margin-left:{{logo_ml}}px;margin-top:{{logo_mt}}px" alt="Emblema LEO"></span>
     <h1 data-od-field="titulo">{{titulo}}</h1>
     <div class="regua"></div>
     <p data-od-field="subtitulo">{{subtitulo}}</p>
