@@ -107,8 +107,19 @@ def put(slide, name: str, text: str, contains: str | None = None) -> None:
         text_frame._txBody.remove(paragraph)
 
 
-def set_pic(slide, name: str, path) -> None:
-    """Repointa o `r:embed` da imagem, mantendo geometria e recorte."""
+def _cover_crop(img_w: int, img_h: int, frame_w: float, frame_h: float, focal) -> tuple:
+    """Fracoes (esq, dir, topo, base) para a imagem cobrir o quadro sem esticar; `focal` em 0..1."""
+    img_ratio, frame_ratio = img_w / img_h, frame_w / frame_h
+    fx, fy = (min(max(float(v), 0.0), 1.0) for v in focal)
+    if img_ratio > frame_ratio:  # imagem mais larga: recorta os lados
+        cut = 1 - frame_ratio / img_ratio
+        return cut * fx, cut * (1 - fx), 0.0, 0.0
+    cut = 1 - img_ratio / frame_ratio  # imagem mais alta: recorta cima e baixo
+    return 0.0, 0.0, cut * fy, cut * (1 - fy)
+
+
+def set_pic(slide, name: str, path, focal=(0.5, 0.5)) -> None:
+    """Repointa o `r:embed` da imagem e enquadra a foto no quadro do template (recorte `cover`, sem esticar)."""
     matches = [shape for shape in slide.shapes if shape.name == name]
     if len(matches) != 1 or not isinstance(matches[0], Picture):
         raise ForjaError(
@@ -116,8 +127,12 @@ def set_pic(slide, name: str, path) -> None:
             f"slide sem imagem unica {name!r}",
             details={"name": name},
         )
-    _, rel_id = slide.part.get_or_add_image_part(str(path))
-    matches[0]._element.blipFill.blip.set(qn("r:embed"), rel_id)
+    image_part, rel_id = slide.part.get_or_add_image_part(str(path))
+    pic = matches[0]
+    pic._element.blipFill.blip.set(qn("r:embed"), rel_id)
+    img_w, img_h = image_part.image.size
+    left, right, top, bottom = _cover_crop(img_w, img_h, pic.width, pic.height, focal)
+    pic.crop_left, pic.crop_right, pic.crop_top, pic.crop_bottom = left, right, top, bottom
 
 
 def slim(prs, keep_layouts) -> None:

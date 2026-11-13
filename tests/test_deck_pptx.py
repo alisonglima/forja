@@ -78,12 +78,12 @@ def test_put_duplicado_com_contains(tmp_path):
 def test_set_pic_troca_blob_mantem_geometria(tmp_path):
     from forja import pptx_deck
     prs, s, b, p = _base(tmp_path)
-    geom = (p.left, p.top, p.width, p.height, p.crop_left)
+    geom = (p.left, p.top, p.width, p.height)  # o recorte e recalculado pelo enquadramento `cover` (tests/test_set_pic_cover.py)
     old = p.image.blob
     _png(tmp_path / "b.png", (0, 255, 0))
     pptx_deck.set_pic(s, "foto", str(tmp_path / "b.png"))
     pic = [x for x in s.shapes if x.name == "foto"][0]
-    assert (pic.left, pic.top, pic.width, pic.height, pic.crop_left) == geom
+    assert (pic.left, pic.top, pic.width, pic.height) == geom
     assert pic.image.blob != old
 def test_set_pic_nome_ausente(tmp_path):
     from forja import pptx_deck

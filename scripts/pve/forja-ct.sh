@@ -42,7 +42,17 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y --no-install-recommends ca-certificates curl git xz-utils gnupg jq openssh-server sudo locales \
   python3 python3-venv python3-pip poppler-utils imagemagick qpdf tcpdump time ffmpeg rsync \
-  fonts-dejavu-core fonts-liberation fonts-roboto libreoffice-impress
+  fonts-dejavu-core fonts-liberation fonts-roboto fonts-crosextra-carlito fonts-crosextra-caladea fonts-open-sans libreoffice-impress
+# Helvetica Neue (template Lions) nao e redistribuivel: o substituto metrico mais proximo e Liberation Sans (sem isso cai em DejaVu)
+mkdir -p /etc/fonts/conf.d
+cat > /etc/fonts/conf.d/30-forja-helvetica-neue.conf <<'FONTCONF'
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <alias binding="same"><family>Helvetica Neue</family><prefer><family>Liberation Sans</family></prefer></alias>
+</fontconfig>
+FONTCONF
+fc-cache -f
 if ! command -v google-chrome-stable >/dev/null; then
   curl -fsSL -o /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
   apt-get install -y /tmp/chrome.deb
