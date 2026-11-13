@@ -5,9 +5,6 @@
 <title>Post com foto</title>
 <style>
 /*TOKENS*/
-@font-face { font-family: "Roboto"; font-weight: 400; src: url("fonts/roboto-400.woff2") format("woff2"); }
-@font-face { font-family: "Roboto"; font-weight: 700; src: url("fonts/roboto-700.woff2") format("woff2"); }
-@font-face { font-family: "Roboto"; font-weight: 900; src: url("fonts/roboto-900.woff2") format("woff2"); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { background: var(--sky); }
@@ -21,7 +18,7 @@ html, body { background: var(--sky); }
   overflow: hidden;
   background: var(--sky);
   color: var(--white);
-  font-family: "Roboto", sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
 }
 /* hierarquia a 1080 px (plano 180): titulo 48-64, corpo 24-28; o texto fica na zona segura */
 [data-format="feed"] {
@@ -71,7 +68,7 @@ html, body { background: var(--sky); }
 .painel > .seta { position: absolute; }
 
 [data-od-field="titulo"] {
-  font-weight: 900;
+  font-weight: 700;
   font-size: var(--h1);
   line-height: 1.08;
   letter-spacing: -0.01em;

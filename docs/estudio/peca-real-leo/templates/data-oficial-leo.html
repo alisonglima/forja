@@ -5,15 +5,12 @@
 <title>Data comemorativa LEO (padrao oficial)</title>
 <style>
 /*TOKENS*/
-@font-face { font-family: "Roboto"; font-weight: 400; src: url("fonts/roboto-400.woff2") format("woff2"); }
-@font-face { font-family: "Roboto"; font-weight: 700; src: url("fonts/roboto-700.woff2") format("woff2"); }
-@font-face { font-family: "Roboto"; font-weight: 900; src: url("fonts/roboto-900.woff2") format("woff2"); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { background: var(--ov1); }
 [data-od-card] {
   position: relative; width: 1080px; height: var(--h); overflow: hidden;
-  background: var(--ov1); color: var(--white); font-family: "Roboto", sans-serif;
+  background: var(--ov1); color: var(--white); font-family: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
 }
 .foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .base { position: absolute; inset: 0; background: var(--base); opacity: var(--base-a); }
@@ -30,7 +27,7 @@ html, body { background: var(--ov1); }
 [data-od-field="data"] { font-size: 36px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 28px; }
 /* rotulo em caixa branca com texto na cor da marca (referencia do dono: "dia internacional") */
 [data-od-field="rotulo"] { background: var(--white); color: var(--lab); font-size: 64px; font-weight: 400; line-height: 1.1; padding: 6px 28px 10px; margin-bottom: 20px; }
-[data-od-field="titulo"] { font-size: {{titulo_px}}px; font-weight: 900; line-height: 0.98; letter-spacing: -0.01em; text-transform: uppercase; white-space: nowrap; }
+[data-od-field="titulo"] { font-size: {{titulo_px}}px; font-weight: 700; line-height: 0.98; letter-spacing: -0.01em; text-transform: uppercase; white-space: nowrap; }
 .fio { width: 360px; height: 6px; background: var(--yellow); margin: 40px 0 0; }
 .rodape { flex: none; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 28px; line-height: 1.25; }
 [data-od-field="assinatura"] { font-size: 40px; font-weight: 700; }

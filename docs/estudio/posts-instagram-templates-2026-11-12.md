@@ -22,6 +22,8 @@ Dado e texto: tudo em `brands/leo-lions/` (paleta em `variants.json`, grafia em 
 - **Overlay:** azul → azul claro, translúcido (0,78 na capa, 0,66 na data; o oficial é mais claro e não passaria no nosso contraste).
 A versão anterior (azul-claro chapado + cunha amarela) fica como alternativa.
 
+**Fonte em TODAS as peças (decisão do dono, 13/11/2026):** os 12 templates usam a pilha oficial `"Helvetica Neue", Helvetica, Arial, "Liberation Sans"` (Roboto saiu). Helvetica Neue não é redistribuível; no CT resolve para Liberation Sans (métrica Arial) e no Mac para a própria Helvetica Neue. O auto-ajuste de título/número em `compose.py` usa agora larguras de Arial Bold (0,72 em/letra; 0,58 em/dígito). O `lions-editorial-capa-story` tem `titulo_px: 104` para o título caber em 2 linhas.
+
 **Nome do clube (decisão do dono, 13/11/2026):** toda peça LEO leva **"LEO Clube de Taquaritinga"** e toda peça Lions **"Lions Clube de Taquaritinga"** (`tests/test_pecas_nome_clube.py` trava isso).
 | Peça | Principal (Leo-Lion) | Alternativa (LEO) |
 |---|---|---|

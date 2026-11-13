@@ -80,11 +80,11 @@ def main(id_, saida):
     campos = dict(copy, formato=p["formato"], foto=foto, emb_w=p.get("emb_w", 0), marca=p["marca"], lang=p["idioma"])
     if "logo" in p:
         campos.update(geometria_logo(p["logo"]["arquivo"], p["logo"]["largura_visivel"]), logo_src=p["logo"]["arquivo"])
-    # titulo da data comemorativa: corpo auto-ajustado a largura da coluna (palavra unica, caixa alta, Roboto 900 ~0,66 em/letra)
+    # titulo da data comemorativa: corpo auto-ajustado a largura da coluna (palavra unica, caixa alta, Helvetica/Arial Bold ~0,72 em/letra)
     if "titulo" in copy:
-        campos["titulo_px"] = p.get("titulo_px") or max(120, min(230, int(900 / (0.66 * max(len(copy["titulo"]), 1)))))
-    if "numero" in copy:  # numero em destaque: uma linha, Roboto 900 ~0,62 em/digito
-        campos["numero_px"] = max(160, min(420, int(930 / (0.62 * max(len(copy["numero"]), 1)))))
+        campos["titulo_px"] = p.get("titulo_px") or max(120, min(230, int(900 / (0.72 * max(len(copy["titulo"]), 1)))))
+    if "numero" in copy:  # numero em destaque: uma linha, Helvetica/Arial Bold ~0,58 em/digito
+        campos["numero_px"] = max(160, min(420, int(930 / (0.58 * max(len(copy["numero"]), 1)))))
     out = tpl.replace("/*TOKENS*/", tokens)
     out = re.sub(r"<!--opt:(\w+)-->(.*?)<!--/opt:\1-->",
                  lambda m: m.group(2) if str(campos.get(m.group(1), "")).strip() else "", out, flags=re.S)
