@@ -593,6 +593,156 @@
     "arraste": "Arraste ›",
     "alt": "Voluntários plantam uma árvore em um gramado."
    }
+  },
+  {
+   "id": "leo-lion-capa-campanha",
+   "template": "capa-leo-lion",
+   "marca": "leo-lion",
+   "idioma": "pt-BR",
+   "formato": "feed",
+   "preset": "ig-feed-4x5",
+   "altura": 1350,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Environment/20180517_rw_Tree_Planting_-133.jpg",
+    "focal": [
+     0.55,
+     0.5
+    ]
+   },
+   "overlay": {
+    "cor1": "azul",
+    "cor2": "azul",
+    "opacidade": 0.82,
+    "cor_rotulo": "azul"
+   },
+   "logo": {
+    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
+    "largura_visivel": 230
+   },
+   "copy": {
+    "clube": "LEO Clube",
+    "periodo": "AL 2026/2027",
+    "eyebrow": "Campanha",
+    "titulo": "Plantio de árvores",
+    "subtitulo": "Cada muda é um gesto de cuidado com a comunidade.",
+    "arraste": "Arraste",
+    "alt": "Duas pessoas de camisetas verdes plantam uma árvore em um gramado, com um carrinho de mão ao lado."
+   },
+   "regras": {
+    "max_accents": 3
+   }
+  },
+  {
+   "id": "leo-lion-capa-campanha-story",
+   "template": "capa-leo-lion",
+   "marca": "leo-lion",
+   "idioma": "pt-BR",
+   "formato": "story",
+   "preset": "ig-story",
+   "altura": 1920,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Environment/20180517_rw_Tree_Planting_-133.jpg",
+    "focal": [
+     0.55,
+     0.5
+    ]
+   },
+   "overlay": {
+    "cor1": "azul",
+    "cor2": "azul",
+    "opacidade": 0.82,
+    "cor_rotulo": "azul"
+   },
+   "logo": {
+    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
+    "largura_visivel": 230
+   },
+   "copy": {
+    "clube": "LEO Clube",
+    "periodo": "AL 2026/2027",
+    "eyebrow": "Campanha",
+    "titulo": "Plantio de árvores",
+    "subtitulo": "Cada muda é um gesto de cuidado com a comunidade.",
+    "arraste": "",
+    "alt": "Duas pessoas de camisetas verdes plantam uma árvore em um gramado, com um carrinho de mão ao lado."
+   },
+   "regras": {
+    "max_accents": 3
+   }
+  },
+  {
+   "id": "leo-lion-data-comemorativa",
+   "template": "data-leo-lion",
+   "marca": "leo-lion",
+   "idioma": "pt-BR",
+   "formato": "feed",
+   "preset": "ig-feed-4x5",
+   "altura": 1350,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Environment/2015_03_16_California_Seal Beach_Clean up_Service Project_Leos_Lions - 02.jpg",
+    "focal": [
+     0.52,
+     0.45
+    ]
+   },
+   "overlay": {
+    "cor1": "azul",
+    "cor2": "azul",
+    "opacidade": 0.82,
+    "cor_rotulo": "azul"
+   },
+   "logo": {
+    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
+    "largura_visivel": 230
+   },
+   "copy": {
+    "data": "5 de dezembro",
+    "rotulo": "dia internacional do",
+    "titulo": "Voluntário",
+    "assinatura": "",
+    "clube": "LEO Clube · AL 2026/2027",
+    "alt": "Jovens LEOs de camiseta azul-marinho caminham juntos, levando latas de tinta, à beira-mar."
+   },
+   "regras": {
+    "max_accents": 3
+   }
+  },
+  {
+   "id": "leo-lion-data-comemorativa-story",
+   "template": "data-leo-lion",
+   "marca": "leo-lion",
+   "idioma": "pt-BR",
+   "formato": "story",
+   "preset": "ig-story",
+   "altura": 1920,
+   "foto": {
+    "origem": "box-extra/G-fotos-biblioteca/_Environment/2015_03_16_California_Seal Beach_Clean up_Service Project_Leos_Lions - 02.jpg",
+    "focal": [
+     0.52,
+     0.45
+    ]
+   },
+   "overlay": {
+    "cor1": "azul",
+    "cor2": "azul",
+    "opacidade": 0.82,
+    "cor_rotulo": "azul"
+   },
+   "logo": {
+    "arquivo": "logos/Logotipos_de_Leo_a_Leão/109141428__Logo_rgb_Leo-Lion_1C_White.png",
+    "largura_visivel": 230
+   },
+   "copy": {
+    "data": "5 de dezembro",
+    "rotulo": "dia internacional do",
+    "titulo": "Voluntário",
+    "assinatura": "",
+    "clube": "LEO Clube · AL 2026/2027",
+    "alt": "Jovens LEOs de camiseta azul-marinho caminham juntos, levando latas de tinta, à beira-mar."
+   },
+   "regras": {
+    "max_accents": 3
+   }
   }
  ]
 }
