@@ -12,7 +12,7 @@ Decisão do dono (12/11/2026): no setup pessoal a Forja roda num **CT fixo do PV
 | Usuário | `forja` (sem root por SSH; `AllowUsers forja`, só chave) |
 | Código | `/srv/forja/repo` (clone de `alisonglima/forja`, branch `studio/integracao`), venv em `/srv/forja/venv` |
 | Acervo | `/srv/forja/acervo` (só os 158 arquivos que os índices da marca referenciam, 2,3 GB; **privado, © Lions**) |
-| Ferramentas | Python 3.11, Node 22, Chrome 157 (`forja-chrome`, `--no-sandbox`), LibreOffice 7.4 (Impress), ffmpeg 5.1, poppler, ImageMagick, qpdf, fontes Roboto/Liberation/DejaVu |
+| Ferramentas | Python 3.11, Node 22, Chrome 157 (`forja-chrome`, `--no-sandbox`), LibreOffice 7.4 (Impress), ffmpeg 5.1, poppler, ImageMagick, qpdf, fontes Roboto/Liberation/DejaVu, mais Carlito (Calibri), Open Sans e alias `Helvetica Neue` → Liberation Sans (13/11: sem isso o LibreOffice caía em DejaVu e o render do deck não correspondia ao da marca) |
 | Ambiente | `/etc/profile.d/forja.sh`: `PATH` do venv, `FORJA_BRAND_SOURCES=/srv/forja/acervo`, `OPEN_DESIGN_BROWSER_PATH`, `OPEN_DESIGN_FFMPEG_PATH` |
 
 Criação e reprodução: `scripts/pve/forja-ct.sh create|provision|keys|verify|status` (idempotente; `--dry-run` só imprime).
@@ -42,6 +42,8 @@ Todos usam as chaves que o PVE já aceita (Mac, `dsh-agent@oci`, `ubuntu@oci-lab
 - Rede: o roteador enxerga `192.168.88.58` na VLAN 40 (ARP), mas não há lease nem reserva e o pool `default-dhcp` cobre o endereço (ver Riscos).
 - Suíte no CT no commit final: 1768 passam, 0 falham, 28 puladas; os 14 avisos restantes estão só em arquivos de teste.
 - Uma queda de SSH ocorreu durante uma suíte longa (`Connection reset by peer`); o CT não reiniciou, sem OOM nem erro do `sshd` nos logs; **causa não determinada**, a repetição passou. Suítes longas: rodar em segundo plano no CT com log em arquivo.
+
+- Render do deck e fontes (13/11): `fc-match` resolve Helvetica Neue → Liberation Sans, Calibri → Carlito, Open Sans → Open Sans; `pdffonts` do deck passou de DejaVu para Liberation/Open Sans. O render de referência do deck é **o do CT** (LibreOffice 7.4); o do Mac é só prévia.
 
 ## Como operar
 
